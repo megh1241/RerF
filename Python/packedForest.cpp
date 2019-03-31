@@ -4,11 +4,10 @@
 #include <pybind11/stl.h>
 #include <pybind11/iostream.h>
 #include <pybind11/numpy.h>
-
+//#include <pybind11/eigen.h>
 #include <string>
 
 namespace py = pybind11;
-
 namespace fp
 {
 
@@ -43,6 +42,7 @@ PYBIND11_MODULE(pyfp, m)
             self.growForest(Xptr, Yptr, numObs, numFeatures);
         })
 
+        .def("_return_sparse_mat",  &fpForest<double>::returnSparseMat, py::return_value_policy::reference_internal)
         .def("_growForest", py::overload_cast<>(&fpForest<double>::growForest))
         .def("_predict", py::overload_cast<std::vector<double> &>(&fpForest<double>::predict))
         .def("_predict_numpy", [](fpForest<double> &self, py::array_t<double, py::array::c_style | py::array::forcecast> mat) {

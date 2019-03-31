@@ -15,6 +15,10 @@ void omp_set_num_threads(int x){
 	std::cout << "I should not get called\n";
 }
 #endif
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Sparse>
+#include <eigen3/Eigen/Core>
+
 
 namespace fp {
 
@@ -128,6 +132,9 @@ namespace fp {
 					return forest->predictClass(observation);
 				}
 
+				inline SpMat returnSparseMat(){
+                                	return forest->eigenMat;
+                        	}
 
 				float testAccuracy(){
 					float testError;

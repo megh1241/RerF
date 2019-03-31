@@ -30,7 +30,12 @@ namespace fp{
 				urfTree() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0){}
 
 				void loadFirstNode(){
+				//	std::cout<< fpSingleton::getSingleton().returnNumObservations()<<"\n";
 					nodeQueue.emplace_back(fpSingleton::getSingleton().returnNumObservations());
+				//	std::cout<<"Before push_back\n";
+				//	std::cout<<"node Queue size!: "<<nodeQueue.size()<<"\n";
+				//	nodeQueue.push_back(fpSingleton::getSingleton().returnNumObservations());
+				//	std::cout<<"after push_back\n";
 				}
 
 				inline bool shouldProcessNode(){

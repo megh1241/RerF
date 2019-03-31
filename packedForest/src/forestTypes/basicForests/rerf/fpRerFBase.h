@@ -11,7 +11,7 @@
 #include <map>
 
 namespace fp {
-
+typedef Eigen::SparseMatrix<int> spMat;
 	template <typename T>
 		class fpRerFBase : public fpForestBase<T>
 	{

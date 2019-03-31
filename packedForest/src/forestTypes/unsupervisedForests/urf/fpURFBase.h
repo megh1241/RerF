@@ -33,8 +33,8 @@ namespace fp {
 			typedef Eigen::SparseMatrix<int> spMat;
 			typedef Eigen::Triplet<int> TripType;
 			std::vector<TripType> tripletList;
-			SpMat eigenMat;
 		public:
+//			SpMat eigenMat;
 
 			~fpURFBase(){}
 
@@ -68,6 +68,12 @@ namespace fp {
 				//TODO: check parameters to make sure they make sense for this forest type.
 				;
 			}
+
+
+			inline SpMat &returnSparseMat(){
+                                return eigenMat;
+                        }
+
 
 			inline void createSparseMat(){
 				auto numObs = fpSingleton::getSingleton().returnNumObservations();
@@ -160,9 +166,13 @@ namespace fp {
 			}
 
 			void growForest(){
+				std::cout<<"Before changeForestSize()\n";
 				changeForestSize();
+				std::cout<<"After changeForestSize()\n";
 				growTrees();
+				std::cout<<"After growTrees()\n";
 				treeStats();
+				std::cout<<"After treeStats()\n";
 			}
 
 			inline int predictClass(std::vector<T>& observation){

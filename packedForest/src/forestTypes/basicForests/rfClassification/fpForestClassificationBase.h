@@ -12,7 +12,7 @@
 #include <map>
 
 namespace fp {
-
+typedef Eigen::SparseMatrix<int> spMat;
 	template <typename T>
 		class fpForestClassificationBase : public fpForestBase<T>
 	{

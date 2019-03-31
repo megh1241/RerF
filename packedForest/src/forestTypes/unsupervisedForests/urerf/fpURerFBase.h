@@ -28,8 +28,8 @@ namespace fp {
                         typedef Eigen::SparseMatrix<int> spMat;
                         typedef Eigen::Triplet<int> TripType;
                         std::vector<TripType> tripletList;
-                        SpMat eigenMat;
 		public:
+        //                SpMat eigenMat;
 
 			~fpURerFBase(){}
 
@@ -60,6 +60,10 @@ namespace fp {
                                 }
                         }
 
+			inline SpMat &returnSparseMat(){
+				return eigenMat;
+			}
+			
                         inline void createSparseMat(){
                                 auto numObs = fpSingleton::getSingleton().returnNumObservations();
                                 SpMat eigenSimMat(numObs, numObs);
