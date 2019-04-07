@@ -9,7 +9,7 @@ def fastRerF(
     Ycolumn=None,
     forestType="binnedBaseRerF",
     trees=500,
-    minParent=1,
+    minParent=10,
     maxDepth=None,
     numCores=None,
     mtry=None,
@@ -86,6 +86,28 @@ def fastPredict(X, forest):
     else:
         predictions = forest._predict_numpy(X)
     return predictions
+
+
+def fastPredict(X, forest):
+    """runs a prediction on a forest with a given set of data
+    
+    Arguments:
+        X {ndarray} -- numpy ndarray of data, if more than 1 row, run multiple predictions
+        forest {forestClass} -- forest to run predictions on
+
+    Returns:
+        predictions {int, list} -- int if a single row, a list if multiple observations input
+    """
+
+    if X.ndim == 1:
+        predictions = forest._predict(X.tolist())
+    else:
+        predictions = forest._predict_numpy(X)
+    return predictions
+
+
+def retSimMat(forest):
+	return forest._return_pair_mat()
 
 
 if __name__ == "__main__":
