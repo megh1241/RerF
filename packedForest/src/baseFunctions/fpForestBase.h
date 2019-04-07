@@ -7,21 +7,22 @@
 #include <ctime>
 #include <chrono>
 #include <cstdlib>
-#include <eigen3/Eigen/Sparse>
-#include <eigen3/Eigen/Core>
+#include<map>
+//#include <eigen3/Eigen/Sparse>
+//#include <eigen3/Eigen/Core>
 
 namespace fp{
 	template <typename T>
 		class fpForestBase
 		{
 			private:
-				Eigen::SparseMatrix<int> spr;
+				std::map<std::pair<int, int>, int> mapmap;
 			public:
 				
 				fpForestBase(){
 				std::srand(unsigned(std::time(0)));
 				}
-				Eigen::SparseMatrix<int> eigenMat;
+				//Eigen::SparseMatrix<int> eigenMat;
 				virtual ~fpForestBase() {}
 				virtual void printForestType() = 0;
 				virtual void growForest() = 0;
@@ -29,9 +30,10 @@ namespace fp{
 				virtual int predictClass(std::vector<T>& observation) = 0;
 				virtual std::vector<int> predictClassPost(std::vector<T>& observation) = 0;
 				virtual int predictClass(const T* observation) = 0;
-				inline Eigen::SparseMatrix<int> &returnSparseMat(){
-					return spr;
-				}
+				virtual std::map<std::pair<int, int>, int> returnPairMat() = 0;
+				//inline Eigen::SparseMatrix<int> &returnSparseMat(){
+				//	return spr;
+				//}
 		};
 
 }//namespace fp

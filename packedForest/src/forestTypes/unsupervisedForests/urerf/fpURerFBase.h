@@ -25,9 +25,10 @@ namespace fp {
 			std::vector<urerfTree<T> > trees;
 			std::map<int, std::map<int, int> > simMat;
                         std::map<std::pair<int, int>, int> pairMat;
-                        typedef Eigen::SparseMatrix<int> spMat;
-                        typedef Eigen::Triplet<int> TripType;
-                        std::vector<TripType> tripletList;
+                        //typedef Eigen::SparseMatrix<int> spMat;
+                        //typedef Eigen::Triplet<int> TripType;
+                        //std::vector<TripType> tripletList;
+			//spMat eigenMat;
 		public:
         //                SpMat eigenMat;
 
@@ -43,14 +44,14 @@ namespace fp {
 			}
 
 			inline void initSimMat(){
-				auto numObs = fpSingleton::getSingleton().returnNumObservations();
+				 auto numObs = fpSingleton::getSingleton().returnNumObservations();
 				for(auto i = 0; i < numObs; ++i) {
-					std::map<int, int> init_map;
-					simMat[i] = init_map;
+					std::pair<int, int> pair1 = std::make_pair(i, i);
+					pairMat[pair1] = 1;
 				}
 			}
 
-                        inline void printSparseMat(){
+                        /*inline void printSparseMat(){
                                 for (int k = 0; k < eigenMat.outerSize(); ++k){
                                         for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat, k); it; ++it){
                                                 std::cout << it.row() <<"\t";
@@ -75,15 +76,16 @@ namespace fp {
                                 }
                                 eigenSimMat.makeCompressed();
 				this->eigenMat = eigenSimMat;
-                        }
+                        }*/
 
 			inline void growTrees(){
+				initSimMat();
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int i = 0; i < (int)trees.size(); ++i){
 					trees[i].growTree();
-					trees[i].updateSimMat(simMat, pairMat);
+				//	trees[i].updateSimMat(simMat, pairMat);
 				}
-				createSparseMat();
+			//	createSparseMat();
 				//printSparseMat();
 			}
 
@@ -175,6 +177,9 @@ namespace fp {
         			return 0;
                         }
 
+                        inline std::map<std::pair<int, int>, int> returnPairMat(){
+                                return pairMat;
+                        }
 
                         inline std::vector<int> predictClassPost(std::vector<T>& observation){
                                 return {};

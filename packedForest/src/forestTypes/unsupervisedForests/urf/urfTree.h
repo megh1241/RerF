@@ -6,12 +6,12 @@
 #include <map>
 #include <assert.h>
 #include <random>
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Sparse>
-#include <eigen3/Eigen/Core>
+//#include <eigen3/Eigen/Dense>
+//#include <eigen3/Eigen/Sparse>
+//#include <eigen3/Eigen/Core>
 
-typedef Eigen::SparseMatrix<double> SpMat;
-typedef Eigen::Triplet<double> TripType;
+//typedef Eigen::SparseMatrix<double> SpMat;
+//typedef Eigen::Triplet<double> TripType;
 
 namespace fp{
 
@@ -39,6 +39,7 @@ namespace fp{
 				}
 
 				inline bool shouldProcessNode(){
+					std::cout<<nodeQueue.back().returnNodeImpurity()<<"\n";
 					if(nodeQueue.back().returnNodeImpurity()==0){
 						return false;
 					}
@@ -94,6 +95,7 @@ return false;
 						std::vector<int> leafObs;
 						leafObs = obsI->returnInSampsVec();
 						auto siz = leafObs.size();
+					        std::cout<<"Size of leafObs: "<<siz<<"\n";	
 						if (siz <= 0)
 							return;
 						for(unsigned int i = 0; i < siz-1; ++i) {

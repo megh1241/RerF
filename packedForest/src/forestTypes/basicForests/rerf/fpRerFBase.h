@@ -11,10 +11,11 @@
 #include <map>
 
 namespace fp {
-typedef Eigen::SparseMatrix<int> spMat;
+//typedef Eigen::SparseMatrix<int> spMat;
 	template <typename T>
 		class fpRerFBase : public fpForestBase<T>
 	{
+		std::map<std::pair<int, int>, int> pairMat;
 		protected:
 			std::vector<rerfTree<T> > trees;
 
@@ -123,6 +124,10 @@ typedef Eigen::SparseMatrix<int> spMat;
 				return classTally;
 			}
 
+
+inline std::map<std::pair<int, int>, int> returnPairMat(){
+                                        return pairMat;
+                                }
 
 inline int predictClass(const T* observation){
 	/*

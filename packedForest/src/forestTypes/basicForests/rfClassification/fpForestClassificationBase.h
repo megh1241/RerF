@@ -12,12 +12,13 @@
 #include <map>
 
 namespace fp {
-typedef Eigen::SparseMatrix<int> spMat;
+//typedef Eigen::SparseMatrix<int> spMat;
 	template <typename T>
 		class fpForestClassificationBase : public fpForestBase<T>
 	{
 		protected:
 			std::vector<rfTree<T> > trees;
+			std::map<std::pair<int, int>, int> pairMat;
 
 		public:
 			fpDisplayProgress printProgress;
@@ -147,7 +148,9 @@ inline int predictClass(const T* observation){
 				return classTally;
 			}
 
-
+inline std::map<std::pair<int, int>, int> returnPairMat(){
+                                        return pairMat;
+                                }
 			inline float testForest(){
 				int numTried = 0;
 				int numWrong = 0;

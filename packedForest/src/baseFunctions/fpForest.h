@@ -132,8 +132,8 @@ namespace fp {
 					return forest->predictClass(observation);
 				}
 
-				inline SpMat returnSparseMat(){
-                                	return forest->eigenMat;
+				inline std::map<std::pair<int, int>, int> returnPairMat(){
+                                	return forest->returnPairMat();
                         	}
 
 				float testAccuracy(){
