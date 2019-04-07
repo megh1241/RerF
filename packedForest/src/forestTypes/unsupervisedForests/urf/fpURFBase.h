@@ -12,10 +12,10 @@
 #include <cstdlib>
 #include "urfTree.h"
 #include <sys/time.h>
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Sparse>
-#include <eigen3/Eigen/Core>
-using namespace Eigen;
+//#include <eigen3/Eigen/Dense>
+//#include <eigen3/Eigen/Sparse>
+//#include <eigen3/Eigen/Core>
+//using namespace Eigen;
 
 namespace fp {
                                 bool sortbysec2(const std::pair<int,int> &a, const std::pair<int,int> &b)
@@ -30,9 +30,10 @@ namespace fp {
 			std::vector<urfTree<T> > trees;
 			std::map<int, std::map<int, int> > simMat;
 			std::map<std::pair<int, int>, int> pairMat;	
-			typedef Eigen::SparseMatrix<int> spMat;
-			typedef Eigen::Triplet<int> TripType;
-			std::vector<TripType> tripletList;
+			//typedef Eigen::SparseMatrix<int> spMat;
+			//typedef Eigen::Triplet<int> TripType;
+			//std::vector<TripType> tripletList;
+			//spMat eigenMat;
 		public:
 //			SpMat eigenMat;
 
@@ -59,22 +60,29 @@ namespace fp {
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int i = 0; i < (int)trees.size(); ++i){
 					trees[i].growTree();
-					trees[i].updateSimMat(simMat, pairMat);
+					trees[i].updateSimMat(simMat, pairMat );
 				}
-				createSparseMat();
+			//	createSparseMat();
 			}
 
-			inline void checkParameters(){
+			inline void checkParameters(){ 
 				//TODO: check parameters to make sure they make sense for this forest type.
 				;
 			}
+                        inline std::map<std::pair<int, int>, int> returnPairMat(){
+                                return pairMat;
+                        }
 
-
-			inline SpMat &returnSparseMat(){
+			/*inline SpMat &returnSparseMat(){
                                 return eigenMat;
                         }
 
 
+			inline std::map<std::pair<int, int>, int> returnPairMat(){
+				return pairMat;
+			}
+
+ 
 			inline void createSparseMat(){
 				auto numObs = fpSingleton::getSingleton().returnNumObservations();
 				SpMat eigenSimMat(numObs, numObs);
@@ -87,7 +95,7 @@ namespace fp {
 				}
 				eigenSimMat.makeCompressed();
 				this->eigenMat = eigenSimMat ;
-			}			
+			}*/			
 
                         inline double computePrecision(int k) {
                                 // show content:
@@ -129,7 +137,7 @@ namespace fp {
                         }
 
 			
-			inline void printSparseMat(){
+			/*inline void printSparseMat(){
 				for (int k = 0; k < eigenMat.outerSize(); ++k){
     					for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat, k); it; ++it){
         					std::cout << it.row() <<"\t";
@@ -137,7 +145,7 @@ namespace fp {
         					std::cout << it.value() << "\n";
     					}
 				}
-			}
+			}*/
 
 			inline void treeStats(){
 				int maxDepth=0;
