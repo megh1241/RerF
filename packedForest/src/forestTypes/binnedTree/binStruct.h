@@ -243,7 +243,11 @@ namespace fp{
 							processNode();
 						}
 					}
+                    std::cout<<"before remove structures\n";
+                    printBin();
 					removeStructures();
+                    std::cout<<"after remove structures\n";
+                    printBin();
 				}
 
 				inline void initializeStructures(){
