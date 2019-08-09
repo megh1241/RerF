@@ -29,7 +29,7 @@ namespace fp{
 				std::vector<zipClassAndValue<int, T> > zipper;
 
 				std::vector<int> nodeIndices;
-
+                std::vector<int> treeEndPos;
 
 				randomNumberRerFMWC randNum;
 
@@ -237,14 +237,26 @@ namespace fp{
 					randNum.initialize(randSeed);
 					initializeStructures();
 					for(; currTree < numOfTreesInBin; ++currTree){
+                        printBin();    
 						setSharedVectors(indicesHolder);
 						loadFirstNode();	
 						while(!nodeQueue.empty()){
+                            treeEndPos.push_back(bin.size()-1);
 							processNode();
 						}
 					}
-					removeStructures();
-				}
+                    std::cout<<"Printing tree end positions!\n";
+					for(auto i: treeEndPos)
+                        std::cout<<i<<" ";
+                    std::cout<<"\n";
+
+                    std::cout<<"Printing bin nodes!\n";
+                    std::cout<<"\n";
+
+
+                    removeStructures();
+				
+                }
 
 				inline void initializeStructures(){
 					zipper.resize(fpSingleton::getSingleton().returnNumObservations());
