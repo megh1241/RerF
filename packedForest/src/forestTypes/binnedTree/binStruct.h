@@ -61,6 +61,14 @@ namespace fp{
 					}
 				}
 
+                inline std::vector< fpBaseNode<T,Q> > getBin(){
+                    return bin;
+                }
+
+                inline std::vector<int> getTreeEndPos(){
+                    return treeEndPos;
+                } 
+
 				inline void makeRootALeaf(){
 					bin[returnRootLocation()].setClass(nodeQueue.back().returnNodeClass());
 					bin[returnRootLocation()].setDepth(0);
@@ -236,26 +244,16 @@ namespace fp{
 					numOfTreesInBin = numTrees;
 					randNum.initialize(randSeed);
 					initializeStructures();
+                    treeEndPos.push_back(bin.size()-1);
 					for(; currTree < numOfTreesInBin; ++currTree){
-                        printBin();    
 						setSharedVectors(indicesHolder);
 						loadFirstNode();	
 						while(!nodeQueue.empty()){
-                            treeEndPos.push_back(bin.size()-1);
 							processNode();
 						}
+                        treeEndPos.push_back(bin.size()-1);
 					}
-                    std::cout<<"Printing tree end positions!\n";
-					for(auto i: treeEndPos)
-                        std::cout<<i<<" ";
-                    std::cout<<"\n";
-
-                    std::cout<<"Printing bin nodes!\n";
-                    std::cout<<"\n";
-
-
                     removeStructures();
-				
                 }
 
 				inline void initializeStructures(){
@@ -555,9 +553,11 @@ namespace fp{
 				}
 
 				void printBin(){
+                    int count = 0;
 					std::cout << "\n";
 					for(auto nd : bin){
-						nd.printNode();
+                        std::cout << count++ <<": ";
+                        nd.printNode();
 					}
 				}
 

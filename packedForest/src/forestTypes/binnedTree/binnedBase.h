@@ -2,6 +2,8 @@
 #define binnedBase_h
 
 #include "../../baseFunctions/fpForestBase.h"
+#include "../../serialization/binLayout.h"
+
 #include <vector>
 #include <stdio.h>
 #include <ctime>
@@ -84,7 +86,9 @@ namespace fp {
 					bins[j].createBin(binSizes[j], binSeeds[j]);
 				}
 				std::cout << "\n"<< std::flush;
-			}
+                BinLayout<T, Q> binss(bins) ;
+                binss.BINStatLayout(2);
+            }
 
 			inline float reportOOB(){
 				return -1;
