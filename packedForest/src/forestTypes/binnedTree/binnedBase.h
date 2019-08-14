@@ -65,10 +65,10 @@ namespace fp {
 				bins.reserve(numBins);
 			}
 
-			inline void calcBinSizes(){
+			inline void calcBinSizes(int depth){
 				int minBinSize = fpSingleton::getSingleton().returnNumTrees()/numBins;
-				binSizes.resize(numBins,minBinSize);
-				int remainingTreesToBin = fpSingleton::getSingleton().returnNumTrees()-minBinSize*numBins;
+                binSizes.resize(numBins,minBinSize);
+                int remainingTreesToBin = fpSingleton::getSingleton().returnNumTrees()-minBinSize*numBins;
 				while(remainingTreesToBin != 0){
 					++binSizes[--remainingTreesToBin];
 				}
@@ -76,18 +76,19 @@ namespace fp {
 
 
 			inline void growBins(){
-
-				calcBinSizes();
+                int depth_intertwined = 3;
+				calcBinSizes(depth_intertwined);
 
 				fpDisplayProgress printProgress;
 				bins.resize(numBins);
+                std::cout<<"Number of bins: "<<numBins<<"\n";
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
-					bins[j].createBin(binSizes[j], binSeeds[j]);
+					bins[j].createBin(binSizes[j], binSeeds[j], depth_intertwined);
 				}
 				std::cout << "\n"<< std::flush;
-                BinLayout<T, Q> binss(bins) ;
-                binss.BINStatLayout(2);
+                //BinLayout<T, Q> binss(bins) ;
+                //binss.BINStatLayout(2);
             }
 
 			inline float reportOOB(){
@@ -143,7 +144,7 @@ namespace fp {
 					bins[k].predictBinObservation(observationNumber, predictions);
 				}
 
-				assert(std::accumulate(predictions.begin(), predictions.end(),0) == fpSingleton::getSingleton().returnNumTrees());
+				//assert(std::accumulate(predictions.begin(), predictions.end(),0) == fpSingleton::getSingleton().returnNumTrees());
 
 				int bestClass = 0;
 				for(int j = 1; j < fpSingleton::getSingleton().returnNumClasses(); ++j){

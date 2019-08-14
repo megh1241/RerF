@@ -43,7 +43,7 @@ template<typename T, typename Q>
                 for (int depth = 1; depth < depthIntertwined; ++depth){
                     for(auto node : bin){
                         if (node.returnDepth() == depth)
-                            finalBin.push_back(node);    
+                            finalbin.push_back(node);    
                     }
                 }
             }
