@@ -53,8 +53,9 @@ namespace fp {
 			inline void generateSeedsForBins(){
 				binSeeds.resize(numBins);
 				for(int i = 0; i < numBins; ++i){
-					binSeeds[i] = fpSingleton::getSingleton().genRandom(std::numeric_limits<int>::max());
-				}
+				//	binSeeds[i] = fpSingleton::getSingleton().genRandom(std::numeric_limits<int>::max());
+				binSeeds[i] = 1;
+                }
 			}
 
 			inline void printForestType(){
@@ -82,7 +83,7 @@ namespace fp {
 				fpDisplayProgress printProgress;
 				bins.resize(numBins);
                 std::cout<<"Number of bins: "<<numBins<<"\n";
-#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
+//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
 					bins[j].createBin(binSizes[j], binSeeds[j], depth_intertwined);
 				}

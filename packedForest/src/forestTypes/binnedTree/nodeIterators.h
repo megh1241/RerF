@@ -20,6 +20,22 @@ namespace fp{
 				iteratorHolderEnd.resize(numClasses);
 			}
 
+            inline void print(){
+                std::cout<<"PRINTING BEGIN: \n";
+                fflush(stdout);
+                
+                for(int classNum = 0; classNum< 3; classNum++){
+                  for(std::vector<int>::iterator q=returnBeginIterator(classNum); q!=returnEndIterator(classNum); ++q){
+                      std::cout<<*q<<", ";
+                        fflush(stdout);
+                  }
+                std::cout<<"\n";
+                fflush(stdout);
+                }
+                
+                std::cout<<"\n";
+                fflush(stdout);
+            }
 			inline void insertBeginIterator(const std::vector<int>::iterator& beginIter, int iterClass){
 				iteratorHolderBegin[iterClass] = beginIter;
 			}

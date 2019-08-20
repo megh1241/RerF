@@ -24,6 +24,8 @@ namespace fp{
 
 	template<typename T, typename Q>
 		class processingNodeBin{
+			public:
+                nodeIterators nodeIndices;
 			protected:
 				int treeNum;
 				int parentNodeNumber;
@@ -40,7 +42,6 @@ namespace fp{
 				inNodeClassTotals propertiesOfLeftNode;
 				inNodeClassTotals propertiesOfRightNode;
 
-				nodeIterators nodeIndices;
 
 				zipperIterators<int,T> zipIters;
 
@@ -49,7 +50,7 @@ namespace fp{
 					for (int i=0; i<fpSingleton::getSingleton().returnNumFeatures(); ++i){
 						featuresToTry.push_back(i);
 					}
-
+/*
 					int tempSwap;
 
 					// This is an efficient way to shuffle the first "mtry" elements of the feature vector
@@ -62,6 +63,7 @@ namespace fp{
 					}
 
 					featuresToTry.resize(fpSingleton::getSingleton().returnMtry());
+                    */
 				}
 
 
@@ -220,29 +222,26 @@ namespace fp{
 
 
 				inline void loadWorkingSet(int currMTRY){
-					typename std::vector<zipClassAndValue<int,T> >::iterator zipIterator = zipIters.returnZipBegin();
+                    typename std::vector<zipClassAndValue<int,T> >::iterator zipIterator = zipIters.returnZipBegin();
 					for(int classNum = 0; classNum < fpSingleton::getSingleton().returnNumClasses(); ++classNum){
-
 						int sizeToPrefetch = globalPrefetchSize;            
-						if(nodeIndices.returnEndIterator(classNum) - nodeIndices.returnBeginIterator(classNum) < 32){ 
+						//int sizeToPrefetch = 0;
+                        if(nodeIndices.returnEndIterator(classNum) - nodeIndices.returnBeginIterator(classNum) < 32){ 
 							sizeToPrefetch = nodeIndices.returnEndIterator(classNum) - nodeIndices.returnBeginIterator(classNum);
 						}
-
 						for(std::vector<int>::iterator q=nodeIndices.returnBeginIterator(classNum); q!=nodeIndices.returnBeginIterator(classNum)+sizeToPrefetch; ++q){
 							fpSingleton::getSingleton().prefetchFeatureVal(currMTRY,*q);
 						}
 
 						for(std::vector<int>::iterator q=nodeIndices.returnBeginIterator(classNum); q!=nodeIndices.returnEndIterator(classNum)-sizeToPrefetch; ++q){
-							fpSingleton::getSingleton().prefetchFeatureVal(currMTRY,*(q+sizeToPrefetch));
+                            fpSingleton::getSingleton().prefetchFeatureVal(currMTRY,*(q+sizeToPrefetch));
 							zipIterator->setPair(classNum, fpSingleton::getSingleton().returnFeatureVal(currMTRY,*q));
 							++zipIterator;
 						}
-
 						for(std::vector<int>::iterator q=nodeIndices.returnEndIterator(classNum)-sizeToPrefetch; q!=nodeIndices.returnEndIterator(classNum); ++q){
 							zipIterator->setPair(classNum, fpSingleton::getSingleton().returnFeatureVal(currMTRY,*q));
 							++zipIterator;
 						}
-
 					}	
 				}
 
@@ -477,7 +476,7 @@ namespace fp{
 
 
 				inline void processNode(){
-					if(leafPropertiesMet()){
+                    if(leafPropertiesMet()){
 						setAsLeafNode();
 					}else{
 						calcBestSplit();

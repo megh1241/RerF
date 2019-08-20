@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
                 case 9:
                     forest.setParameter("forestType", "binnedBase");
                     forest.setParameter("numTreeBins", numCores);
-                    forest.setParameter("maxDepth", 7);
+                    forest.setParameter("maxDepth", 5);
                     break;
                 case 10:
                     forest.setParameter("forestType", "binnedBaseRerF");
@@ -134,7 +134,8 @@ int main(int argc, char* argv[]) {
             forest.setParameter("numTreesInForest", 10);
             forest.setParameter("minParent", 1);
             forest.setParameter("numCores", numCores);
-            forest.setParameter("seed",-1661580697);
+            //forest.setParameter("seed",-1661580697);
+            forest.setParameter("seed",1);
 
 
             //logTime.startFindSplitTimer();
