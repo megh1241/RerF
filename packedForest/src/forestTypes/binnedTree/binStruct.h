@@ -6,7 +6,7 @@
 #include "zipClassAndValue.h"
 #include "processingNodeBin.h"
 #include <vector>
-#include <queue>
+#include <deque>
 #include <assert.h>
 
 namespace fp{
@@ -20,16 +20,16 @@ namespace fp{
 				float totalOOB;
 				std::vector< fpBaseNode<T,Q> > bin;
 				std::vector<processingNodeBin<T,Q> > nodeQueue;
-				std::queue<processingNodeBin<T,Q> > nodeQueueInter;
-				std::queue<processingNodeBin<T,Q> > nodeQueueRight;
-				std::queue<processingNodeBin<T,Q> > nodeQueueLeft;
+				std::vector<processingNodeBin<T,Q> > nodeQueueInter;
+				std::vector<processingNodeBin<T,Q> > nodeQueueRight;
+				std::vector<processingNodeBin<T,Q> > nodeQueueLeft;
 
 				int numberOfNodes;
 
 				int numOfTreesInBin;
 				int currTree;
 
-				obsIndexAndClassVec indicesHolder;
+                std::vector<obsIndexAndClassVec> indicesHolder;
 				std::vector<zipClassAndValue<int, T> > zipper;
 
 				std::vector<int> nodeIndices;
@@ -49,13 +49,18 @@ namespace fp{
 				}
 
 			public:
-				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0), indicesHolder(fpSingleton::getSingleton().returnNumClasses()){	}
+				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0){
+                    int numClasses = fpSingleton::getSingleton().returnNumClasses();
+                    int numTrees = 10;
+                    for(int i =0; i<numTrees; i++)
+                        indicesHolder.push_back(obsIndexAndClassVec(numClasses));
+                }
 
 
 				inline void loadFirstNode(){
 					//inline void loadFirstNode(obsIndexAndClassVec& indicesHolder, std::vector<zipClassAndValue<int, T> >& zipper){
 					nodeQueue.emplace_back(0,0,0,randNum);
-					nodeQueue.back().setupRoot(indicesHolder, zipper);
+					nodeQueue.back().setupRoot(indicesHolder[currTree], zipper);
 					nodeQueue.back().processNode();
 					if(nodeQueue.back().isLeafNode()){
 						makeRootALeaf();
@@ -74,13 +79,14 @@ namespace fp{
 				inline void loadFirstNodeInter(){
 					//inline void loadFirstNode(obsIndexAndClassVec& indicesHolder, std::vector<zipClassAndValue<int, T> >& zipper){
 					
-                    nodeQueueInter.emplace(currTree,0,0,randNum);
-					nodeQueueInter.front().setupRoot(indicesHolder, zipper);
-					nodeQueueInter.front().processNode();
-                    std::cout<<"PRINTING nodeinter queue\n";
+                    nodeQueueInter.emplace_back(currTree,0,0,randNum);
+					nodeQueueInter.at(0).setupRoot(indicesHolder[currTree], zipper);
+					nodeQueueInter.at(0).processNode();
+                    /*std::cout<<"PRINTING nodeinter queue\n";
                     fflush(stdout);
-                     nodeQueueInter.front().nodeIndices.print();
-                    if(nodeQueueInter.front().isLeafNode()){
+                     nodeQueueInter.at(0).nodeIndices.print();
+                    */
+                     if(nodeQueueInter.at(0).isLeafNode()){
 						makeRootALeafInter();
 					}else{
 						copyProcessedRootToBinInter();
@@ -89,12 +95,14 @@ namespace fp{
 				}
 
 				inline void makeRootALeafInter(){
-					bin[returnRootLocation()].setClass(nodeQueueInter.front().returnNodeClass());
+				    std::cout<<"ENTERRED makeRootALeafInter !!\n";
+                fflush(stdout);    
+                    bin[returnRootLocation()].setClass(nodeQueueInter.at(0).returnNodeClass());
 					bin[returnRootLocation()].setDepth(0);
 				}
 
-				inline void setSharedVectors(obsIndexAndClassVec& indicesInNode){
-					indicesHolder.resetVectors();
+				inline void setSharedVectors2(){
+					indicesHolder[currTree].resetVectors();
 
 					int numUnusedObs = fpSingleton::getSingleton().returnNumObservations();
 					int randomObsID;
@@ -102,7 +110,7 @@ namespace fp{
 
 					for(int n = 0; n < fpSingleton::getSingleton().returnNumObservations(); n++){
 						randomObsID = randNum.gen(fpSingleton::getSingleton().returnNumObservations());
-						indicesHolder.insertIndex(nodeIndices[randomObsID], fpSingleton::getSingleton().returnLabel(nodeIndices[randomObsID]));
+						indicesHolder[currTree].insertIndex(nodeIndices[randomObsID], fpSingleton::getSingleton().returnLabel(nodeIndices[randomObsID]));
 
 						if(randomObsID < numUnusedObs){
 							--numUnusedObs;
@@ -112,6 +120,26 @@ namespace fp{
 						}
 					}
 				}
+				inline void setSharedVectors(obsIndexAndClassVec& indicesInNode){
+					indicesInNode.resetVectors();
+
+					int numUnusedObs = fpSingleton::getSingleton().returnNumObservations();
+					int randomObsID;
+					int tempMoveObs;
+
+					for(int n = 0; n < fpSingleton::getSingleton().returnNumObservations(); n++){
+						randomObsID = randNum.gen(fpSingleton::getSingleton().returnNumObservations());
+						indicesInNode.insertIndex(nodeIndices[randomObsID], fpSingleton::getSingleton().returnLabel(nodeIndices[randomObsID]));
+
+						if(randomObsID < numUnusedObs){
+							--numUnusedObs;
+							tempMoveObs = nodeIndices[numUnusedObs];
+							nodeIndices[numUnusedObs] = nodeIndices[randomObsID];
+							nodeIndices[randomObsID] = tempMoveObs;
+						}
+					}
+				}
+
 
 
 				inline bool shouldProcessNode(){
@@ -144,7 +172,7 @@ namespace fp{
 				
                 inline int returnDepthOfNodeInter(){
 				//	assert(!nodeQueueInter.empty());
-					return bin[nodeQueueInter.front().returnParentNodeNumber()].returnDepth()+1;
+					return bin[nodeQueueInter.at(0).returnParentNodeNumber()].returnDepth()+1;
 				}
 
 
@@ -154,7 +182,7 @@ namespace fp{
 
 
 				inline void copyProcessedNodeToBinInter(){
-					bin.emplace_back(nodeQueueInter.front().returnNodeCutValue(), returnDepthOfNodeInter(), nodeQueueInter.front().returnNodeCutFeature());
+					bin.emplace_back(nodeQueueInter.at(0).returnNodeCutValue(), returnDepthOfNodeInter(), nodeQueueInter.at(0).returnNodeCutFeature());
 				}
 				
                 inline void copyProcessedRootToBin(){
@@ -164,9 +192,9 @@ namespace fp{
 				}
 
 				inline void copyProcessedRootToBinInter(){
-					bin[returnRootLocation()].setCutValue(nodeQueueInter.front().returnNodeCutValue());
+					bin[returnRootLocation()].setCutValue(nodeQueueInter.at(0).returnNodeCutValue());
 					bin[returnRootLocation()].setDepth(0);
-					bin[returnRootLocation()].setFeatureValue(nodeQueueInter.front().returnNodeCutFeature());
+					bin[returnRootLocation()].setFeatureValue(nodeQueueInter.at(0).returnNodeCutFeature());
 				}
 
 
@@ -199,10 +227,10 @@ namespace fp{
 				}
 
 				inline void linkParentToChildInter(){
-					if(nodeQueueInter.front().returnIsLeftNode()){
-						bin[nodeQueueInter.front().returnParentNodeNumber()].setLeftValue(positionOfNextNode());
+					if(nodeQueueInter.at(0).returnIsLeftNode()){
+						bin[nodeQueueInter.at(0).returnParentNodeNumber()].setLeftValue(positionOfNextNode());
 					}else{
-						bin[nodeQueueInter.front().returnParentNodeNumber()].setRightValue(positionOfNextNode());
+						bin[nodeQueueInter.at(0).returnParentNodeNumber()].setRightValue(positionOfNextNode());
 					}
 				}
 
@@ -214,10 +242,10 @@ namespace fp{
 					assert(nodeQueueInter.front().returnNodeClass() >= 0);
 					assert(nodeQueueInter.front().returnNodeClass() < fpSingleton::getSingleton().returnNumClasses());
 
-					if(nodeQueueInter.front().returnIsLeftNode()){
-						bin[nodeQueueInter.front().returnParentNodeNumber()].setLeftValue(nodeQueueInter.front().returnNodeClass());
+					if(nodeQueueInter.at(0).returnIsLeftNode()){
+						bin[nodeQueueInter.at(0).returnParentNodeNumber()].setLeftValue(nodeQueueInter.at(0).returnNodeClass());
 					}else{
-						bin[nodeQueueInter.front().returnParentNodeNumber()].setRightValue(nodeQueueInter.front().returnNodeClass());
+						bin[nodeQueueInter.at(0).returnParentNodeNumber()].setRightValue(nodeQueueInter.at(0).returnNodeClass());
 					}
 				}
 
@@ -263,38 +291,50 @@ namespace fp{
 				}
 
 				inline void createChildNodesInter(){
-					nodeIterators nodeIts(nodeQueueInter.front().returnNodeIterators());
-					zipperIterators<int,T> zipIts(nodeQueueInter.front().returnZipIterators());
+					nodeIterators nodeIts(nodeQueueInter.at(0).returnNodeIterators());
+					zipperIterators<int,T> zipIts(nodeQueueInter.at(0).returnZipIterators());
 					int childDepth = returnDepthOfNodeInter()+1;
-					auto parentTreeNum = nodeQueueInter.front().exposeTreeNum();
-                    nodeQueueInter.pop();
+					auto parentTreeNum = nodeQueueInter.at(0).exposeTreeNum();
+                    nodeQueueInter.erase(nodeQueueInter.begin());
 					//TODO: don't emplace_back if should be leaf node.
-					nodeQueueInter.emplace(parentTreeNum,parentNodesPosition(), childDepth, randNum);
+					nodeQueueInter.emplace_back(parentTreeNum,parentNodesPosition(), childDepth, randNum);
 					nodeQueueInter.back().setupNode(nodeIts, zipIts, leftNode());
 					
-                    nodeQueueRight.emplace(parentTreeNum,parentNodesPosition(), childDepth, randNum);
+                    nodeQueueRight.emplace_back(parentTreeNum,parentNodesPosition(), childDepth, randNum);
 					nodeQueueRight.back().setupNode(nodeIts, zipIts, rightNode());
 				}
 
 
 				inline void createRootChildNodesInter(){
-					nodeIterators nodeIts(nodeQueueInter.front().returnNodeIterators());
-                    zipperIterators<int,T> zipIts(nodeQueueInter.front().returnZipIterators());
+					nodeIterators nodeIts(nodeQueueInter.at(0).returnNodeIterators());
+                    zipperIterators<int,T> zipIts(nodeQueueInter.at(0).returnZipIterators());
 					int childDepth = returnDepthOfNodeInter()+1;
-					auto parentTreeNum = nodeQueueInter.front().exposeTreeNum();
-						nodeQueueInter.pop();
-						//TODO: don't emplace_back if should be leaf node.
-						nodeQueueLeft.emplace(parentTreeNum,returnRootLocation(), childDepth,randNum);
-						nodeQueueLeft.back().setupNode(nodeIts, zipIts, leftNode());
-						
-                        nodeQueueRight.emplace(parentTreeNum,returnRootLocation(), childDepth, randNum);
-						nodeQueueRight.back().setupNode(nodeIts, zipIts, rightNode());
+					auto parentTreeNum = nodeQueueInter.at(0).exposeTreeNum();
+                    std::cout<<"BEFORE!!!\n"; 
                     std::cout<<"Inside left createRootChildNodesInter(): \n";
                     fflush(stdout);
-                    nodeQueueLeft.back().nodeIndices.print();
+                    for(auto el : nodeQueueLeft)
+                        el.nodeIndices.print();
                     std::cout<<"Inside rightcreateRootChildNodesInter(): \n";
                     fflush(stdout);
-                    nodeQueueRight.back().nodeIndices.print();
+                    for(auto el : nodeQueueRight)
+                      el.nodeIndices.print();
+					//	nodeQueueInter.pop_front();
+                    nodeQueueInter.erase(nodeQueueInter.begin());
+					
+                    processingNodeBin<T, Q> left = processingNodeBin<T, Q>(parentTreeNum,returnRootLocation(), childDepth,randNum);    
+					left.setupNode(nodeIts, zipIts, leftNode());
+                    processingNodeBin<T, Q> right = processingNodeBin<T, Q>(parentTreeNum,returnRootLocation(), childDepth,randNum);    
+				    right.setupNode(nodeIts, zipIts, rightNode());
+                    nodeQueueLeft.push_back(left);
+                    nodeQueueRight.push_back(right);
+                    //TODO: don't emplace_back if should be leaf node.
+						//nodeQueueLeft.push_back(processingNodeBin<T, Q>(parentTreeNum,returnRootLocation(), childDepth,randNum));
+						//nodeQueueLeft.back().setupNode(nodeIts, zipIts, leftNode());
+						
+                        //nodeQueueRight.push_back(processingNodeBin<T, Q>(parentTreeNum,returnRootLocation(), childDepth, randNum));
+						//nodeQueueRight.back().setupNode(nodeIts, zipIts, rightNode());
+                   
 				}
 
 				inline void processLeafNode(){
@@ -308,7 +348,8 @@ namespace fp{
 					assert(nodeQueueInter.front().returnNodeSize() > 0);
 					assert(nodeQueueInter.front().returnNodeSize() <= fpSingleton::getSingleton().returnNumObservations());
 					linkParentToLeafInter();
-					nodeQueueInter.pop();
+                    nodeQueueInter.erase(nodeQueueInter.begin());
+					//nodeQueueInter.pop_front();
 				}
 
 
@@ -346,8 +387,8 @@ namespace fp{
 
 				inline void processNodeInter(){
 					// process the node, i.e. calculate best split, ...
-                    nodeQueueInter.front().processNode();
-                    if (nodeQueueInter.front().isLeafNode()) {
+                    nodeQueueInter.at(0).processNode();
+                    if (nodeQueueInter.at(0).isLeafNode()) {
 						// label the processed node as a leaf.
 						processLeafNodeInter();
 					}
@@ -363,49 +404,44 @@ namespace fp{
 					randNum.initialize(randSeed);
 					initializeStructures();
                     for(; currTree < numOfTreesInBin; ++currTree){
-					    setSharedVectors(indicesHolder);
+					    setSharedVectors2();
+					    //setSharedVectors(indicesHolder);
+                        std::cout<<currTree<<":*********************************************************\n";
                         loadFirstNodeInter();
-                        processingNodeBin<T,Q> ele = nodeQueueRight.front();
-                        std::cout<<"PRINTING INSIDE QUEUE!!: \n";
-                        fflush(stdout);
-                        ele.returnNodeIterators().print();
                         //removeStructures2(); 
 					    //initializeStructures3();
                     }
+                    for(auto ele: nodeQueueLeft){
+                        nodeQueueInter.push_back(ele);
+                    }
 
-                    std::cout<<"PRINTING SIZE: !!!!!!!\n";
-                        fflush(stdout);
-                    std::cout<<nodeQueueLeft.size()<<"\n";
-                        fflush(stdout);
-                    while(!nodeQueueLeft.empty()){
-                        processingNodeBin<T,Q> ele = nodeQueueLeft.front();
-                        nodeQueueLeft.pop();
-                        nodeQueueInter.push(ele);
+                    for(auto ele: nodeQueueRight){
+                        nodeQueueInter.push_back(ele);
                     }
-                    while(!nodeQueueRight.empty()){
-                        processingNodeBin<T,Q> ele = nodeQueueRight.front();
-                        nodeQueueRight.pop();
-                        nodeQueueInter.push(ele);
-                    }
-                    int topNodeTreeNum=0, d = 0, depth2 = 1;
-                   /* while(d < depth2 ){
-                        for(int currTree1=0; currTree1< numOfTreesInBin; ++currTree1){
+
+
+                    int topNodeTreeNum=0, d = 0, depth2 = 2;
+                   while(d < depth2 ){
+                       std::cout<<"IN WHILE\n"; 
+                       for(int currTree=0; currTree< numOfTreesInBin; ++currTree){
                             topNodeTreeNum=nodeQueueInter.front().exposeTreeNum();
-                            if(topNodeTreeNum != currTree1)
+                            if(topNodeTreeNum != currTree)
                                continue;
                             processNodeInter();
                             break;
                         }
                         while(!nodeQueueRight.empty()){
                             processingNodeBin<T,Q> ele = nodeQueueRight.front();
-                            nodeQueueRight.pop();
-                            nodeQueueInter.push(ele);
+                            nodeQueueRight.erase(nodeQueueRight.begin());
+                            nodeQueueInter.push_back(ele);
                         }
                         d++;
-                    }*/
-                    while(!nodeQueueInter.empty()){
+                    }
+                    
+                       std::cout<<"out of WHILE\n"; 
+                   while(!nodeQueueInter.empty()){
                         auto ele = nodeQueueInter.front();
-                        nodeQueueInter.pop();
+                        nodeQueueInter.erase(nodeQueueInter.begin());
 					    nodeQueue.emplace_back(ele);
                         while(!nodeQueue.empty()){
 							processNode();
