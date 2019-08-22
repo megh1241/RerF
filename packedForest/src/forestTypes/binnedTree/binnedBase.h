@@ -77,12 +77,11 @@ namespace fp {
 
 
 			inline void growBins(){
-                int depth_intertwined = 3;
+                int depth_intertwined = 2;
 				calcBinSizes(depth_intertwined);
 
 				fpDisplayProgress printProgress;
 				bins.resize(numBins);
-                std::cout<<"Number of bins: "<<numBins<<"\n";
 //#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
 					bins[j].createBin(binSizes[j], binSeeds[j], depth_intertwined);
