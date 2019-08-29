@@ -2,6 +2,7 @@
 #define fpBaseNode_h
 
 #include <stdio.h>
+#include <fstream>
 
 template <typename T, typename F>
 class alignas(32) fpBaseNode
@@ -12,15 +13,24 @@ class alignas(32) fpBaseNode
 		T cutValue;
 		int right;
 		int depth;
+        int id;
 
 	public:
-		fpBaseNode():left(0), right(0), depth(0){}
-		fpBaseNode(T cutValue, int depth, F feature): left(0),feature(feature),cutValue(cutValue),right(0), depth(depth){}
-		fpBaseNode(int classNum):left(0), right(classNum), depth(-1){}
+		fpBaseNode():left(0), right(0), depth(0), id(0){}
+		fpBaseNode(T cutValue, int depth, F feature, int uid): left(0),feature(feature),cutValue(cutValue),right(0), depth(depth), id(uid){}
+		fpBaseNode(int classNum, int uid):left(0), right(classNum), depth(-1), id(uid){}
 
 		inline bool isInternalNode(){
 			return left;
 		}
+
+        inline int getID() {
+            return id;
+        }
+
+        inline int setID(int uid) {
+            id = uid;
+        }
 
 		inline bool isInternalNodeFront(){
 			return depth >= 0;
@@ -122,14 +132,16 @@ class alignas(32) fpBaseNode
 		inline int nextNode(const T* observation){
 			return	nextNodeHelper(observation, feature);
 		}
-		inline int nextNodeHelper(const T* observation, std::vector<int>& featureVec){
+		
+        inline int nextNodeHelper(const T* observation, std::vector<int>& featureVec){
 			T featureVal = 0;
 			for(auto featureNumber : featureVec){
 				featureVal += observation[featureNumber];
 			}
 			return (featureVal <= cutValue) ? left : right;
 		}
-		inline int nextNodeHelper(const T* observation, int featureIndex){
+		
+        inline int nextNodeHelper(const T* observation, int featureIndex){
 			return (observation[featureIndex] <= cutValue) ? left : right;
 		}
 
@@ -147,6 +159,17 @@ class alignas(32) fpBaseNode
 			}
 			std::cout << "cutValue " << cutValue << ", left " << left << ", right " << right << ", depth " << depth << "\n";
 		}
-
+        
+        friend std::ostream & operator << (std::ostream &out, const fpBaseNode<T, F> & obj){
+            out << obj.left << "\n" <<obj.right<<"\n"<<obj.cutValue<<"\n";
+            return out;
+        }
+        
+        friend std::istream & operator >> (std::istream &in, const fpBaseNode<T, F> & obj){
+            in>>obj.left;
+            in>>obj.right;
+            in>>obj.cutValue;
+            //in>>obj.feature;
+        }
 };
 #endif //fpBaseNode_h

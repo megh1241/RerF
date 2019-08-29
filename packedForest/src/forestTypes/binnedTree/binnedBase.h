@@ -53,8 +53,7 @@ namespace fp {
 			inline void generateSeedsForBins(){
 				binSeeds.resize(numBins);
 				for(int i = 0; i < numBins; ++i){
-				//	binSeeds[i] = fpSingleton::getSingleton().genRandom(std::numeric_limits<int>::max());
-				binSeeds[i] = 1;
+					binSeeds[i] = fpSingleton::getSingleton().genRandom(std::numeric_limits<int>::max());
                 }
 			}
 
@@ -66,7 +65,7 @@ namespace fp {
 				bins.reserve(numBins);
 			}
 
-			inline void calcBinSizes(int depth){
+			inline void calcBinSizes(){
 				int minBinSize = fpSingleton::getSingleton().returnNumTrees()/numBins;
                 binSizes.resize(numBins,minBinSize);
                 int remainingTreesToBin = fpSingleton::getSingleton().returnNumTrees()-minBinSize*numBins;
@@ -77,18 +76,23 @@ namespace fp {
 
 
 			inline void growBins(){
-                int depth_intertwined = 2;
-				calcBinSizes(depth_intertwined);
+                int depth_intertwined = 1;
+				calcBinSizes();
 
 				fpDisplayProgress printProgress;
 				bins.resize(numBins);
 //#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
 					bins[j].createBin(binSizes[j], binSeeds[j], depth_intertwined);
-				}
+                    
+                    BinLayout<T, Q> binss(bins[j]) ;
+                    binss.BINStatLayout2(2);
+                    //binss.BFSLayout();
+				    bins[j].setBin(binss.getFinalBin());
+                    binss.writeToFile();
+                    binss.readFromFile();
+                }
 				std::cout << "\n"<< std::flush;
-                //BinLayout<T, Q> binss(bins) ;
-                //binss.BINStatLayout(2);
             }
 
 			inline float reportOOB(){

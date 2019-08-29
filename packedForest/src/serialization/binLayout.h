@@ -2,70 +2,240 @@
 #define binLayout_h
 
 #include <vector>
+#include <deque>
+#include <map>
 #include <assert.h>
 #include "../baseFunctions/fpBaseNode.h"
 #include "../forestTypes/binnedTree/binnedBase.h"
 #include "../forestTypes/binnedTree/binStruct.h"
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <assert.h>
+#include <cstdio>
+#include <cstring>
 
 namespace fp{
 
 template<typename T, typename Q>
     class BinLayout
     {
-        std::vector<binStruct<T, Q> > binstr;
+        binStruct<T, Q> binstr;
         std::vector<fpBaseNode<T, Q>> finalbin;
+        std::deque<fpBaseNode<T, Q>> binQ;
+        std::map<int, int> nodeNewIdx;
+        fpBaseNode<T, Q> *mmappedData;
+        char *filename;
+
         public:
-            BinLayout(std::vector<binStruct<T, Q> > tempbins): binstr(tempbins){};
+            BinLayout(binStruct<T, Q> tempbins): binstr(tempbins){
+                strcpy(filename, "test.raw");
+            };
             
             inline void initFinalBin(int binNum){
                
                 /*  Copy the class nodes and root nodes to the finalbin */ 
                 
-                std::vector< fpBaseNode<T,Q> > bin = binstr[binNum].getBin();
-                std::vector<int> treeEndPos = binstr[binNum].getTreeEndPos();
-                int currPos = 0, firstPos = treeEndPos[binNum];
-               
-                for(auto node: bin)
-                    if(currPos++ <= firstPos)
-                        finalbin.push_back(node);
-                    else
-                        break;
+                std::vector< fpBaseNode<T,Q> > bin = binstr.getBin();
+                int numTrees = binstr.numOfTreesInBin;
+                int numClasses = fpSingleton::getSingleton().returnNumClasses();  
+                int numInitNodes = binstr.numOfTreesInBin + fpSingleton::getSingleton().returnNumClasses();        
+                for(int i=0; i<numInitNodes; ++i){
+                    finalbin.push_back(bin.at(i));
+                    nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), i));
+                }
+
                 printFinalBin();
-                printTreePos();
             }
             
-            inline void BFSLayout();
             inline void StatLayout();
             inline void BINStatLayout(int depthIntertwined){
                 initFinalBin(0); 
-                std::vector< fpBaseNode<T,Q> > bin = binstr[0].getBin();
-                std::vector<int> treeEndPos = binstr[0].getTreeEndPos();
+                std::vector< fpBaseNode<T,Q> > bin = binstr.getBin();
+                std::vector<int> treeEndPos = binstr.getTreeEndPos();
                 for (int depth = 1; depth < depthIntertwined; ++depth){
                     for(auto node : bin){
-                        if (node.returnDepth() == depth)
-                            finalbin.push_back(node);    
+                        if (node.returnDepth() == depth){
+                            finalbin.push_back(node);   
+                            nodeNewIdx.insert(std::pair<int, int>(node.getID(), finalbin.size()-1));
+                        }
                     }
                 }
             }
             
+            inline void BINStatLayout2(int depthIntertwined){
+                std::vector< fpBaseNode<T,Q> > bin = binstr.getBin();
+                std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
+
+                int numNodesToProc = std::pow(2, depthIntertwined) - 2; 
+                int d;
+                auto numClasses = fpSingleton::getSingleton().returnNumClasses();
+                for(auto i = 0; i < numClasses; ++i){
+                    finalbin.push_back(bin[i]);
+                    nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));
+                }
+
+                for(auto i = 0; i < binstr.numOfTreesInBin; ++i)
+                    binQ.push_back(bin[i+numClasses]);
+
+                // Intertwined levels
+                
+                for(int i = 0; i<binstr.numOfTreesInBin; ++i){
+                    if(nodeTreeMap[binQ.front().getID()] != i)
+                        continue;
+                    d=0;
+                    while(d < numNodesToProc) {
+                        auto ele = binQ.front();
+                        binQ.pop_front();
+                        finalbin.push_back(ele);
+                        nodeNewIdx.insert(std::pair<int, int>(ele.getID(), finalbin.size()-1));
+                        binQ.push_back(bin[ele.returnLeftNodeID()]); 
+                        binQ.push_back(bin[ele.returnRightNodeID()]); 
+                        d++;
+                    }
+                }
+
+                // STAT per (sub)tree layout 
+                
+                while(!binQ.empty()){
+                    std::deque<fpBaseNode<T, Q>> binST;
+                    auto ele = binQ.front();
+                    binQ.pop_front();
+                    binST.push_back(ele);
+                    while(!binST.empty()){
+                        auto ele = binST.back();
+                        binST.pop_back(); 
+                        finalbin.push_back(ele);
+                        nodeNewIdx.insert(std::pair<int, int>(ele.getID(), finalbin.size()-1));
+                        if((ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) && (ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()))
+                           continue;
+
+                        else if(ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses())
+                            binST.push_back(bin[ele.returnRightNodeID()]);
+
+                        else if(ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses())
+                            binST.push_back(bin[ele.returnLeftNodeID()]); 
+
+                        else if(ele.returnLeftNodeID() < ele.returnRightNodeID()){
+                            binST.push_back(bin[ele.returnRightNodeID()]); 
+                            binST.push_back(bin[ele.returnLeftNodeID()]); 
+                        }
+                        else {
+                            binST.push_back(bin[ele.returnLeftNodeID()]); 
+                            binST.push_back(bin[ele.returnRightNodeID()]); 
+                        }
+                    }
+                }
+                auto siz = finalbin.size();
+                for (auto i=0; i<siz; i++){
+                    finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
+                    finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
+                }
+            }
+            
+            inline void BFSLayout(){
+                std::vector< fpBaseNode<T,Q> > bin = binstr.getBin();
+                std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
+                std::deque<fpBaseNode<T, Q>> binST;
+                finalbin.clear();
+                int numClasses = fpSingleton::getSingleton().returnNumClasses();
+                for(int i = 0; i < numClasses; ++i){
+                    finalbin.push_back(bin[i]);
+                    nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));
+                }
+
+                for(int i = 0; i < binstr.numOfTreesInBin; ++i){
+                    binST.push_back(bin[i+numClasses]);
+                    while(!binST.empty()){
+                        auto ele = binST.front();
+                        binST.pop_front(); 
+                        finalbin.push_back(ele);
+                        nodeNewIdx.insert(std::pair<int, int>(ele.getID(), finalbin.size()-1));
+
+                        if((ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) && (ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()))
+                            continue;
+                        
+                        else if(ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses())
+                            binST.push_back(bin[ele.returnRightNodeID()]);
+
+                        else if(ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses())
+                            binST.push_back(bin[ele.returnLeftNodeID()]); 
+                        
+                        else{
+                            binST.push_back(bin[ele.returnLeftNodeID()]); 
+                            binST.push_back(bin[ele.returnRightNodeID()]); 
+                        }
+                    }
+                }
+
+                printFinalBin();
+                auto siz = finalbin.size();
+                for (auto i=numClasses; i<siz; i++){
+                    finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
+                    finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
+                    finalbin[i].setDepth(bin[nodeNewIdx[i]].returnDepth());
+                }
+                printFinalBin();
+            }
+
+            inline std::vector<fpBaseNode<T, Q>> getFinalBin(){
+                return finalbin;
+            }
+
+            inline void BINStatClassLayout(int depthIntertwined);
+            
+            inline void writeToFile(){
+                std::ofstream file;
+                file.open(filename, std::ios::out | std::ios::in | std::ios_base::binary);
+                for(auto i: finalbin)
+                   file<<i; 
+                file.close();
+            }
+            
+            inline void readFromFile(){
+                std::ifstream file;
+                file.open(filename, std::ios::out | std::ios::in | std::ios_base::binary);
+                for(int i=0; i<3; i++){
+                   file>>i;
+                }
+                file.close();
+            }
+            
+            
+            std::size_t getFilesize(const char* filename) {
+                struct stat st;
+                stat(filename, &st);
+                return st.st_size;
+            } 
+            inline void serializeMmap(){
+                std::size_t filesize = getFilesize(filename);
+                int fd = open(filename, O_RDONLY, 0);
+                assert(fd != -1);
+                mmappedData = mmap(NULL, filesize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, 0);
+                assert(mmappedData != MAP_FAILED);
+            }
+
+            inline void serializeUnmap(){
+                std::size_t filesize = getFilesize(filename);
+                int fd = open(filename, O_RDONLY, 0);
+                int rc = munmap(mmappedData, filesize);
+                assert(rc == 0);
+                close(fd); 
+            }
             
             inline void printFinalBin(){
+                int count = 0;
                 std::cout<<"final bin: \n";
-                for (auto i: finalbin)
+                std::cout<<"******************************************************************************\n";
+                for (auto i: finalbin){
+                    std::cout<<count++<<": ";
                     i.printNode();
+                }
             }
             
-            inline void printTreePos(){
-                std::vector<int> treeEndPos = binstr[0].getTreeEndPos();
-                std::cout<<"Position Vector\n";
-                for(auto i : treeEndPos)
-                    std::cout<<i<<"  ";
-                std::cout<<"\n";
-            }
-            
-            inline void BINStatClassLayout(int depthIntertwined);
-            inline void serializeToDisk();
-            inline void deserializeFromDisk();    
+
     };
 }
 #endif //binLayout_h

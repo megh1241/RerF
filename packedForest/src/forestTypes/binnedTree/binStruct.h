@@ -7,6 +7,7 @@
 #include "processingNodeBin.h"
 #include <vector>
 #include <deque>
+#include <map>
 #include <assert.h>
 
 namespace fp{
@@ -26,8 +27,9 @@ namespace fp{
 
 				int numberOfNodes;
 
-				int numOfTreesInBin;
 				int currTree;
+                int uid;
+                std::map<int, int> nodeTreeMap;
 
                 std::vector<obsIndexAndClassVec> indicesHolder;
                 std::vector<zipClassAndValue<int, T> > zipper;
@@ -46,9 +48,18 @@ namespace fp{
 				}
 
 			public:
-				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0){
+				int numOfTreesInBin;
+				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0), uid(0){
                 }
 
+
+                inline std::vector< fpBaseNode<T,Q> > getBin(){
+                    return bin;
+                }
+
+                inline void setBin(std::vector< fpBaseNode<T,Q> > newbin){
+                    bin = newbin;
+                }
 
 				inline void loadFirstNode(){
 					nodeQueue.emplace_back(0,0,0,randNum);
@@ -123,8 +134,14 @@ namespace fp{
 				inline void makeLeafNodes(){
 					for(int i= 0; i < fpSingleton::getSingleton().returnNumClasses(); ++i){
 						bin[i].setSharedClass(i);
-					}
-				}
+					    bin[i].setID(uid++);
+                    nodeTreeMap.insert(std::pair<int, int>(bin[i].getID(), -1));
+                    }
+					for(int i= fpSingleton::getSingleton().returnNumClasses(); i < fpSingleton::getSingleton().returnNumClasses()+numOfTreesInBin; ++i){
+				        bin[i].setID(uid++);
+                    nodeTreeMap.insert(std::pair<int, int>(bin[i].getID(), i-fpSingleton::getSingleton().returnNumClasses()));
+                    }
+                }
 
 
 				inline int returnDepthOfNode(){
@@ -140,14 +157,21 @@ namespace fp{
 
 
 				inline void copyProcessedNodeToBin(){
-					bin.emplace_back(nodeQueue.back().returnNodeCutValue(), returnDepthOfNode(), nodeQueue.back().returnNodeCutFeature());
-				}
+					bin.emplace_back(nodeQueue.back().returnNodeCutValue(), returnDepthOfNode(), nodeQueue.back().returnNodeCutFeature(), uid++);
+				    auto bin_ele = bin.back();
+                    auto tree_num = nodeQueue.back().exposeTreeNum();
+                    nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
+                }
 
 
 				inline void copyProcessedNodeToBinInter(){
-					bin.emplace_back(nodeQueueInter.front().returnNodeCutValue(), returnDepthOfNodeInter(), nodeQueueInter.front().returnNodeCutFeature());
+					bin.emplace_back(nodeQueueInter.front().returnNodeCutValue(), returnDepthOfNodeInter(), nodeQueueInter.front().returnNodeCutFeature(), uid++);
+				    auto bin_ele = bin.back();
+                    auto tree_num = nodeQueueInter.back().exposeTreeNum();
+                    nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
 				}
-				
+
+
                 inline void copyProcessedRootToBin(){
 					bin[returnRootLocation()].setCutValue(nodeQueue.back().returnNodeCutValue());
 					bin[returnRootLocation()].setDepth(0);
@@ -344,10 +368,16 @@ namespace fp{
 				}
 
 
-				inline void createBin(int numTrees, int randSeed, int depthInter){
-					numOfTreesInBin = numTrees;
-					randNum.initialize(randSeed);
-					initializeStructures();
+                inline void intertwineRootsLayout(){
+                    for(; currTree < numOfTreesInBin; ++currTree){
+						setSharedVectors();
+						loadFirstNode();	
+                        while(!nodeQueue.empty())
+							processNode();
+					}
+                }
+
+                inline void intertwineMultipleLevelsLayout(int depthInter){
                     for(; currTree < numOfTreesInBin; ++currTree){
 					    setSharedVectors();
                         loadFirstNodeInter();
@@ -384,16 +414,26 @@ namespace fp{
 							processNode();
                         }
                     }
-                    /*for(; currTree < numOfTreesInBin; ++currTree){
-					    //setSharedVectors2();
-						//setSharedVectors(indicesHolder);
-						loadFirstNode();	
-                        while(!nodeQueue.empty()){
-							processNode();
-						}
-					}*/
+                }
+
+                inline void intertwineClassLayout(){
+                    int a =9;
+                }
+
+				inline void createBin(int numTrees, int randSeed, int depthInter){
+					numOfTreesInBin = numTrees;
+					randNum.initialize(randSeed);
+					initializeStructures();
+                    if(depthInter == 1)
+                        intertwineRootsLayout();
+                    else if (depthInter > 1)
+                        intertwineMultipleLevelsLayout(depthInter);
+                    else
+                        intertwineClassLayout();
+
                     printBin();    
-					removeStructures();
+                    std::cout<<"*******************************************************************************\n";
+                    removeStructures();
 				}
 					
 				inline void initializeStructures(){
@@ -415,6 +455,9 @@ namespace fp{
 					std::vector<int>().swap( nodeIndices);
 				}
 				
+                inline std::map<int, int> getNodeTreeMap(){
+                    return nodeTreeMap;
+                }
 
 				inline int returnMaxDepth(){
 					int maxDepth=0;
