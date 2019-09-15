@@ -153,9 +153,10 @@ class alignas(32) fpBaseNode
 		}
 
         inline void outputFeature(std::ostream &out, std::vector<int>& featureVec, fpBaseNode<T, F> & obj){
-            out << obj.left << "\n" <<obj.right<<"\n"<<obj.cutValue<<"\n";
-            for(auto i: featureVec){
-                out<<i<<"\n";
+            if(obj.isInternalNodeFront()){
+                for(auto i: featureVec){
+                    out<<i<<"\n";
+                }
             }
         }
 
@@ -163,7 +164,8 @@ class alignas(32) fpBaseNode
             in>>obj.left;
             in>>obj.right;
             in>>obj.cutValue;
-            in>>feat;
+            in>>obj.feature;
+            //std::cout<<obj.left<<"\n"<<obj.right<<"\n"<<obj.cutValue<<"\n"<<obj.feature<<"\n";
         }
         
         inline void inputFeature(std::istream &in, const fp::weightedFeature& feat, fpBaseNode<T, F> & obj){
@@ -182,8 +184,15 @@ class alignas(32) fpBaseNode
         }
 
         inline void outputFeature(std::ostream &out, int feat, fpBaseNode<T, F> & obj){
-            std::cout << obj.left << "\n" <<obj.right<<"\n"<<obj.cutValue<<"\n"<<feat<<"\n";
-            std::cout<<"enterred here!!\n";
+            if(obj.isInternalNodeFront())
+                out << obj.left << "\n" <<obj.right<<"\n"<<obj.cutValue<<"\n"<<obj.feature<<"\n";
+            else
+                out<<0<<"\n"<<obj.right<<"\n"<<0<<"\n"<<0<<"\n";
+        
+            /*if(obj.isInternalNodeFront())
+                out << obj.left << "\n"<<obj.right << "\n"<<obj.cutValue <<"\n"<< obj.feature;
+            else
+                out<<0<<"\n"<<obj.right<<"\n"<<0<<"\n"<<0;*/
         }
         
         inline void outputFeature(std::ostream &out, const fp::weightedFeature& feat, fpBaseNode<T, F> & obj){

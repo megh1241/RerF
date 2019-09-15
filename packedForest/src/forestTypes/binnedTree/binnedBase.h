@@ -2,6 +2,7 @@
 #define binnedBase_h
 
 #include "../../baseFunctions/fpForestBase.h"
+#include "../../baseFunctions/fpBaseNode.h"
 #include "../../serialization/binLayout.h"
 
 #include <vector>
@@ -16,7 +17,9 @@
 #include <iostream>
 #include <algorithm>
 #include <map>
+#include <chrono>
 
+MemoryMapped mmappedObj("newfile.bin", 0);
 
 namespace fp {
 
@@ -29,8 +32,6 @@ namespace fp {
 			std::map<std::pair<int, int>, double> pairMat;
 			std::vector<int> binSizes;
 			std::vector<int> binSeeds;
-
-
 			inline void checkParameters(){
 				if(fpSingleton::getSingleton().returnNumTreeBins() > fpSingleton::getSingleton().returnNumTrees()){
 					fpSingleton::getSingleton().setNumTreeBins(fpSingleton::getSingleton().returnNumTrees());
@@ -42,13 +43,16 @@ namespace fp {
 			}
 
 		public:
+            fpBaseNode<T, Q> *data;
 
 			~binnedBase(){}
 			binnedBase(){
 				checkParameters();
 				numBins =  fpSingleton::getSingleton().returnNumTreeBins();
 				generateSeedsForBins();
-			}
+            }
+            
+
 
 			inline void generateSeedsForBins(){
 				binSeeds.resize(numBins);
@@ -78,7 +82,6 @@ namespace fp {
 			inline void growBins(){
                 int depth_intertwined = 1;
 				calcBinSizes();
-
 				fpDisplayProgress printProgress;
 				bins.resize(numBins);
 //#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
@@ -86,13 +89,12 @@ namespace fp {
 					bins[j].createBin(binSizes[j], binSeeds[j], depth_intertwined);
                     
                     BinLayout<T, Q> binss(bins[j]) ;
+                    //TODO: set flag for layout
                     binss.BINStatLayout2(2);
-                    //binss.BFSLayout();
 				    bins[j].setBin(binss.getFinalBin());
+                    //TODO: set flag to write to file
                     binss.writeToFile();
-                    binss.readFromFile();
                 }
-				std::cout << "\n"<< std::flush;
             }
 
 			inline float reportOOB(){
@@ -140,13 +142,24 @@ namespace fp {
 			}
 
 
-			inline int predictClass(int observationNumber){
-				std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
 
-#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
-				for(int k = 0; k < numBins; ++k){
-					bins[k].predictBinObservation(observationNumber, predictions);
-				}
+			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = "newfile.bin"){
+				std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
+                size_t arrlen = 0;
+                deserializeMmap(arrlen);
+//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
+                for(int k = 0; k < numBins; ++k){
+                    if(!fromFile)
+					    bins[k].predictBinObservation(observationNumber, predictions);
+				    else{
+                        binStruct<T, Q> temp = binStruct<T, Q>(binSizes[k]);
+                        auto start = std::chrono::steady_clock::now();
+                        temp.predictBinObservation(data, observationNumber, predictions);
+                        auto end = std::chrono::steady_clock::now();
+                        //std::cout<<"Elapsed time: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" seconds.\n";
+                        std::cout<<"Elapsed time: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
+                    }
+                }
 
 				//assert(std::accumulate(predictions.begin(), predictions.end(),0) == fpSingleton::getSingleton().returnNumTrees());
 
@@ -156,8 +169,9 @@ namespace fp {
 						bestClass = j;
 					}
 				}
-				return bestClass;
+			 	return bestClass;
 			}
+            
 
 
 			inline int predictClass(std::vector<T>& observation){
@@ -228,6 +242,12 @@ inline float testForest(){
 
 	return (float)numWrong/(float)numTried;
 }
+
+inline void deserializeMmap(size_t &numNodes){
+    this->data = (fpBaseNode<T, Q>*)mmappedObj.getData();
+    numNodes = mmappedObj.mappedSize() / sizeof(data[0]);
+}
+
 };
 
 }// namespace fp

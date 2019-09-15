@@ -5,6 +5,8 @@
 #include <deque>
 #include <map>
 #include <assert.h>
+#include <time.h>
+#include "MemoryMapped.h"
 #include "../baseFunctions/fpBaseNode.h"
 #include "../forestTypes/binnedTree/binnedBase.h"
 #include "../forestTypes/binnedTree/binStruct.h"
@@ -17,6 +19,7 @@
 #include <cstdio>
 //#include <cstring>
 #include <string>
+#include "nodeStruct.cpp"
 namespace fp{
 
 template<typename T, typename Q>
@@ -26,11 +29,16 @@ template<typename T, typename Q>
         std::vector<fpBaseNode<T, Q>> finalbin;
         std::deque<fpBaseNode<T, Q>> binQ;
         std::map<int, int> nodeNewIdx;
-        fpBaseNode<T, Q> *mmappedData;
         std::string filename;
         public:
             BinLayout(binStruct<T, Q> tempbins): binstr(tempbins){
-                filename = "filename.raw";
+                //TODO: initialize in fpSingleton
+                filename = "newfile.bin";
+            }
+            
+            inline std::string returnFilename(){
+               /* Return the file in which the forest was written to */
+                return filename;
             };
             
             inline void initFinalBin(int binNum){
@@ -194,30 +202,12 @@ template<typename T, typename Q>
             inline void BINStatClassLayout(int depthIntertwined);
             
             inline void writeToFile(){
-                std::ofstream file;
-                file.open(filename.c_str(), std::ios::out | std::ios::in | std::ios::app);
+                std::ofstream f;
+                f.open(filename.c_str(), std::ios::out|std::ios::binary);
                 for(auto i: finalbin)
-                {   
-                    std::cout<<i.returnLeftNodeID()<<", ";
-                    std::cout<<i.returnRightNodeID()<<", ";
-                    std::cout<<i.returnCutValue()<<"\n";
-                    file<<i; 
-                }
-                file.close();
+                    f.write((char*)&i, sizeof(i));
+                f.close();
             }
-            
-            inline void readFromFile(){
-                std::ifstream file;
-                std::cout<<"readoing \n";
-                file.open(filename.c_str(), std::ios::out | std::ios::in | std::ios::app);
-                for(int i=0; i<30; i++){
-                    fpBaseNode<T, Q> nd;
-                    file>>nd;
-                    std::cout<<nd.returnLeftNodeID()<<": "<<nd.returnRightNodeID()<<": "<<nd.returnCutValue()<<"\n";
-                }
-                file.close();
-            }
-            
             
             std::size_t getFilesize(const char* filename) {
                 struct stat st;
@@ -225,20 +215,15 @@ template<typename T, typename Q>
                 return st.st_size;
             }
  
-            inline void serializeMmap(){
-                std::size_t filesize = getFilesize(filename.c_str());
-                int fd = open(filename.c_str(), O_RDONLY, 0);
-                assert(fd != -1);
-                mmappedData = mmap(NULL, filesize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, 0);
-                assert(mmappedData != MAP_FAILED);
+            inline fpBaseNode<T, Q> *serializeMmap(size_t &numNodes){
+                MemoryMapped mmappedObj(filename.c_str(), 0);
+                fpBaseNode<T, Q> *data = (fpBaseNode<T, Q>*)mmappedObj.getData();
+                numNodes = mmappedObj.mappedSize() / sizeof(finalbin[0]);
+                return data;
             }
 
             inline void serializeUnmap(){
-                std::size_t filesize = getFilesize(filename.c_str());
-                int fd = open(filename.c_str(), O_RDONLY, 0);
-                int rc = munmap(mmappedData, filesize);
-                assert(rc == 0);
-                close(fd); 
+            //TODO : fill this 
             }
             
             inline void printFinalBin(){
