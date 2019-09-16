@@ -150,9 +150,15 @@ namespace fp {
                                     return forest->returnPairMat();
                             }
 				float testAccuracy(){
-					float testError;
+                    std::cout<<"first\n";
+                    fflush(stdout);
+                    float testError;
 					loadTestData();
+                    std::cout<<"second\n";
+                    fflush(stdout);
 					testError = forest->testForest();
+                    std::cout<<"third\n";
+                    fflush(stdout);
 					deleteTestData();
 					return testError;
 				}

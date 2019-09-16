@@ -17,9 +17,9 @@
 #include <sys/stat.h>
 #include <assert.h>
 #include <cstdio>
-//#include <cstring>
 #include <string>
 #include "nodeStruct.cpp"
+
 namespace fp{
 
 template<typename T, typename Q>
@@ -33,7 +33,7 @@ template<typename T, typename Q>
         public:
             BinLayout(binStruct<T, Q> tempbins): binstr(tempbins){
                 //TODO: initialize in fpSingleton
-                filename = "newfile.bin";
+                filename = "mnistBFS.bin";
             }
             
             inline std::string returnFilename(){
@@ -54,7 +54,7 @@ template<typename T, typename Q>
                     nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), i));
                 }
 
-                printFinalBin();
+                //printFinalBin();
             }
             
             inline void StatLayout();
@@ -147,7 +147,7 @@ template<typename T, typename Q>
                     finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
                     finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
                 }
-                printFinalBin();
+                //printFinalBin();
             }
             
             inline void BFSLayout(){
@@ -185,14 +185,14 @@ template<typename T, typename Q>
                     }
                 }
 
-                printFinalBin();
+                //printFinalBin();
                 auto siz = finalbin.size();
                 for (auto i=numClasses; i<siz; i++){
                     finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
                     finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
                     finalbin[i].setDepth(bin[nodeNewIdx[i]].returnDepth());
                 }
-                printFinalBin();
+//printFinalBin();
             }
 
             inline std::vector<fpBaseNode<T, Q>> getFinalBin(){

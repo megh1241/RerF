@@ -434,8 +434,7 @@ namespace fp{
                     else
                         intertwineClassLayout();
 
-                    printBin();    
-                    std::cout<<"*******************************************************************************\n";
+                    //printBin();    
                     removeStructures();
 				}
 					
@@ -639,7 +638,6 @@ namespace fp{
 						numberNotInLeaf = 0;
 
 						for( q=0; q<numOfTreesInBin; ++q){
-                            bin[currNode[q]].printNode();
 							if(bin[currNode[q]].isInternalNodeFront()){
 								featureNum = bin[currNode[q]].returnFeatureNumber();
 								featureVal = fpSingleton::getSingleton().returnTestFeatureVal(featureNum,observationNum);

@@ -19,8 +19,9 @@
 #include <map>
 #include <chrono>
 
-MemoryMapped mmappedObj("newfile.bin", 0);
-
+std::string global_fname = "newfile.bin";
+MemoryMapped mmappedObj(global_fname, 0);
+std::string global_fname_csv = "profile_mnist_bfs.csv";
 namespace fp {
 
 	template <typename T, typename Q>
@@ -48,8 +49,9 @@ namespace fp {
 			~binnedBase(){}
 			binnedBase(){
 				checkParameters();
-				numBins =  fpSingleton::getSingleton().returnNumTreeBins();
-				generateSeedsForBins();
+				//numBins =  fpSingleton::getSingleton().returnNumTreeBins();
+				numBins=1;
+                generateSeedsForBins();
             }
             
 
@@ -90,10 +92,13 @@ namespace fp {
                     
                     BinLayout<T, Q> binss(bins[j]) ;
                     //TODO: set flag for layout
-                    binss.BINStatLayout2(2);
+                    binss.BINStatLayout2();
 				    bins[j].setBin(binss.getFinalBin());
                     //TODO: set flag to write to file
+                        auto start = std::chrono::steady_clock::now();
                     binss.writeToFile();
+                        auto end = std::chrono::steady_clock::now();
+                        std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
                 }
             }
 
@@ -143,21 +148,33 @@ namespace fp {
 
 
 
-			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = "newfile.bin"){
-				std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
+			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = "newfile.bin"){				
+                        std::cout<<"before deserialize mmap !!*******\n";
+                fflush(stdout);
+                std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
+                        std::cout<<"before deserialize mmap !!*******\n";
+                fflush(stdout);
                 size_t arrlen = 0;
                 deserializeMmap(arrlen);
+                        std::cout<<"after deserialize mmap !!*******\n";
+                fflush(stdout);
+                        
 //#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
                 for(int k = 0; k < numBins; ++k){
                     if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
 				    else{
                         binStruct<T, Q> temp = binStruct<T, Q>(binSizes[k]);
+                        std::cout<<"RPINGITNG !!*******\n";
+                fflush(stdout);
+                        for(int i=0; i<10; i++)
+                            data[i].printNode();
                         auto start = std::chrono::steady_clock::now();
                         temp.predictBinObservation(data, observationNumber, predictions);
                         auto end = std::chrono::steady_clock::now();
-                        //std::cout<<"Elapsed time: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" seconds.\n";
                         std::cout<<"Elapsed time: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
+                fflush(stdout);
+                        //fout<<std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()<<" ";
                     }
                 }
 
@@ -227,10 +244,16 @@ inline std::map<std::pair<int, int>, double> returnPairMat(){
                                 }
 
 inline float testForest(){
+                        std::cout<<"before iiideserialize mmap !!*******\n";
+                fflush(stdout);
 	int numTried = 0;
 	int numWrong = 0;
-
-	for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
+                        std::cout<<"before iiideserialize mmap !!*******\n";
+                fflush(stdout);
+//    fout.open(global_fname_csv, std::ios::out );
+                        std::cout<<"after iiideserialize mmap !!*******\n";
+                fflush(stdout);
+    for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
 		++numTried;
 		int predClass = predictClass(i);
 
@@ -238,6 +261,7 @@ inline float testForest(){
 			++numWrong;
 		}
 	}
+  //  fout.close();
 	std::cout << "\nnumWrong= " << numWrong << "\n";
 
 	return (float)numWrong/(float)numTried;
