@@ -15,10 +15,14 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include<stdio.h>
+#include<stdlib.h>
 #include <assert.h>
 #include <cstdio>
 #include <string>
 #include "nodeStruct.cpp"
+
+#define NUM_FILES 1000
 
 namespace fp{
 
@@ -30,10 +34,11 @@ template<typename T, typename Q>
         std::deque<fpBaseNode<T, Q>> binQ;
         std::map<int, int> nodeNewIdx;
         std::string filename;
+        std::vector<std::string> filename_vec;
         public:
-            BinLayout(binStruct<T, Q> tempbins): binstr(tempbins){
+            BinLayout(binStruct<T, Q> tempbins, std::string fname): binstr(tempbins){
                 //TODO: initialize in fpSingleton
-                filename = "mnistBFS.bin";
+                filename = fname;
             }
             
             inline std::string returnFilename(){
@@ -155,6 +160,7 @@ template<typename T, typename Q>
                 std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
                 std::deque<fpBaseNode<T, Q>> binST;
                 finalbin.clear();
+                nodeNewIdx.clear();
                 int numClasses = fpSingleton::getSingleton().returnNumClasses();
                 for(int i = 0; i < numClasses; ++i){
                     finalbin.push_back(bin[i]);
@@ -187,12 +193,12 @@ template<typename T, typename Q>
 
                 //printFinalBin();
                 auto siz = finalbin.size();
-                for (auto i=numClasses; i<siz; i++){
+                for (auto i=0; i<siz; i++){
                     finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
                     finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
-                    finalbin[i].setDepth(bin[nodeNewIdx[i]].returnDepth());
+                    //finalbin[i].setDepth(bin[nodeNewIdx[i]].returnDepth());
                 }
-//printFinalBin();
+printFinalBin();
             }
 
             inline std::vector<fpBaseNode<T, Q>> getFinalBin(){
@@ -203,9 +209,18 @@ template<typename T, typename Q>
             
             inline void writeToFile(){
                 std::ofstream f;
-                f.open(filename.c_str(), std::ios::out|std::ios::binary);
-                for(auto i: finalbin)
-                    f.write((char*)&i, sizeof(i));
+                for(int j = 0; j < NUM_FILES; j++){
+                    f.open((filename + std::to_string(j) + ".bin").c_str(), std::ios::out|std::ios::binary);
+                    for(auto i: finalbin)
+                        f.write((char*)&i, sizeof(i));
+                    f.close();
+                }
+                f.open("rand_file.bin");
+                
+                for(int j = 0; j < 10000000; j++)
+                {
+                    f.write((char*)&j, sizeof(j));
+                } 
                 f.close();
             }
             

@@ -33,7 +33,7 @@
 
 
 /// do nothing, must use open()
-/*MemoryMapped::MemoryMapped()
+MemoryMapped::MemoryMapped()
 : _filename   (),
   _filesize   (0),
   _hint       (Normal),
@@ -44,7 +44,7 @@
 #endif
   _mappedView (NULL)
 {
-}*/
+}
 
 
 /// open file, mappedBytes = 0 maps the whole file
@@ -62,6 +62,9 @@ MemoryMapped::MemoryMapped(const std::string& filename, size_t mappedBytes, Cach
   open(filename, mappedBytes, hint);
 }
 
+/*MemoryMapped::MemoryMapped()
+{
+}*/
 
 /// close file (see close() )
 MemoryMapped::~MemoryMapped()
@@ -120,6 +123,8 @@ bool MemoryMapped::open(const std::string& filename, size_t mappedBytes, CacheHi
 
   // open file
   _file = ::open(filename.c_str(), O_RDONLY | O_LARGEFILE);
+  printf("string here: %s\n", filename.c_str());
+  fflush(stdout);
   if (_file == -1)
   {
     _file = 0;
@@ -290,6 +295,7 @@ bool MemoryMapped::remap(uint64_t offset, size_t mappedBytes)
   {
     _mappedBytes = 0;
     _mappedView  = NULL;
+    printf("FAILED\n");
     return false;
   }
 

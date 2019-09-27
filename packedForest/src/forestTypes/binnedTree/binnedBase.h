@@ -19,9 +19,14 @@
 #include <map>
 #include <chrono>
 
-std::string global_fname = "newfile.bin";
-MemoryMapped mmappedObj(global_fname, 0);
-std::string global_fname_csv = "profile_mnist_bfs.csv";
+std::string global_fname = "newfilebfs";
+//MemoryMapped mmappedObj(global_fname.c_str(), 0);
+std::string global_fname_csv = "profile_mnist_bfs2.csv";
+std::fstream fout;
+std::string global_str;
+#define NUM_FILES 10000
+
+std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 namespace fp {
 
 	template <typename T, typename Q>
@@ -45,17 +50,14 @@ namespace fp {
 
 		public:
             fpBaseNode<T, Q> *data;
-
+            std::vector<fpBaseNode<T, Q> *> data_vector; 
 			~binnedBase(){}
 			binnedBase(){
 				checkParameters();
-				//numBins =  fpSingleton::getSingleton().returnNumTreeBins();
-				numBins=1;
+				numBins =  fpSingleton::getSingleton().returnNumTreeBins();
                 generateSeedsForBins();
             }
             
-
-
 			inline void generateSeedsForBins(){
 				binSeeds.resize(numBins);
 				for(int i = 0; i < numBins; ++i){
@@ -90,12 +92,12 @@ namespace fp {
 				for(int j = 0; j < numBins; ++j){
 					bins[j].createBin(binSizes[j], binSeeds[j], depth_intertwined);
                     
-                    BinLayout<T, Q> binss(bins[j]) ;
+                    BinLayout<T, Q> binss(bins[j], global_fname) ;
                     //TODO: set flag for layout
-                    binss.BINStatLayout2();
+                    binss.BINStatLayout2(3);
 				    bins[j].setBin(binss.getFinalBin());
                     //TODO: set flag to write to file
-                        auto start = std::chrono::steady_clock::now();
+                    auto start = std::chrono::steady_clock::now();
                     binss.writeToFile();
                         auto end = std::chrono::steady_clock::now();
                         std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
@@ -148,33 +150,27 @@ namespace fp {
 
 
 
-			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = "newfile.bin"){				
-                        std::cout<<"before deserialize mmap !!*******\n";
-                fflush(stdout);
+			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = global_fname){				
                 std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
-                        std::cout<<"before deserialize mmap !!*******\n";
-                fflush(stdout);
-                size_t arrlen = 0;
-                deserializeMmap(arrlen);
-                        std::cout<<"after deserialize mmap !!*******\n";
-                fflush(stdout);
-                        
+                std::fstream f;
+                f.open("rand_file.bin");
+                int i;
+                for(int j = 0; j < 10000000; j++)
+                                    {
+                                                            f.read((char*)&i, sizeof(i));
+                                                                            }
+                f.close();
 //#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
                 for(int k = 0; k < numBins; ++k){
                     if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
 				    else{
                         binStruct<T, Q> temp = binStruct<T, Q>(binSizes[k]);
-                        std::cout<<"RPINGITNG !!*******\n";
-                fflush(stdout);
-                        for(int i=0; i<10; i++)
-                            data[i].printNode();
                         auto start = std::chrono::steady_clock::now();
-                        temp.predictBinObservation(data, observationNumber, predictions);
+                        temp.predictBinObservation(data_vector, observationNumber, predictions);
                         auto end = std::chrono::steady_clock::now();
                         std::cout<<"Elapsed time: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
-                fflush(stdout);
-                        //fout<<std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()<<" ";
+                        fout<<std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()<<" ";
                     }
                 }
 
@@ -244,15 +240,11 @@ inline std::map<std::pair<int, int>, double> returnPairMat(){
                                 }
 
 inline float testForest(){
-                        std::cout<<"before iiideserialize mmap !!*******\n";
-                fflush(stdout);
+                size_t arrlen = 0;
+                deserializeMmap(arrlen);
 	int numTried = 0;
 	int numWrong = 0;
-                        std::cout<<"before iiideserialize mmap !!*******\n";
-                fflush(stdout);
-//    fout.open(global_fname_csv, std::ios::out );
-                        std::cout<<"after iiideserialize mmap !!*******\n";
-                fflush(stdout);
+    fout.open(global_fname_csv, std::ios::out );
     for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
 		++numTried;
 		int predClass = predictClass(i);
@@ -261,15 +253,24 @@ inline float testForest(){
 			++numWrong;
 		}
 	}
-  //  fout.close();
+    fout.close();
 	std::cout << "\nnumWrong= " << numWrong << "\n";
 
-	return (float)numWrong/(float)numTried;
+    return (float)numWrong/(float)numTried;
 }
 
 inline void deserializeMmap(size_t &numNodes){
-    this->data = (fpBaseNode<T, Q>*)mmappedObj.getData();
-    numNodes = mmappedObj.mappedSize() / sizeof(data[0]);
+    std::cout<<"In deserialize Mmap!\n";
+    /*for(int i=0; i<NUM_FILES; i++){
+        std::cout<<global_fname + std::to_string(i) + ".bin"<<"\n";
+        fflush(stdout);
+        global_str = global_fname + std::to_string(i) + ".bin";
+        mmappedObj_vec[i].open(global_str, 0);
+        data = (fpBaseNode<T, Q>*)mmappedObj_vec[i].getData();
+        data_vector.push_back(data);
+    }
+    numNodes = mmappedObj_vec[0].mappedSize() / sizeof(data[0]);
+*/
 }
 
 };

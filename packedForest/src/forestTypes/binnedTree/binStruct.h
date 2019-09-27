@@ -10,6 +10,9 @@
 #include <map>
 #include <assert.h>
 
+ #define NUM_FILES 1000
+
+int counter = 0;
 namespace fp{
 
 	template <typename T, typename Q>
@@ -500,8 +503,9 @@ namespace fp{
 				inline void predictBinObservation(int observationNum, std::vector<int>& preds){
 					predictBinObservation(observationNum,preds, identity<Q>());
 				}
-				inline void predictBinObservation(fpBaseNode<T, Q> *data, int observationNum, std::vector<int>& preds){
-					predictBinObservation(&data[0],observationNum,preds, identity<Q>());
+				inline void predictBinObservation(std::vector<fpBaseNode<T, Q>*> &data, int observationNum, std::vector<int>& preds){
+                    std::cout<<"count is: "<<counter<<"\n";
+                    predictBinObservation(data,observationNum,preds, identity<Q>());
 				}
 
 				inline void predictBinObservation(std::vector<T>& observation, std::vector<int>& preds){
@@ -622,51 +626,55 @@ namespace fp{
 					}
 				}
 
-				inline void predictBinObservation(fpBaseNode<T, Q>* bin, int observationNum,std::vector<int>& preds, identity<int> ){
+				inline void predictBinObservation(std::vector<fpBaseNode<T, Q>*> &bin, int observationNum,std::vector<int>& preds, identity<int> ){
                     std::vector<int> currNode(numOfTreesInBin);
 					int numberNotInLeaf;
 					int featureNum;
 					T featureVal;
 					int q;
+  auto start = std::chrono::steady_clock::now();
 
 					for( q=0; q<numOfTreesInBin; ++q){
 						currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();
-						__builtin_prefetch(&bin[currNode[q]], 0, 3);
+						//__builtin_prefetch(&bin[(counter++)%NUM_FILES][currNode[q]], 0, 3);
 					}
-
+            auto end = std::chrono::steady_clock::now();
+        std::cout<<"Elapsed time first while: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
 					do{
 						numberNotInLeaf = 0;
 
 						for( q=0; q<numOfTreesInBin; ++q){
-							if(bin[currNode[q]].isInternalNodeFront()){
-								featureNum = bin[currNode[q]].returnFeatureNumber();
+                            end = std::chrono::steady_clock::now();
+							if(bin[(counter++)%NUM_FILES][currNode[q]].isInternalNodeFront()){
+								featureNum = bin[(counter++)%NUM_FILES][currNode[q]].returnFeatureNumber();
 								featureVal = fpSingleton::getSingleton().returnTestFeatureVal(featureNum,observationNum);
-								currNode[q] = bin[currNode[q]].fpBaseNode<T, Q>::nextNode(featureVal);
-								__builtin_prefetch(&bin[currNode[q]], 0, 3);
+								currNode[q] = bin[(counter++)%NUM_FILES][currNode[q]].fpBaseNode<T, Q>::nextNode(featureVal);
+								//__builtin_prefetch(&bin[(counter++)%NUM_FILES][currNode[q]], 0, 3);
 								++numberNotInLeaf;
 							}
+            auto end2 = std::chrono::steady_clock::now();
+        std::cout<<"Elapsed time second while: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end2 - end).count()<<" nanoseconds.\n";
 						}
 
 					}while(numberNotInLeaf);
 
 					for( q=0; q<numOfTreesInBin; q++){
 #pragma omp atomic update
-						++preds[bin[currNode[q]].returnClass()];
+						++preds[bin[(counter++)%NUM_FILES][currNode[q]].returnClass()];
 					}
 				}
 
 
 
-				inline void predictBinObservation(fpBaseNode<T, Q>* bin, int observationNum, std::vector<int>& preds, identity<std::vector<int> >){
+				inline void predictBinObservation(std::vector<fpBaseNode<T, Q>*> &bin, int observationNum, std::vector<int>& preds, identity<std::vector<int> >){
 					std::vector<int> currNode(numOfTreesInBin);
 					int numberNotInLeaf;
 					T featureVal;
 					int  q;
 
-
 					for( q=0; q<numOfTreesInBin; ++q){
 						currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();
-						__builtin_prefetch(&bin[currNode[q]], 0, 3);
+						//__builtin_prefetch(&bin[(counter++)%NUM_FILES][currNode[q]], 0, 3);
 					}
 
 					do{
@@ -674,13 +682,13 @@ namespace fp{
 
 						for( q=0; q<numOfTreesInBin; ++q){
 
-							if(bin[currNode[q]].isInternalNodeFront()){
+							if(bin[(counter++)%NUM_FILES][currNode[q]].isInternalNodeFront()){
 								featureVal = 0;
-								for(auto i : bin[currNode[q]].returnFeatureNumber()){
+								for(auto i : bin[(counter++)%NUM_FILES][currNode[q]].returnFeatureNumber()){
 									featureVal += fpSingleton::getSingleton().returnTestFeatureVal(i,observationNum);
 								}
-								currNode[q] = bin[currNode[q]].fpBaseNode<T, Q>::nextNode(featureVal);
-								__builtin_prefetch(&bin[currNode[q]], 0, 3);
+								currNode[q] = bin[(counter++)%NUM_FILES][currNode[q]].fpBaseNode<T, Q>::nextNode(featureVal);
+								//__builtin_prefetch(&bin[(counter++)%NUM_FILES][currNode[q]], 0, 3);
 								++numberNotInLeaf;
 							}
 						}
@@ -689,22 +697,21 @@ namespace fp{
 
 					for( q=0; q<numOfTreesInBin; q++){
 #pragma omp atomic update
-						++preds[bin[currNode[q]].returnClass()];
+						++preds[bin[(counter++)%NUM_FILES][currNode[q]].returnClass()];
 					}
 				}
 
 
-				inline void predictBinObservation(fpBaseNode<T, Q>* bin,int observationNum, std::vector<int>& preds, identity<weightedFeature>){
+				inline void predictBinObservation(std::vector<fpBaseNode<T, Q>*> &bin,int observationNum, std::vector<int>& preds, identity<weightedFeature>){
 					std::vector<int> currNode(numOfTreesInBin);
 					int numberNotInLeaf;
 					T featureVal;
 					int weightNum;
 					int  q;
 
-
 					for( q=0; q<numOfTreesInBin; ++q){
 						currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();
-						__builtin_prefetch(&bin[currNode[q]], 0, 3);
+				//		__builtin_prefetch(&bin[(counter++)%NUM_FILES][currNode[q]], 0, 3);
 					}
 
 					do{
@@ -712,14 +719,14 @@ namespace fp{
 
 						for( q=0; q<numOfTreesInBin; ++q){
 
-							if(bin[currNode[q]].isInternalNodeFront()){
+							if(bin[(counter++)%NUM_FILES][currNode[q]].isInternalNodeFront()){
 								featureVal = 0;
 								weightNum = 0;
-								for(auto i : bin[currNode[q]].returnFeatureNumber().returnFeatures()){
-									featureVal += fpSingleton::getSingleton().returnTestFeatureVal(i,observationNum)*bin[currNode[q]].returnFeatureNumber().returnWeights()[weightNum++];
+								for(auto i : bin[(counter++)%NUM_FILES][currNode[q]].returnFeatureNumber().returnFeatures()){
+									featureVal += fpSingleton::getSingleton().returnTestFeatureVal(i,observationNum)*bin[(counter++)%NUM_FILES][currNode[q]].returnFeatureNumber().returnWeights()[weightNum++];
 								}
-								currNode[q] = bin[currNode[q]].fpBaseNode<T, Q>::nextNode(featureVal);
-								__builtin_prefetch(&bin[currNode[q]], 0, 3);
+								currNode[q] = bin[(counter++)%NUM_FILES][currNode[q]].fpBaseNode<T, Q>::nextNode(featureVal);
+				//				__builtin_prefetch(&bin[(counter++)%NUM_FILES][currNode[q]], 0, 3);
 								++numberNotInLeaf;
 							}
 						}
@@ -728,7 +735,7 @@ namespace fp{
 
 					for( q=0; q<numOfTreesInBin; q++){
 #pragma omp atomic update
-						++preds[bin[currNode[q]].returnClass()];
+						++preds[bin[(counter++)%NUM_FILES][currNode[q]].returnClass()];
 					}
 				}
 
