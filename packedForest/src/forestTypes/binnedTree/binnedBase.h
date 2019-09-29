@@ -165,9 +165,24 @@ namespace fp {
                     if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
 				    else{
+                        std::cout<<"first first\n";
+                        fflush(stdout);
                         binStruct<T, Q> temp = binStruct<T, Q>(binSizes[k]);
+                        std::cout<<"second first first\n";
+                        fflush(stdout);
+                        global_str = global_fname + std::to_string(observationNumber) + ".bin";
+                        std::cout<<"third first first\n";
+                        mmappedObj_vec[observationNumber].open(global_str, 0);
+                        std::cout<<"third point five first first\n";
+                        fflush(stdout);
+                        data = (fpBaseNode<T, Q>*)mmappedObj_vec[observationNumber].getData();
+                        std::cout<<"fourth first first\n";
+                        fflush(stdout);
+                        //numNodes = mmappedObj_vec[i].mappedSize() / sizeof(data[0]);
                         auto start = std::chrono::steady_clock::now();
-                        temp.predictBinObservation(data_vector, observationNumber, predictions);
+                        temp.predictBinObservation(data, observationNumber, predictions);
+                        std::cout<<"fifth first first\n";
+                        fflush(stdout);
                         auto end = std::chrono::steady_clock::now();
                         std::cout<<"Elapsed time: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
                         fout<<std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()<<" ";
