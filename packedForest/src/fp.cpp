@@ -132,6 +132,7 @@ int main(int argc, char* argv[]) {
             }
 
             forest.setParameter("numTreesInForest", 128);
+            //forest.setParameter("numTreesInForest", 16);
             forest.setParameter("minParent", 1);
             forest.setParameter("numCores", numCores);
             //forest.setParameter("seed",-1661580697);
@@ -146,8 +147,9 @@ int main(int argc, char* argv[]) {
             //forest.printParameters();
             //forest.printForestType();
 
-            std::cout << "error: " << forest.testAccuracy() << "\n";
-            //forest.testAccuracy();
+            //std::cout << "error: " << forest.testAccuracy() << "\n";
+            float error = forest.testAccuracy();
+            std::cout<<"Error is: "<<error<<"\n";
         
         }catch(std::exception& e){
             std::cout << "standard error: " << e.what() << std::endl;
