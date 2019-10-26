@@ -79,12 +79,18 @@ template<typename T, typename Q>
             }
             
             inline void BINStatLayout2(int depthIntertwined){
+             
                 std::vector< fpBaseNode<T,Q> > bin = binstr.getBin();
                 std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
                 int numNodesToProc = std::pow(2, depthIntertwined) - 2; 
                 int d;
                 auto numClasses = fpSingleton::getSingleton().returnNumClasses();
+                if(depthIntertwined == 1){
+                    for(auto i: bin)
+                        finalbin.push_back(i);
+                    return;
+                }   
                 for(auto i = 0; i < numClasses; ++i){
                     finalbin.push_back(bin[i]);
                     nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));

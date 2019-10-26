@@ -156,7 +156,8 @@ namespace fp {
 					loadTestData();
                     std::cout<<"second\n";
                     fflush(stdout);
-					testError = forest->testForest();
+					initializeForestType();
+                    testError = forest->testForest();
                     std::cout<<"third\n";
                     fflush(stdout);
 					deleteTestData();
