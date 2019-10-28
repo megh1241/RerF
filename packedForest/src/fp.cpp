@@ -125,6 +125,14 @@ int main(int argc, char* argv[]) {
                     forest.setParameter("CSVFileName", "../experiments/res/p53.csv");
                     forest.setParameter("columnWithY", 5408);
                     break;
+                case 7: //TODO: better way (automatically ? ) to find the number of columns in a given csv file
+                    forest.setParameter("CSVFileName", "datasets/fars.csv");
+                    forest.setParameter("columnWithY", 29);
+                    break;
+                case 8: 
+                    forest.setParameter("CSVFileName", "datasets/cifar-10.csv");
+                    forest.setParameter("columnWithY", 3072);
+                    break;
                 default:
                     std::cout << "unknown dataset selected" << std::endl;
                     return -1;

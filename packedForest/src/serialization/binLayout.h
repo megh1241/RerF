@@ -22,7 +22,7 @@
 #include <string>
 #include "nodeStruct.cpp"
 
-#define NUM_FILES 10000
+#define NUM_FILES 6000
 
 namespace fp{
 
@@ -231,13 +231,14 @@ std::cout<<"Size of treeRootPos here : "<<treeRootPos.size()<<"\n";
                         f.write((char*)&i, sizeof(i));
                     f.close();
                 }
-                f.open("rand_file.bin");
+                /*f.open("rand_file.bin");
                 
                 for(int j = 0; j < 10000000; j++)
                 {
                     f.write((char*)&j, sizeof(j));
                 } 
                 f.close();
+                */
             }
             
             std::size_t getFilesize(const char* filename) {

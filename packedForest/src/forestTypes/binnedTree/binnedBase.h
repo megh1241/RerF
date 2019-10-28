@@ -19,14 +19,14 @@
 #include <map>
 #include <chrono>
 
-std::string global_fname = "bfsblocks.csv";
+std::string global_fname = "binstat1blocks";
 //MemoryMapped mmappedObj(global_fname.c_str(), 0);
 std::string global_fname_csv = "profile_iris.csv";
 std::fstream fout;
 std::string global_str;
 std::vector<int> treeRootPos;
 std::vector<int> blocks;
-#define NUM_FILES 10000
+#define NUM_FILES 6000
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 namespace fp {
@@ -95,8 +95,8 @@ namespace fp {
 					bins[j].createBin(binSizes[j], binSeeds[j], depth_intertwined);
                     BinLayout<T, Q> binss(bins[j], global_fname) ;
                     //TODO: set flag for layout
-                    //binss.BINStatLayout2(1);
-                    binss.BFSLayout();
+                    binss.BINStatLayout2(1);
+                    //binss.BFSLayout();
 				    
                     bins[j].setBin(binss.getFinalBin());
                     treeRootPos = binss.treeRootPos;
@@ -167,23 +167,21 @@ namespace fp {
 					    bins[k].predictBinObservation(observationNumber, predictions);
 				    else{
                         binStruct<T, Q> temp = binStruct<T, Q>(128);
-                        global_str = "/mnt/ssd_ser/" + global_fname + std::to_string(observationNumber) + ".bin";
-                        mmappedObj_vec[observationNumber].open(global_str, 0);
-                        data = (fpBaseNode<T, Q>*)mmappedObj_vec[observationNumber].getData();
+                        global_str = "/mnt/ssd_ser/" + global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
+                        mmappedObj_vec[observationNumber%NUM_FILES].open(global_str, 0);
+                        data = (fpBaseNode<T, Q>*)mmappedObj_vec[observationNumber%NUM_FILES].getData();
                         //numNodes = mmappedObj_vec[i].mappedSize() / sizeof(data[0]);
                         temp.predictBinObservation(uniqueCount, treeRootPos, data, observationNumber, predictions);
                         blocks.push_back(uniqueCount);
                         //auto end = std::chrono::steady_clock::now();
                         std::cout<<"Observation number: "<<observationNumber<<"\n";
-                      //  fflush(stdout);
+                        fflush(stdout);
                       //  std::cout<<"Elapsed time: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
                       //  fflush(stdout);
                       //  fout<<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<",";
                     }
                 }
 
-
-    
 				//assert(std::accumulate(predictions.begin(), predictions.end(),0) == fpSingleton::getSingleton().returnNumTrees());
 
 				int bestClass = 0;
@@ -192,7 +190,7 @@ namespace fp {
 						bestClass = j;
 					}
 				}
-                mmappedObj_vec[observationNumber].close();
+                mmappedObj_vec[observationNumber%NUM_FILES].close();
 			 	return bestClass;
 			}
             
@@ -267,7 +265,7 @@ inline float testForest(){
 		}
 	}
     //fout.close();
-    fout.open("bfsblocks.csv", std::ios::out);
+    fout.open("binstat1blocks.csv", std::ios::out);
     for(auto i: blocks)
         fout<<i<<",";
     fout.close();
