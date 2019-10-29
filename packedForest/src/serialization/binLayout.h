@@ -102,8 +102,8 @@ template<typename T, typename Q>
 
                 // Intertwined levels
                 int currLevel = 0; 
-                    if(nodeTreeMap[binQ.front().getID()] != i)
-                        continue;
+                    //if(nodeTreeMap[binQ.front().getID()] != i)
+                      //  continue;
                 while(currLevel <= numNodesToProc*binstr.numOfTreesInBin) {
                         currLevel += 2;
                         auto ele = binQ.front();
