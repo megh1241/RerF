@@ -95,7 +95,7 @@ namespace fp {
 					bins[j].createBin(binSizes[j], binSeeds[j], depth_intertwined);
                     BinLayout<T, Q> binss(bins[j], global_fname) ;
                     //TODO: set flag for layout
-                    binss.BINStatLayout2(1);
+                    binss.BINBFSLayout(1);
                     //binss.BFSLayout();
 				    
                     bins[j].setBin(binss.getFinalBin());
@@ -289,16 +289,6 @@ inline void deserializeMmap(size_t &numNodes){
             }*/
     }
 
-    /*for(int i=0; i<NUM_FILES; i++){
-        std::cout<<global_fname + std::to_string(i) + ".bin"<<"\n";
-        fflush(stdout);
-        global_str = global_fname + std::to_string(i) + ".bin";
-        mmappedObj_vec[i].open(global_str, 0);
-        data = (fpBaseNode<T, Q>*)mmappedObj_vec[i].getData();
-        data_vector.push_back(data);
-    }
-    numNodes = mmappedObj_vec[0].mappedSize() / sizeof(data[0]);
-*/
 }
 
 };

@@ -15,7 +15,7 @@ class alignas(32) fpBaseNode
 		T cutValue;
 		int right;
 		int depth;
-        int id;
+        	int id;
 
 	public:
 		fpBaseNode():left(0), right(0), depth(0), id(0){}
@@ -26,13 +26,13 @@ class alignas(32) fpBaseNode
 			return left;
 		}
 
-        inline int getID() {
-            return id;
-        }
+        	inline int getID() {
+            		return id;
+        	}
 
-        inline int setID(int uid) {
-            id = uid;
-        }
+        	inline int setID(int uid) {
+            		id = uid;
+        	}
 
 		inline bool isInternalNodeFront(){
 			return depth >= 0;
