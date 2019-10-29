@@ -33,15 +33,15 @@ namespace fp{
 				std::deque<processingNodeBin<T,Q> > nodeQueueInter;
 				std::deque<processingNodeBin<T,Q> > nodeQueueRight;
 				std::deque<processingNodeBin<T,Q> > nodeQueueLeft;
-
+				std::map<int, int> binIndexToCardinality;
 				int numberOfNodes;
 
 				int currTree;
-                int uid;
-                std::map<int, int> nodeTreeMap;
-
-                std::vector<obsIndexAndClassVec> indicesHolder;
-                std::vector<zipClassAndValue<int, T> > zipper;
+                		int uid;
+         		       	std::map<int, int> nodeTreeMap;
+	
+                		std::vector<obsIndexAndClassVec> indicesHolder;
+                		std::vector<zipClassAndValue<int, T> > zipper;
 
 				std::vector<int> nodeIndices;
 
@@ -881,6 +881,10 @@ namespace fp{
 
 				inline std::vector< fpBaseNode<T,Q> >& exposeBinTest(){
 					return bin;
+				}
+
+				inline std::map<int, int> exposeBinIndexToCardinality(){
+					return binIndexToCardinality;
 				}
 
 				void printBin(){
