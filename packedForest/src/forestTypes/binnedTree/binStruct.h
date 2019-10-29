@@ -58,25 +58,25 @@ namespace fp{
 			public:
 				int numOfTreesInBin;
 				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0), uid(0)
-            {
-                            ff.open("elapsed_time_binstat.csv",std::ios::app);
+            			{
+                            		ff.open("elapsed_time_binstat.csv",std::ios::app);
              
-            }
-                binStruct(int numTrees) : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(numTrees),currTree(0), uid(0)
-            {
-                              ff.open("elapsed_time_binstat.csv", std::ios::app);
+            			}
+                		binStruct(int numTrees) : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(numTrees),currTree(0), uid(0)
+            			{
+                              		ff.open("elapsed_time_binstat.csv", std::ios::app);
              
-            }
-                ~binStruct(){
-                    ff.close();
-                }
-                inline std::vector< fpBaseNode<T,Q> > getBin(){
-                    return bin;
-                }
+            			}
+                		~binStruct(){
+                    			ff.close();
+                		}
+                		inline std::vector< fpBaseNode<T,Q> > getBin(){
+                    			return bin;
+                		}
 
-                inline void setBin(std::vector< fpBaseNode<T,Q> > newbin){
-                    bin = newbin;
-                }
+                		inline void setBin(std::vector< fpBaseNode<T,Q> > newbin){
+                    			bin = newbin;
+                		}
 
 				inline void loadFirstNode(){
 					nodeQueue.emplace_back(0,0,0,randNum);
@@ -97,10 +97,10 @@ namespace fp{
 
 
 				inline void loadFirstNodeInter(){
-                    nodeQueueInter.emplace_back(currTree,0,0,randNum);
+                    			nodeQueueInter.emplace_back(currTree,0,0,randNum);
 					nodeQueueInter.front().setupRoot(indicesHolder[currTree], zipper);
 					nodeQueueInter.front().processNode();
-                     if(nodeQueueInter.front().isLeafNode()){
+                     			if(nodeQueueInter.front().isLeafNode()){
 						makeRootALeafInter();
 					}else{
 						copyProcessedRootToBinInter();
@@ -109,7 +109,7 @@ namespace fp{
 				}
 
 				inline void makeRootALeafInter(){
-                    bin[returnRootLocation()].setClass(nodeQueueInter.front().returnNodeClass());
+                    			bin[returnRootLocation()].setClass(nodeQueueInter.front().returnNodeClass());
 					bin[returnRootLocation()].setDepth(0);
 				}
 
@@ -151,14 +151,14 @@ namespace fp{
 				inline void makeLeafNodes(){
 					for(int i= 0; i < fpSingleton::getSingleton().returnNumClasses(); ++i){
 						bin[i].setSharedClass(i);
-					    bin[i].setID(uid++);
-                    nodeTreeMap.insert(std::pair<int, int>(bin[i].getID(), -1));
-                    }
+					    	bin[i].setID(uid++);
+                    				nodeTreeMap.insert(std::pair<int, int>(bin[i].getID(), -1));
+                    			}
 					for(int i= fpSingleton::getSingleton().returnNumClasses(); i < fpSingleton::getSingleton().returnNumClasses()+numOfTreesInBin; ++i){
-				        bin[i].setID(uid++);
-                    nodeTreeMap.insert(std::pair<int, int>(bin[i].getID(), i-fpSingleton::getSingleton().returnNumClasses()));
-                    }
-                }
+				        	bin[i].setID(uid++);
+                    				nodeTreeMap.insert(std::pair<int, int>(bin[i].getID(), i-fpSingleton::getSingleton().returnNumClasses()));
+                    			}
+                		}
 
 
 				inline int returnDepthOfNode(){
@@ -167,7 +167,7 @@ namespace fp{
 				}
 
 				
-                inline int returnDepthOfNodeInter(){
+                		inline int returnDepthOfNodeInter(){
 				//	assert(!nodeQueueInter.empty());
 					return bin[nodeQueueInter.front().returnParentNodeNumber()].returnDepth()+1;
 				}
@@ -175,21 +175,21 @@ namespace fp{
 
 				inline void copyProcessedNodeToBin(){
 					bin.emplace_back(nodeQueue.back().returnNodeCutValue(), returnDepthOfNode(), nodeQueue.back().returnNodeCutFeature(), uid++);
-				    auto bin_ele = bin.back();
-                    auto tree_num = nodeQueue.back().exposeTreeNum();
-                    nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
-                }
+				    	auto bin_ele = bin.back();
+                    			auto tree_num = nodeQueue.back().exposeTreeNum();
+                    			nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
+                		}
 
 
 				inline void copyProcessedNodeToBinInter(){
 					bin.emplace_back(nodeQueueInter.front().returnNodeCutValue(), returnDepthOfNodeInter(), nodeQueueInter.front().returnNodeCutFeature(), uid++);
-				    auto bin_ele = bin.back();
-                    auto tree_num = nodeQueueInter.back().exposeTreeNum();
-                    nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
+				    	auto bin_ele = bin.back();
+                    			auto tree_num = nodeQueueInter.back().exposeTreeNum();
+                    			nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
 				}
 
 
-                inline void copyProcessedRootToBin(){
+                		inline void copyProcessedRootToBin(){
 					bin[returnRootLocation()].setCutValue(nodeQueue.back().returnNodeCutValue());
 					bin[returnRootLocation()].setDepth(0);
 					bin[returnRootLocation()].setFeatureValue(nodeQueue.back().returnNodeCutFeature());
@@ -209,7 +209,7 @@ namespace fp{
 
 				inline void linkParentToChild(){
 					if(nodeQueue.back().returnIsLeftNode()){
-                        bin[nodeQueue.back().returnParentNodeNumber()].setLeftValue(positionOfNextNode());
+                        			bin[nodeQueue.back().returnParentNodeNumber()].setLeftValue(positionOfNextNode());
 					}else{
 						bin[nodeQueue.back().returnParentNodeNumber()].setRightValue(positionOfNextNode());
 					}
@@ -299,27 +299,27 @@ namespace fp{
 					zipperIterators<int,T> zipIts(nodeQueueInter.front().returnZipIterators());
 					int childDepth = returnDepthOfNodeInter()+1;
 					auto parentTreeNum = nodeQueueInter.front().exposeTreeNum();
-                    nodeQueueInter.pop_front();
+                    			nodeQueueInter.pop_front();
 					//TODO: don't emplace_back if should be leaf node.
 					nodeQueueInter.emplace_back(parentTreeNum,parentNodesPosition(), childDepth, randNum);
 					nodeQueueInter.back().setupNode(nodeIts, zipIts, leftNode());
 					
-                    nodeQueueRight.emplace_back(parentTreeNum,parentNodesPosition(), childDepth, randNum);
+                    			nodeQueueRight.emplace_back(parentTreeNum,parentNodesPosition(), childDepth, randNum);
 					nodeQueueRight.back().setupNode(nodeIts, zipIts, rightNode());
 				}
 
 
 				inline void createRootChildNodesInter(){
 					nodeIterators nodeIts(nodeQueueInter.front().returnNodeIterators());
-                    zipperIterators<int,T> zipIts(nodeQueueInter.front().returnZipIterators());
+                    			zipperIterators<int,T> zipIts(nodeQueueInter.front().returnZipIterators());
 					int childDepth = returnDepthOfNodeInter()+1;
 					auto parentTreeNum = nodeQueueInter.front().exposeTreeNum();
 					
-                    nodeQueueInter.pop_front();
-				    nodeQueueLeft.emplace_back(parentTreeNum,returnRootLocation(), childDepth,randNum);
+                    			nodeQueueInter.pop_front();
+				    	nodeQueueLeft.emplace_back(parentTreeNum,returnRootLocation(), childDepth,randNum);
 					nodeQueueLeft.back().setupNode(nodeIts, zipIts, leftNode());
 						
-				    nodeQueueRight.emplace_back(parentTreeNum,returnRootLocation(), childDepth,randNum);
+				    	nodeQueueRight.emplace_back(parentTreeNum,returnRootLocation(), childDepth,randNum);
 					nodeQueueRight.back().setupNode(nodeIts, zipIts, rightNode());
                    
 				}
@@ -354,9 +354,9 @@ namespace fp{
 				inline void processNode(){
 					// process the node, i.e. calculate best split, ...
 					nodeQueue.back().processNode();
-                    if (nodeQueue.back().isLeafNode()) {
+                    			if (nodeQueue.back().isLeafNode()) {
 						// label the processed node as a leaf.
-                        processLeafNode();
+                        			processLeafNode();
 					}
 					else {
 						// label the processed node as internal.
@@ -373,8 +373,8 @@ namespace fp{
 
 				inline void processNodeInter(){
 					// process the node, i.e. calculate best split, ...
-                    nodeQueueInter.front().processNode();
-                    if (nodeQueueInter.front().isLeafNode()) {
+                    			nodeQueueInter.front().processNode();
+                    			if (nodeQueueInter.front().isLeafNode()) {
 						// label the processed node as a leaf.
 						processLeafNodeInter();
 					}
@@ -385,76 +385,77 @@ namespace fp{
 				}
 
 
-                inline void intertwineRootsLayout(){
-                    for(; currTree < numOfTreesInBin; ++currTree){
+                		inline void intertwineRootsLayout(){
+                    			for(; currTree < numOfTreesInBin; ++currTree){
 						setSharedVectors();
 						loadFirstNode();	
-                        while(!nodeQueue.empty())
+                        			while(!nodeQueue.empty())
 							processNode();
 					}
-                }
+                		}
 
-                inline void intertwineMultipleLevelsLayout(int depthInter){
-                    for(; currTree < numOfTreesInBin; ++currTree){
-					    setSharedVectors();
-                        loadFirstNodeInter();
-                    }
+                		inline void intertwineMultipleLevelsLayout(int depthInter){
+                    			for(; currTree < numOfTreesInBin; ++currTree){
+						setSharedVectors();
+                        			loadFirstNodeInter();
+                    			}
                     
-                    for(auto ele: nodeQueueLeft)
-                        nodeQueueInter.push_back(ele);
+                    			for(auto ele: nodeQueueLeft)
+                        			nodeQueueInter.push_back(ele);
 
-                    for(auto ele: nodeQueueRight)
-                        nodeQueueInter.push_back(ele);
-                    nodeQueueRight.clear();
+                    			for(auto ele: nodeQueueRight)
+                        			nodeQueueInter.push_back(ele);
+                    			nodeQueueRight.clear();
                     
-                   int topNodeTreeNum=0, d = 0, numNodesInterleaved = std::pow(2, depthInter) - 2;
-                   while(d++ <  depthInter){
-                       for(int currTree=0; currTree< numOfTreesInBin; ++currTree){
-                            topNodeTreeNum=nodeQueueInter.front().exposeTreeNum();
-                            if(topNodeTreeNum != currTree)
-                               continue;
-                            processNodeInter();
-                        }
-                        while(!nodeQueueRight.empty()){
-                            processingNodeBin<T,Q> ele = nodeQueueRight.front();
-                            nodeQueueRight.pop_front();
-                            nodeQueueInter.push_back(ele);
-                        }
-                    }
+                   			int topNodeTreeNum=0, d = 0, numNodesInterleaved = std::pow(2, depthInter) - 2;
+                   			while(d++ <  depthInter){
+                       				for(int currTree=0; currTree< numOfTreesInBin; ++currTree){
+                            				topNodeTreeNum=nodeQueueInter.front().exposeTreeNum();
+                            				if(topNodeTreeNum != currTree)
+                               					continue;
+                            				processNodeInter();
+                        			}
+
+                        			while(!nodeQueueRight.empty()){
+                            				processingNodeBin<T,Q> ele = nodeQueueRight.front();
+                            				nodeQueueRight.pop_front();
+                            				nodeQueueInter.push_back(ele);
+                        			}
+                    			}
                     
-                   while(!nodeQueueInter.empty()){
-                        auto ele = nodeQueueInter.front();
-                        currTree = ele.exposeTreeNum(); 
-                        nodeQueueInter.pop_front();
-					    nodeQueue.emplace_back(ele);
-                        while(!nodeQueue.empty()){
+                   			while(!nodeQueueInter.empty()){
+                        			auto ele = nodeQueueInter.front();
+                        			currTree = ele.exposeTreeNum(); 
+                        			nodeQueueInter.pop_front();
+					    	nodeQueue.emplace_back(ele);
+                        			while(!nodeQueue.empty()){
 							processNode();
-                        }
-                    }
-                }
+                        			}
+                    			}
+                		}
 
-                inline void intertwineClassLayout(){
-                    int a =9;
-                }
+                		inline void intertwineClassLayout(){
+                    			int a =9;
+                		}
 
 				inline void createBin(int numTrees, int randSeed, int depthInter){
 					numOfTreesInBin = numTrees;
 					randNum.initialize(randSeed);
 					initializeStructures();
-                    if(depthInter == 1)
-                        intertwineRootsLayout();
-                    else if (depthInter > 1)
-                        intertwineMultipleLevelsLayout(depthInter);
-                    else
-                        intertwineClassLayout();
+                    			if(depthInter == 1)
+                        			intertwineRootsLayout();
+                    			else if (depthInter > 1)
+                        			intertwineMultipleLevelsLayout(depthInter);
+                    			else
+                        			intertwineClassLayout();
 
-                    //printBin();    
-                    removeStructures();
+                    			//printBin();    
+                    			removeStructures();
 				}
 					
 				inline void initializeStructures(){
 					for(int i = 0; i < numOfTreesInBin; ++i)
-                        indicesHolder.push_back(obsIndexAndClassVec(fpSingleton::getSingleton().returnNumClasses()));
+                        			indicesHolder.push_back(obsIndexAndClassVec(fpSingleton::getSingleton().returnNumClasses()));
                     
 					zipper.resize(fpSingleton::getSingleton().returnNumObservations());
 					nodeIndices.resize(fpSingleton::getSingleton().returnNumObservations());
@@ -467,13 +468,13 @@ namespace fp{
 
 				inline void removeStructures(){
 					std::vector<processingNodeBin<T,Q> >().swap( nodeQueue );
-                    std::vector<zipClassAndValue<int, T> >().swap( zipper );
+                    			std::vector<zipClassAndValue<int, T> >().swap( zipper );
 					std::vector<int>().swap( nodeIndices);
 				}
 				
-                inline std::map<int, int> getNodeTreeMap(){
-                    return nodeTreeMap;
-                }
+                		inline std::map<int, int> getNodeTreeMap(){
+                    			return nodeTreeMap;
+                		}
 
 				inline int returnMaxDepth(){
 					int maxDepth=0;
@@ -515,7 +516,7 @@ namespace fp{
 					predictBinObservation(observationNum,preds, identity<Q>());
 				}
 				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>* data, int observationNum, std::vector<int>& preds){
-                    predictBinObservation(uniqueCount, roots, data,observationNum,preds, identity<Q>());
+                    			predictBinObservation(uniqueCount, roots, data,observationNum,preds, identity<Q>());
 				}
 
 				inline void predictBinObservation(std::vector<T>& observation, std::vector<int>& preds){
@@ -889,14 +890,14 @@ namespace fp{
 
 				void printBin(){
 					int count=0;
-                    std::cout << "\n";
+                    			std::cout << "\n";
 					for(auto nd : bin){
-                        std::cout<<count++<<": ";
+                        			std::cout<<count++<<": ";
 						nd.printNode();
 					}
 				}
 
-				};
+			};
 
 		}//fp
 #endif //binStruct_h
