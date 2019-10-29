@@ -20,9 +20,8 @@
 #include <assert.h>
 #include <cstdio>
 #include <string>
-#include "nodeStruct.cpp"
 
-#define NUM_FILES 6000
+#define NUM_FILES 10
 
 namespace fp{
 
@@ -85,7 +84,15 @@ template<typename T, typename Q>
                 int numNodesToProc = std::pow(2, depthIntertwined) - 2; 
                 int d;
                 auto numClasses = fpSingleton::getSingleton().returnNumClasses();
-                for(auto i = 0; i < numClasses; ++i){
+                
+		if(depthIntertwined == 1){
+			for(auto i: bin)
+				finalbin.push_back(i);
+			return;
+		}
+		
+		
+		for(auto i = 0; i < numClasses; ++i){
                     finalbin.push_back(bin[i]);
                     nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));
                 }
@@ -95,9 +102,9 @@ template<typename T, typename Q>
 
                 // Intertwined levels
                 int currLevel = 0; 
-                    //if(nodeTreeMap[binQ.front().getID()] != i)
-                      //  continue;
-                    while(currLevel <= numNodesToProc*binstr.numOfTreesInBin) {
+                    if(nodeTreeMap[binQ.front().getID()] != i)
+                        continue;
+                while(currLevel <= numNodesToProc*binstr.numOfTreesInBin) {
                         currLevel += 2;
                         auto ele = binQ.front();
                         binQ.pop_front();
@@ -117,9 +124,7 @@ template<typename T, typename Q>
                             binQ.push_back(bin[ele.returnRightNodeID()]); 
                         }
                         
-                        //binQ.push_back(bin[ele.returnLeftNodeID()]); 
-                        //binQ.push_back(bin[ele.returnRightNodeID()]); 
-                    }
+                }
 
                 // STAT per (sub)tree layout 
                 
@@ -226,19 +231,19 @@ std::cout<<"Size of treeRootPos here : "<<treeRootPos.size()<<"\n";
             inline void writeToFile(){
                 std::ofstream f;
                 for(int j = 0; j < NUM_FILES; j++){
-                    f.open(("/mnt/ssd_ser/" + filename + std::to_string(j) + ".bin").c_str(), std::ios::out|std::ios::binary);
+                    f.open((filename + std::to_string(j) + ".bin").c_str(), std::ios::out|std::ios::binary);
                     for(auto i: finalbin)
                         f.write((char*)&i, sizeof(i));
                     f.close();
                 }
-                /*f.open("rand_file.bin");
+                f.open("rand_file.bin");
                 
-                for(int j = 0; j < 10000000; j++)
+                for(int j = 0; j < 10000; j++)
                 {
                     f.write((char*)&j, sizeof(j));
                 } 
                 f.close();
-                */
+                
             }
             
             std::size_t getFilesize(const char* filename) {

@@ -21,10 +21,10 @@ namespace fp {
 			std::vector<urerfTree<T> > trees;
 			std::map<int, std::map<int, int> > simMat;
                         std::map<std::pair<int, int>, double> pairMat;
-                        typedef Eigen::SparseMatrix<int> spMat;
-                        typedef Eigen::Triplet<int> TripType;
-                        std::vector<TripType> tripletList;
-                        SpMat eigenMat;
+                        //typedef Eigen::SparseMatrix<int> spMat;
+                        //typedef Eigen::Triplet<int> TripType;
+                        //std::vector<TripType> tripletList;
+                        //SpMat eigenMat;
 		public:
 
 			~fpURerFBase(){}
@@ -46,7 +46,7 @@ namespace fp {
 				}
 			}
 
-                        inline void createSparseMat(){
+                      /*  inline void createSparseMat(){
 				//Not in use now. TODO: Remove entirely?
 				auto numObs = fpSingleton::getSingleton().returnNumObservations();
 				SpMat eigenSimMat(numObs, numObs);
@@ -58,7 +58,7 @@ namespace fp {
 				}
 				eigenSimMat.makeCompressed();
 				this->eigenMat = eigenSimMat;
-			}
+			}*/
 
 			inline void growTrees(){
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())

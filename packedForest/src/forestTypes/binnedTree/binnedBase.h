@@ -21,12 +21,12 @@
 
 std::string global_fname = "binstat1blocks";
 //MemoryMapped mmappedObj(global_fname.c_str(), 0);
-std::string global_fname_csv = "profile_iris.csv";
+std::string global_fname_csv = "binstat1blocks.csv";
 std::fstream fout;
 std::string global_str;
 std::vector<int> treeRootPos;
 std::vector<int> blocks;
-#define NUM_FILES 6000
+#define NUM_FILES 10
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 namespace fp {
@@ -167,7 +167,7 @@ namespace fp {
 					    bins[k].predictBinObservation(observationNumber, predictions);
 				    else{
                         binStruct<T, Q> temp = binStruct<T, Q>(128);
-                        global_str = "/mnt/ssd_ser/" + global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
+                        global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
                         mmappedObj_vec[observationNumber%NUM_FILES].open(global_str, 0);
                         data = (fpBaseNode<T, Q>*)mmappedObj_vec[observationNumber%NUM_FILES].getData();
                         //numNodes = mmappedObj_vec[i].mappedSize() / sizeof(data[0]);
@@ -265,7 +265,7 @@ inline float testForest(){
 		}
 	}
     //fout.close();
-    fout.open("binstat1blocks.csv", std::ios::out);
+    fout.open("binstatblocks.csv", std::ios::out);
     for(auto i: blocks)
         fout<<i<<",";
     fout.close();

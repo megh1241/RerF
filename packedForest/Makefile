@@ -18,7 +18,7 @@ OBJEXT      := o
 
 #Flags, Libraries and Includes
 #CFLAGS      := -Wall -O3 -DNDEBUG -ffast-math 
-CFLAGS      := -fopenmp -Wall -O3 -DNDEBUG -ffast-math
+CFLAGS      := -fopenmp -Wall -O3 -DNDEBUG -ffast-math -pg
 CFLAGS      := -fopenmp -Wall -O3 -ffast-math
 #LIB         := -fopenmp -lm -lnuma
 LIB         :=  -fopenmp -lm -O3 

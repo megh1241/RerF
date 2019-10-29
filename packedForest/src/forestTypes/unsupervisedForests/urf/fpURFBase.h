@@ -12,10 +12,10 @@
 #include <cstdlib>
 #include "urfTree.h"
 #include <sys/time.h>
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Sparse>
-#include <eigen3/Eigen/Core>
-using namespace Eigen;
+//#include <eigen3/Eigen/Dense>
+//#include <eigen3/Eigen/Sparse>
+//#include <eigen3/Eigen/Core>
+//using namespace Eigen;
 
 namespace fp {
 
@@ -26,10 +26,10 @@ namespace fp {
 			std::vector<urfTree<T> > trees;
 			std::map<int, std::map<int, int> > simMat;
 			std::map<std::pair<int, int>, double> pairMat;	
-			typedef Eigen::SparseMatrix<int> spMat;
-			typedef Eigen::Triplet<int> TripType;
-			std::vector<TripType> tripletList;
-			SpMat eigenMat;
+			//typedef Eigen::SparseMatrix<int> spMat;
+			//typedef Eigen::Triplet<int> TripType;
+			//std::vector<TripType> tripletList;
+			//SpMat eigenMat;
 		public:
 
 			~fpURFBase(){}
@@ -64,7 +64,7 @@ namespace fp {
 				;
 			}
 
-			inline void createSparseMat(){
+		/*	inline void createSparseMat(){
 				//Not in use now. TODO: Remove entirely?
 				auto numObs = fpSingleton::getSingleton().returnNumObservations();
 				SpMat eigenSimMat(numObs, numObs);
@@ -88,7 +88,7 @@ namespace fp {
         					std::cout << it.value() << "\n";
     					}
 				}
-			}
+			}*/
 
 			inline void treeStats(){
 				int maxDepth=0;
