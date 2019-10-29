@@ -33,12 +33,12 @@ namespace fp{
 				std::deque<processingNodeBin<T,Q> > nodeQueueInter;
 				std::deque<processingNodeBin<T,Q> > nodeQueueRight;
 				std::deque<processingNodeBin<T,Q> > nodeQueueLeft;
-				std::map<int, int> binIndexToCardinality;
 				int numberOfNodes;
 
 				int currTree;
                 		int uid;
          		       	std::map<int, int> nodeTreeMap;
+         		       	std::map<int, int> nodeCardinalityMap;
 	
                 		std::vector<obsIndexAndClassVec> indicesHolder;
                 		std::vector<zipClassAndValue<int, T> > zipper;
@@ -178,7 +178,8 @@ namespace fp{
 				    	auto bin_ele = bin.back();
                     			auto tree_num = nodeQueue.back().exposeTreeNum();
                     			nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
-                		}
+                			nodeCardinalityMap.insert(std::pair<int, int>(bin_ele.getID(), nodeQueue.back().returnNodeSize()));
+				}
 
 
 				inline void copyProcessedNodeToBinInter(){
@@ -186,6 +187,7 @@ namespace fp{
 				    	auto bin_ele = bin.back();
                     			auto tree_num = nodeQueueInter.back().exposeTreeNum();
                     			nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
+                			nodeCardinalityMap.insert(std::pair<int, int>(bin_ele.getID(), nodeQueueInter.front().returnNodeSize()));
 				}
 
 
@@ -474,6 +476,10 @@ namespace fp{
 				
                 		inline std::map<int, int> getNodeTreeMap(){
                     			return nodeTreeMap;
+                		}
+
+                		inline std::map<int, int> getNodeCardinalityMap(){
+                    			return nodeCardinalityMap;
                 		}
 
 				inline int returnMaxDepth(){
@@ -884,9 +890,6 @@ namespace fp{
 					return bin;
 				}
 
-				inline std::map<int, int> exposeBinIndexToCardinality(){
-					return binIndexToCardinality;
-				}
 
 				void printBin(){
 					int count=0;
