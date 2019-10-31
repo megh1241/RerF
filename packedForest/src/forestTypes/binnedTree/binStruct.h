@@ -15,7 +15,7 @@
 #include <fstream>
 #include <set>
 
-#define NUM_FILES 10
+#define NUM_FILES 100
 #define BLOCK_SIZE 128
 int counter = 0;
 std::fstream ff;
@@ -59,12 +59,12 @@ namespace fp{
 				int numOfTreesInBin;
 				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0), uid(0)
             			{
-                            		ff.open("elapsed_time_binstat.csv",std::ios::app);
+                            		ff.open("elapsed_time_binstatclass.csv",std::ios::app);
              
             			}
                 		binStruct(int numTrees) : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(numTrees),currTree(0), uid(0)
             			{
-                              		ff.open("elapsed_time_binstat.csv", std::ios::app);
+                              		ff.open("elapsed_time_binstatclass.csv", std::ios::app);
              
             			}
                 		~binStruct(){

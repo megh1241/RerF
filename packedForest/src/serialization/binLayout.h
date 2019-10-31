@@ -20,11 +20,11 @@
 #include <assert.h>
 #include <cstdio>
 #include <string>
-
-#define NUM_FILES 10
+#include <functional>
+ using namespace std::placeholders;
+#define NUM_FILES 100
 
 namespace fp{
-
 template<typename T, typename Q>
     class BinLayout
     {
@@ -34,16 +34,20 @@ template<typename T, typename Q>
         std::map<int, int> nodeNewIdx;
         std::string filename;
         std::vector<std::string> filename_vec;
-	std::map<int, int> map_node_to_subtree;
+        public:
+	std::map<int, int> map_node_to_subtree ;
 	std::map<int, int> map_subtree_to_class;
 	std::map<int, int> map_subtree_to_size;
 	std::map<int, int> map_node_to_interleaved;
-        public:
             std::vector<int> treeRootPos;
             BinLayout(binStruct<T, Q> tempbins, std::string fname): binstr(tempbins){
                 //TODO: initialize in fpSingleton
                 filename = fname;
-            }
+            	map_node_to_subtree.clear();
+            	map_subtree_to_class.clear();
+            	map_subtree_to_size.clear();
+            	map_node_to_interleaved.clear();
+	    }
             
             inline std::string returnFilename(){
                /* Return the file in which the forest was written to */
@@ -220,7 +224,7 @@ template<typename T, typename Q>
 
             }
             
-	    inline bool myCompFunction(const fpBaseNode<T, Q> node1, const fpBaseNode<T, Q> node2)
+	    inline bool myCompFunction(fpBaseNode<T, Q> &node1, fpBaseNode<T, Q> &node2)
 	    {
 		    //Node 1 is in the BIN, node 2 is not
 		    if(map_node_to_interleaved[node1.getID()] == 1 && map_node_to_interleaved[node2.getID()] == 0)
@@ -250,6 +254,13 @@ template<typename T, typename Q>
 		   return false;
 		    
 	    }
+
+	    /*inline static bool myCompFunction(const fpBaseNode<T, fp::weightedFeature> &node1, const fpBaseNode<T, fp::weightedFeature> &node2)
+	    {
+
+		   return false;
+		    
+	    }*/
             inline void BINStatClassLayout(int depthIntertwined){
                 int total_tree_card = 0;
 		int num_classes_in_subtree = 0;
@@ -363,7 +374,8 @@ template<typename T, typename Q>
 		    map_subtree_to_class[stno] = subtree_class;
 		    map_subtree_to_size[stno] = numNodesInST;
                 }
-		std::sort(finalbin.begin(), finalbin.end(), myCompFunction);
+		//std::sort(finalbin.begin(), finalbin.end(), std::bind(myCompFunction,this, _1, _2));
+		std::sort(finalbin.begin(), finalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
                 auto siz = finalbin.size();
                 for (auto i=0; i<siz; i++){
                     finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);

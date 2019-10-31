@@ -26,7 +26,7 @@ class alignas(32) fpBaseNode
 			return left;
 		}
 
-        	inline int getID() {
+        	inline int getID() const{
             		return id;
         	}
 

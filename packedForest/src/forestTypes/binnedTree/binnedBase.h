@@ -19,14 +19,14 @@
 #include <map>
 #include <chrono>
 
-std::string global_fname = "binstat1blocks";
+std::string global_fname = "binstatclassblocks";
 //MemoryMapped mmappedObj(global_fname.c_str(), 0);
-std::string global_fname_csv = "binstat1blocks.csv";
+std::string global_fname_csv = "binstatclassblocks.csv";
 std::fstream fout;
 std::string global_str;
 std::vector<int> treeRootPos;
 std::vector<int> blocks;
-#define NUM_FILES 10
+#define NUM_FILES 100
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 namespace fp {
@@ -95,7 +95,7 @@ namespace fp {
 					bins[j].createBin(binSizes[j], binSeeds[j], depth_intertwined);
                     BinLayout<T, Q> binss(bins[j], global_fname) ;
                     //TODO: set flag for layout
-                    binss.BINBFSLayout(1);
+                    binss.BINStatClassLayout(2);
                     //binss.BFSLayout();
 				    
                     bins[j].setBin(binss.getFinalBin());
@@ -265,7 +265,7 @@ inline float testForest(){
 		}
 	}
     //fout.close();
-    fout.open("binstatblocks.csv", std::ios::out);
+    fout.open("binstatclassblocks.csv", std::ios::out);
     for(auto i: blocks)
         fout<<i<<",";
     fout.close();
