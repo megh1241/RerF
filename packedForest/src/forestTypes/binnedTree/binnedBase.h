@@ -19,14 +19,14 @@
 #include <map>
 #include <chrono>
 
-std::string global_fname = "binstatclassblocks";
+std::string global_fname = "binstatclassfars";
 //MemoryMapped mmappedObj(global_fname.c_str(), 0);
-std::string global_fname_csv = "binstatclassblocks.csv";
+std::string global_fname_csv = "binstatclassfars.csv";
 std::fstream fout;
 std::string global_str;
 std::vector<int> treeRootPos;
 std::vector<int> blocks;
-#define NUM_FILES 100
+#define NUM_FILES 5
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 namespace fp {
@@ -89,13 +89,27 @@ namespace fp {
                 int depth_intertwined = 1;
 				calcBinSizes();
 				fpDisplayProgress printProgress;
-				bins.resize(numBins);
+			bins.resize(numBins);
+		    std::cout<<"before create bin\n";
+		    fflush(stdout);
 //#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
-					bins[j].createBin(binSizes[j], binSeeds[j], depth_intertwined);
-                    BinLayout<T, Q> binss(bins[j], global_fname) ;
+					bins[j].createBin(binSizes[j], binSeeds[j], 1);
+		    std::cout<<"before create bin2\n";
+                    for(auto i: bins[j].bin)
+			    i.printNode();
+		    //BinLayout<T, Q> binss(bins[j], global_fname) ;
+		    //BinLayout<T, Q> binss(bins[j]) ;
+		    BinLayout<T, Q> binss(bins[j], global_fname) ;
                     //TODO: set flag for layout
-                    binss.BINStatClassLayout(2);
+		    std::cout<<"created bin\n";
+		    fflush(stdout);
+		    //binss.BINBFSLayout(2);
+		    binss.BINStatClassLayout(4);
+		    //binss.BINStatLayout(2);
+		    std::cout<<"created layout\n";
+		    fflush(stdout);
+                    //binss.statLayout();
                     //binss.BFSLayout();
 				    
                     bins[j].setBin(binss.getFinalBin());
@@ -265,7 +279,7 @@ inline float testForest(){
 		}
 	}
     //fout.close();
-    fout.open("binstatclassblocks.csv", std::ios::out);
+    fout.open("binstatclassblocksfars.csv", std::ios::out);
     for(auto i: blocks)
         fout<<i<<",";
     fout.close();

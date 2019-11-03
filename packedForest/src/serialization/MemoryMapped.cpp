@@ -29,6 +29,8 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
+#include<iostream>
+#include<stdio.h>
 #endif
 
 
@@ -127,6 +129,8 @@ bool MemoryMapped::open(const std::string& filename, size_t mappedBytes, CacheHi
   fflush(stdout);
   if (_file == -1)
   {
+    std::cout<<"ERROR!!!!\n";
+    fflush(stdout);
     _file = 0;
     return false;
   }
@@ -145,6 +149,8 @@ bool MemoryMapped::open(const std::string& filename, size_t mappedBytes, CacheHi
   if (!_mappedView)
     return false;
 
+    std::cout<<"return TRUE !!!!!!!\n";
+    fflush(stdout);
   // everything's fine
   return true;
 }
