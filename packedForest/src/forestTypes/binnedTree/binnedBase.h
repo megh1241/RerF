@@ -96,8 +96,8 @@ namespace fp {
 				for(int j = 0; j < numBins; ++j){
 					bins[j].createBin(binSizes[j], binSeeds[j], 1);
 		    std::cout<<"before create bin2\n";
-                    for(auto i: bins[j].bin)
-			    i.printNode();
+                    //for(auto i: bins[j].bin)
+		//	    i.printNode();
 		    //BinLayout<T, Q> binss(bins[j], global_fname) ;
 		    //BinLayout<T, Q> binss(bins[j]) ;
 		    BinLayout<T, Q> binss(bins[j], global_fname) ;
@@ -105,7 +105,7 @@ namespace fp {
 		    std::cout<<"created bin\n";
 		    fflush(stdout);
 		    //binss.BINBFSLayout(2);
-		    binss.BINStatClassLayout(4);
+		    binss.BINStatClassLayout(2);
 		    //binss.BINStatLayout(2);
 		    std::cout<<"created layout\n";
 		    fflush(stdout);

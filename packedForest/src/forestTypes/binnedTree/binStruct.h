@@ -19,6 +19,7 @@
 #define BLOCK_SIZE 128
 int counter = 0;
 std::fstream ff;
+std::map<int, int> nodeCardinalityMap;
 namespace fp{
 
 	template <typename T, typename Q>
@@ -37,7 +38,6 @@ namespace fp{
 				int currTree;
                 		int uid;
          		       	std::map<int, int> nodeTreeMap;
-         		       	std::map<int, int> nodeCardinalityMap;
 	
                 		std::vector<obsIndexAndClassVec> indicesHolder;
                 		std::vector<zipClassAndValue<int, T> > zipper;
@@ -481,9 +481,9 @@ namespace fp{
                     			return nodeTreeMap;
                 		}
 
-                		inline std::map<int, int> getNodeCardinalityMap(){
+                	/*	inline std::map<int, int> getNodeCardinalityMap(){
                     			return nodeCardinalityMap;
-                		}
+                		}*/
 
 				inline int returnMaxDepth(){
 					int maxDepth=0;
