@@ -33,8 +33,8 @@ template<typename T, typename Q>
     class BinLayout
     {
         binStruct<T, Q> binstr;
-        std::vector<fpBaseNode<T, Q>> finalbin;
-        std::deque<fpBaseNode<T, Q>> binQ;
+        std::vector<fpBaseNodeStat<T, Q>> finalbin;
+        std::deque<fpBaseNodeStat<T, Q>> binQ;
         std::map<int, int> nodeNewIdx;
         std::string filename;
         std::vector<std::string> filename_vec;
@@ -66,7 +66,7 @@ template<typename T, typename Q>
             
             
             inline void BINBFSLayout(int depthIntertwined){
-                std::vector< fpBaseNode<T,Q> > bin = binstr.getBin();
+                std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
                 std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
                 int numNodesToProc = std::pow(2, depthIntertwined) - 2; 
@@ -115,7 +115,7 @@ template<typename T, typename Q>
                 // STAT per (sub)tree layout 
                 
                 while(!binQ.empty()){
-                    std::deque<fpBaseNode<T, Q>> binST;
+                    std::deque<fpBaseNodeStat<T, Q>> binST;
                     auto ele = binQ.front();
                     binQ.pop_front();
                     binST.push_back(ele);
@@ -148,7 +148,7 @@ template<typename T, typename Q>
             }
             
             inline void BINStatLayout(int depthIntertwined){
-                std::vector< fpBaseNode<T,Q> > bin = binstr.getBin();
+                std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
                 std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
                 int numNodesToProc = std::pow(2, depthIntertwined) - 2; 
@@ -199,7 +199,7 @@ template<typename T, typename Q>
                 // STAT per (sub)tree layout 
                 
                 while(!binQ.empty()){
-                    std::deque<fpBaseNode<T, Q>> binST;
+                    std::deque<fpBaseNodeStat<T, Q>> binST;
                     auto ele = binQ.front();
                     binQ.pop_front();
                     binST.push_back(ele);
@@ -231,7 +231,7 @@ template<typename T, typename Q>
 
             }
             
-	    inline bool myCompFunction(fpBaseNode<T, Q> &node1, fpBaseNode<T, Q> &node2)
+	    inline bool myCompFunction(fpBaseNodeStat<T, Q> &node1, fpBaseNodeStat<T, Q> &node2)
 	    {
 		    //Node 1 is in the BIN, node 2 is not
 
@@ -307,7 +307,7 @@ template<typename T, typename Q>
 		int num_classes_in_subtree = 0;
 		//std::map<int, int> nodeCardinalityMap = binstr.getNodeCardinalityMap();
                 std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
-		std::vector< fpBaseNode<T,Q> > bin = binstr.getBin();
+		std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 
                 int numNodesToProc = std::pow(2, depthIntertwined) - 2; 
                 int d;
@@ -369,7 +369,7 @@ template<typename T, typename Q>
                 int stno = -1; 
 		int numNodesInST = 0;
                 while(!binQ.empty()){
-                    std::deque<fpBaseNode<T, Q>> binST;
+                    std::deque<fpBaseNodeStat<T, Q>> binST;
                     auto ele = binQ.front();
                     binQ.pop_front();
                     binST.push_back(ele);
@@ -455,10 +455,10 @@ template<typename T, typename Q>
             
 
             inline void BFSLayout(){
-                std::vector< fpBaseNode<T,Q> > bin = binstr.getBin();
+                std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
                 int numClasses = fpSingleton::getSingleton().returnNumClasses();
                 std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
-                std::deque<fpBaseNode<T, Q>> binST;
+                std::deque<fpBaseNodeStat<T, Q>> binST;
                 finalbin.clear();
                 nodeNewIdx.clear();
                 for(int i = 0; i < numClasses; ++i){
@@ -504,16 +504,16 @@ template<typename T, typename Q>
                 }
             }
 
-            inline std::vector<fpBaseNode<T, Q>> getFinalBin(){
+            inline std::vector<fpBaseNodeStat<T, Q>> getFinalBin(){
                 return finalbin;
             }
 
             inline void statLayout(){
-                std::vector< fpBaseNode<T,Q> > bin = binstr.getBin();
+                std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 		std::map<int, int> nodeCardinalityMap = binstr.getNodeCardinalityMap();
                 int numClasses = fpSingleton::getSingleton().returnNumClasses();
                 std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
-                std::deque<fpBaseNode<T, Q>> binST;
+                std::deque<fpBaseNodeStat<T, Q>> binST;
                 finalbin.clear();
                 nodeNewIdx.clear();
                 for(int i = 0; i < numClasses; ++i){
@@ -569,10 +569,13 @@ template<typename T, typename Q>
             inline void writeToFile(){
                 std::ofstream f;
 		std::cout<<"in writeTOFile!!!!!\n";
+                fpBaseNode<T,Q> nodeToWrite;
                 for(int j = 0; j < NUM_FILES; j++){
                     f.open((filename + std::to_string(j) + ".bin").c_str(), std::ios::out|std::ios::binary);
-                    for(auto i: finalbin)
-                        f.write((char*)&i, sizeof(i));
+                    for(auto i: finalbin){
+                        nodeToWrite = i;
+			f.write((char*)&nodeToWrite, sizeof(nodeToWrite));
+		    }
                     f.close();
                 }
 		std::cout<<"end writeTOFile!!!!!\n";

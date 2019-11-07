@@ -15,24 +15,19 @@ class alignas(32) fpBaseNode
 		T cutValue;
 		int right;
 		int depth;
-        	int id;
+		int id;
 
 	public:
-		fpBaseNode():left(0), right(0), depth(0), id(0){}
-		fpBaseNode(T cutValue, int depth, F feature, int uid): left(0),feature(feature),cutValue(cutValue),right(0), depth(depth), id(uid){}
-		fpBaseNode(int classNum, int uid):left(0), right(classNum), depth(-1), id(uid){}
+		fpBaseNode():left(0), right(0), depth(0){}
+		fpBaseNode(T cutValue, int depth, F feature): left(0),feature(feature),cutValue(cutValue),right(0), depth(depth){}
+		fpBaseNode(int classNum ):left(0), right(classNum), depth(-1){}
+		int getID(){
+			return id;
+		}
 
 		inline bool isInternalNode(){
 			return left;
 		}
-
-        	inline int getID() const{
-            		return id;
-        	}
-
-        	inline int setID(int uid) {
-            		id = uid;
-        	}
 
 		inline bool isInternalNodeFront(){
 			return depth >= 0;
@@ -218,4 +213,41 @@ class alignas(32) fpBaseNode
             return in;
         }
 };
+
+template <typename T, typename F>
+class fpBaseNodeStat : public fpBaseNode<T, F>
+{
+		int cardinality;
+        	int id;
+		//subtreeNum = -2 indicates class, =-1 indicates interleaved BIN
+		int subtreeNum;
+	public:
+		fpBaseNodeStat()
+		{
+			fpBaseNode<T, F>();
+		}
+		fpBaseNodeStat(T cutValue, int depth, F feature, int uid, int card) 
+		{
+			cardinality = card;
+			id = uid;
+			fpBaseNode<T, F>(cutValue, depth, feature);
+		}
+		void setSTNum(int num)
+		{
+			subtreeNum = num;
+		}
+		/*int getID(){
+			return id;
+		}*/
+		void setID(int idToSet){
+			id = idToSet;
+		}
+
+};
+
+
+
+
+
+
 #endif //fpBaseNode_h

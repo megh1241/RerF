@@ -56,7 +56,7 @@ namespace fp{
 
 			public:
 				int numOfTreesInBin;
-				std::vector< fpBaseNode<T,Q> > bin;
+				std::vector< fpBaseNodeStat<T,Q> > bin;
 				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0), uid(0)
             			{
 					ff.open("elapsed_time_binstatclassfars.csv",std::ios::app);
@@ -70,14 +70,15 @@ namespace fp{
                 		~binStruct(){
                     			ff.close();
                 		}
-                		inline std::vector< fpBaseNode<T,Q> > getBin(){
+                		inline std::vector< fpBaseNodeStat<T,Q> > getBin(){
                     			return bin;
                 		}
 
-                		inline void setBin(std::vector< fpBaseNode<T,Q> > newbin){
+
+                		inline void setBin(std::vector< fpBaseNodeStat<T,Q> > newbin){
                     			bin = newbin;
                 		}
-
+				
 				inline void loadFirstNode(){
 					nodeQueue.emplace_back(0,0,0,randNum);
 					nodeQueue.back().setupRoot(indicesHolder[currTree], zipper);
@@ -152,11 +153,13 @@ namespace fp{
 					for(int i= 0; i < fpSingleton::getSingleton().returnNumClasses(); ++i){
 						bin[i].setSharedClass(i);
 					    	bin[i].setID(uid++);
-                    				nodeTreeMap.insert(std::pair<int, int>(bin[i].getID(), -1));
+                    				bin[i].setSTNum(-2);
+						//nodeTreeMap.insert(std::pair<int, int>(bin[i].getID(), -1));
                     			}
 					for(int i= fpSingleton::getSingleton().returnNumClasses(); i < fpSingleton::getSingleton().returnNumClasses()+numOfTreesInBin; ++i){
 				        	bin[i].setID(uid++);
-                    				nodeTreeMap.insert(std::pair<int, int>(bin[i].getID(), i-fpSingleton::getSingleton().returnNumClasses()));
+                    				bin[i].setSTNum(i-fpSingleton::getSingleton().returnNumClasses());
+                    				//nodeTreeMap.insert(std::pair<int, int>(bin[i].getID(), i-fpSingleton::getSingleton().returnNumClasses()));
                     			}
                 		}
 
@@ -174,20 +177,24 @@ namespace fp{
 
 
 				inline void copyProcessedNodeToBin(){
-					bin.emplace_back(nodeQueue.back().returnNodeCutValue(), returnDepthOfNode(), nodeQueue.back().returnNodeCutFeature(), uid++);
-				    	auto bin_ele = bin.back();
-                    			auto tree_num = nodeQueue.back().exposeTreeNum();
-                    			nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
-                			nodeCardinalityMap.insert(std::pair<int, int>(bin_ele.getID(), nodeQueue.back().returnNodeSize()));
+					bin.emplace_back(nodeQueue.back().returnNodeCutValue(), returnDepthOfNode(), nodeQueue.back().returnNodeCutFeature(), uid++, nodeQueue.back().returnNodeSize());
+				    	auto pos = bin.size()-1;
+					bin[pos].setSTNum( nodeQueue.back().exposeTreeNum()); 
+					//auto bin_ele = bin.back();
+                    			//auto tree_num = nodeQueue.back().exposeTreeNum();
+                    			//nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
+                			//nodeCardinalityMap.insert(std::pair<int, int>(bin_ele.getID(), nodeQueue.back().returnNodeSize()));
 				}
 
 
 				inline void copyProcessedNodeToBinInter(){
-					bin.emplace_back(nodeQueueInter.front().returnNodeCutValue(), returnDepthOfNodeInter(), nodeQueueInter.front().returnNodeCutFeature(), uid++);
-				    	auto bin_ele = bin.back();
-                    			auto tree_num = nodeQueueInter.back().exposeTreeNum();
-                    			nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
-                			nodeCardinalityMap.insert(std::pair<int, int>(bin_ele.getID(), nodeQueueInter.front().returnNodeSize()));
+					bin.emplace_back(nodeQueueInter.front().returnNodeCutValue(), returnDepthOfNodeInter(), nodeQueueInter.front().returnNodeCutFeature(), uid++, nodeQueue.front().returnNodeSize());
+				    	auto pos = bin.size()-1;
+					bin[pos].setSTNum( nodeQueueInter.front().exposeTreeNum()); 
+				    	//auto bin_ele = bin.back();
+                    			//auto tree_num = nodeQueueInter.back().exposeTreeNum();
+                    			//nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
+                			//nodeCardinalityMap.insert(std::pair<int, int>(bin_ele.getID(), nodeQueueInter.front().returnNodeSize()));
 				}
 
 
