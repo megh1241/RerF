@@ -15,15 +15,11 @@ class alignas(32) fpBaseNode
 		T cutValue;
 		int right;
 		int depth;
-		int id;
 
 	public:
 		fpBaseNode():left(0), right(0), depth(0){}
 		fpBaseNode(T cutValue, int depth, F feature): left(0),feature(feature),cutValue(cutValue),right(0), depth(depth){}
 		fpBaseNode(int classNum ):left(0), right(classNum), depth(-1){}
-		int getID(){
-			return id;
-		}
 
 		inline bool isInternalNode(){
 			return left;
@@ -130,7 +126,7 @@ class alignas(32) fpBaseNode
 			return	nextNodeHelper(observation, feature);
 		}
 		
-        inline int nextNodeHelper(const T* observation, std::vector<int>& featureVec){
+        	inline int nextNodeHelper(const T* observation, std::vector<int>& featureVec){
 			T featureVal = 0;
 			for(auto featureNumber : featureVec){
 				featureVal += observation[featureNumber];
@@ -138,7 +134,7 @@ class alignas(32) fpBaseNode
 			return (featureVal <= cutValue) ? left : right;
 		}
 		
-        inline int nextNodeHelper(const T* observation, int featureIndex){
+        	inline int nextNodeHelper(const T* observation, int featureIndex){
 			return (observation[featureIndex] <= cutValue) ? left : right;
 		}
 
@@ -147,13 +143,13 @@ class alignas(32) fpBaseNode
 			feature.push_back(fVal);
 		}
 
-        inline void outputFeature(std::ostream &out, std::vector<int>& featureVec, fpBaseNode<T, F> & obj){
-            if(obj.isInternalNodeFront()){
-                for(auto i: featureVec){
-                    out<<i<<"\n";
-                }
-            }
-        }
+       	 	inline void outputFeature(std::ostream &out, std::vector<int>& featureVec, fpBaseNode<T, F> & obj){
+            		if(obj.isInternalNodeFront()){
+                		for(auto i: featureVec){
+                    			out<<i<<"\n";
+                		}
+            		}
+        	}
 
         inline void inputFeature(std::istream &in, int feat, fpBaseNode<T, F> & obj){
             in>>obj.left;
@@ -222,23 +218,33 @@ class fpBaseNodeStat : public fpBaseNode<T, F>
 		//subtreeNum = -2 indicates class, =-1 indicates interleaved BIN
 		int subtreeNum;
 	public:
-		fpBaseNodeStat()
-		{
+		fpBaseNodeStat(){
 			fpBaseNode<T, F>();
 		}
-		fpBaseNodeStat(T cutValue, int depth, F feature, int uid, int card) 
-		{
+		fpBaseNodeStat(T cutValue, int depth, F feature, int uid, int card){
 			cardinality = card;
 			id = uid;
-			fpBaseNode<T, F>(cutValue, depth, feature);
+			this->setCutValue(cutValue);
+			this->setFeatureValue(feature);
+			this->setDepth(depth);
+			//fpBaseNode<T, F>(cutValue, depth, feature);
 		}
-		void setSTNum(int num)
-		{
+		void setSTNum(int num){
 			subtreeNum = num;
 		}
-		/*int getID(){
+		
+		int getSTNum(){
+			return subtreeNum;
+		}
+		
+		int getCard(){
+			return cardinality;
+		}
+		
+		int getID(){
 			return id;
-		}*/
+		}
+		
 		void setID(int idToSet){
 			id = idToSet;
 		}

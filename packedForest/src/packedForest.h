@@ -24,9 +24,6 @@
 #include "baseFunctions/fpForestBase.h"
 #include "baseFunctions/fpForest.h"
 
-extern std::map<int, int> nodeCardinalityMap;
-extern std::map<int, int> map_node_to_subtree ;
 extern std::map<int, int> map_subtree_to_class;
 extern std::map<int, int> map_subtree_to_size;
-extern 	std::map<int, int> map_node_to_interleaved;
 #endif //packedForest_h

@@ -19,14 +19,12 @@
 #include <map>
 #include <chrono>
 
-std::string global_fname = "binstatclassfars";
-//MemoryMapped mmappedObj(global_fname.c_str(), 0);
-std::string global_fname_csv = "binstatclassfars.csv";
+std::string global_fname = "/data/binstatclassfars";
 std::fstream fout;
 std::string global_str;
 std::vector<int> treeRootPos;
 std::vector<int> blocks;
-#define NUM_FILES 5
+#define NUM_FILES 100
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 namespace fp {
@@ -51,14 +49,14 @@ namespace fp {
 			}
 
 		public:
-            fpBaseNode<T, Q> *data;
-            std::vector<fpBaseNode<T, Q> *> data_vector; 
+            		fpBaseNode<T, Q> *data;
+            		std::vector<fpBaseNode<T, Q> *> data_vector; 
 			~binnedBase(){}
 			binnedBase(){
 				checkParameters();
 				numBins =  fpSingleton::getSingleton().returnNumTreeBins();
-                generateSeedsForBins();
-            }
+                		generateSeedsForBins();
+            		}
             
 			inline void generateSeedsForBins(){
 				binSeeds.resize(numBins);
@@ -77,57 +75,53 @@ namespace fp {
 
 			inline void calcBinSizes(){
 				int minBinSize = fpSingleton::getSingleton().returnNumTrees()/numBins;
-                binSizes.resize(numBins,minBinSize);
-                int remainingTreesToBin = fpSingleton::getSingleton().returnNumTrees()-minBinSize*numBins;
+                		binSizes.resize(numBins,minBinSize);
+                		int remainingTreesToBin = fpSingleton::getSingleton().returnNumTrees()-minBinSize*numBins;
 				while(remainingTreesToBin != 0){
 					++binSizes[--remainingTreesToBin];
 				}
 			}
 
-
 			inline void growBins(){
-                int depth_intertwined = 1;
+				std::fstream ff4;
+				ff4.open("rand_file.bin", std::ios::out);
+                		int i;
+                		for(int j = 0; j < 20000000; j++)
+                			ff4<<j;
+
+				ff4.close();
+				int depth_intertwined = 1;
 				calcBinSizes();
 				fpDisplayProgress printProgress;
-			bins.resize(numBins);
-		    std::cout<<"before create bin\n";
-		    fflush(stdout);
+				bins.resize(numBins);
+		    		std::cout<<"before create bin\n";
+		    		fflush(stdout);
 //#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
 					bins[j].createBin(binSizes[j], binSeeds[j], 1);
-		    std::cout<<"before create bin2\n";
-                    //for(auto i: bins[j].bin)
-		//	    i.printNode();
-		    //BinLayout<T, Q> binss(bins[j], global_fname) ;
-		    //BinLayout<T, Q> binss(bins[j]) ;
-		    BinLayout<T, Q> binss(bins[j], global_fname) ;
-                    //TODO: set flag for layout
-		    std::cout<<"created bin\n";
-		    fflush(stdout);
-		    //binss.BINBFSLayout(2);
-		    binss.BINStatClassLayout(2);
-		    //binss.BINStatLayout(2);
-		    std::cout<<"created layout\n";
-		    fflush(stdout);
-                    //binss.statLayout();
-                    //binss.BFSLayout();
-				    
-                    bins[j].setBin(binss.getFinalBin());
-                    treeRootPos = binss.treeRootPos;
+		   		 	std::cout<<"before create bin2\n";
+		    			BinLayout<T, Q> binss(bins[j], global_fname) ;
+                    			//TODO: set flag for layout
+		    			//binss.BINBFSLayout(1);
+		    			//binss.BINStatLayout(1);
+		    			binss.BINStatClassLayout(3);
+                    			//binss.statLayout();
+                    			//binss.BFSLayout();
+                    			bins[j].setBin(binss.getFinalBin());
+                    			treeRootPos = binss.treeRootPos;
                     
-                    std::cout<<"Printing root nodes!\n";
-                    
-                    //TODO: set flag to write to file
-                    auto start = std::chrono::steady_clock::now();
-                    binss.writeToFile();
-                    auto end = std::chrono::steady_clock::now();
-                    std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
-                }
-            }
+                    			//TODO: set flag to write to file
+                    			auto start = std::chrono::steady_clock::now();
+                    			binss.writeToFile();
+                    			auto end = std::chrono::steady_clock::now();
+                    			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
+                		}
+            		}		
 
 			inline float reportOOB(){
 				return -1;
 			}
+
 			inline std::map<std::string, int> calcBinStats(){
 				int maxDepth=0;
 				int totalLeafNodes=0;
@@ -172,29 +166,29 @@ namespace fp {
 
 
 			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = global_fname){				
-                std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
-                std::fstream f;
-                int uniqueCount;
-                //#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
-                for(int k = 0; k < numBins; ++k){
-                    if(!fromFile)
+                		std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
+                		int uniqueCount;
+				std::fstream f;
+                		f.open("rand_file.bin");
+                		int i;
+                		for(int j = 0; j < 2000; j++)
+                			f.read((char*)&i, sizeof(i));
+				f.close();
+                		//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
+                		for(int k = 0; k < numBins; ++k){
+                    			if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
-				    else{
-                        binStruct<T, Q> temp = binStruct<T, Q>(128);
-                        global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
-                        mmappedObj_vec[observationNumber%NUM_FILES].open(global_str, 0);
-                        data = (fpBaseNode<T, Q>*)mmappedObj_vec[observationNumber%NUM_FILES].getData();
-                        //numNodes = mmappedObj_vec[i].mappedSize() / sizeof(data[0]);
-                        temp.predictBinObservation(uniqueCount, treeRootPos, data, observationNumber, predictions);
-                        blocks.push_back(uniqueCount);
-                        //auto end = std::chrono::steady_clock::now();
-                        std::cout<<"Observation number: "<<observationNumber<<"\n";
-                        fflush(stdout);
-                      //  std::cout<<"Elapsed time: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
-                      //  fflush(stdout);
-                      //  fout<<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<",";
-                    }
-                }
+		    			else{
+                        			binStruct<T, Q> temp = binStruct<T, Q>(128);
+                        			global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
+                        			mmappedObj_vec[observationNumber%NUM_FILES].open(global_str, 0);
+                        			data = (fpBaseNode<T, Q>*)mmappedObj_vec[observationNumber%NUM_FILES].getData();
+                        			temp.predictBinObservation(uniqueCount, treeRootPos, data, observationNumber, predictions);
+                        			blocks.push_back(uniqueCount);
+                        			std::cout<<"Observation number: "<<observationNumber<<"\n";
+                        			fflush(stdout);
+                    			}
+                		}
 
 				//assert(std::accumulate(predictions.begin(), predictions.end(),0) == fpSingleton::getSingleton().returnNumTrees());
 
@@ -204,7 +198,7 @@ namespace fp {
 						bestClass = j;
 					}
 				}
-                mmappedObj_vec[observationNumber%NUM_FILES].close();
+                		mmappedObj_vec[observationNumber%NUM_FILES].close();
 			 	return bestClass;
 			}
             
@@ -241,36 +235,34 @@ namespace fp {
 			inline int predictClass(const T* observation){
 				/*
 					 std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
+					#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
+					for(int k = 0; k < numBins; ++k){
+						bins[k].predictBinObservation(observation, predictions);
+					}
 
-#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
-for(int k = 0; k < numBins; ++k){
-bins[k].predictBinObservation(observation, predictions);
-}
-
-int bestClass = 0;
-for(int j = 1; j < fpSingleton::getSingleton().returnNumClasses(); ++j){
-if(predictions[bestClass] < predictions[j]){
-bestClass = j;
-}
-}
-return bestClass;
-*/
-			return 0;
+					int bestClass = 0;
+					for(int j = 1; j < fpSingleton::getSingleton().returnNumClasses(); ++j){
+						if(predictions[bestClass] < predictions[j]){
+							bestClass = j;
+						}
+					}
+					return bestClass;
+				*/
+				return 0;
 			}
 
-inline std::map<std::pair<int, int>, double> returnPairMat(){
+			inline std::map<std::pair<int, int>, double> returnPairMat(){
                                         return pairMat;
                                 }
 
 inline float testForest(){
     
-    size_t arrlen = 0;
-                deserializeMmap(arrlen);
+	size_t arrlen = 0;
+	deserializeMmap(arrlen);
 	int numTried = 0;
 	int numWrong = 0;
-    int tot = fpSingleton::getSingleton().returnNumObservations();
-    //fout.open(global_fname_csv, std::ios::out );
-    for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
+    	int tot = fpSingleton::getSingleton().returnNumObservations();
+    	for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
 		++numTried;
 		int predClass = predictClass(i);
 
@@ -278,34 +270,25 @@ inline float testForest(){
 			++numWrong;
 		}
 	}
-    //fout.close();
-    fout.open("binstatclassblocksfars.csv", std::ios::out);
-    for(auto i: blocks)
-        fout<<i<<",";
-    fout.close();
+    	fout.open("binstatclassblocksfars.csv", std::ios::out);
+    	for(auto i: blocks)
+        	fout<<i<<",";
+    	fout.close();
 	std::cout << "\nnumWrong= " << numWrong << "\n";
 
-    return (float)numWrong/(float)numTried;
+    	return (float)numWrong/(float)numTried;
 }
 
 inline void deserializeMmap(size_t &numNodes){
     // open file    
     std::ifstream inputFile("rootpos.txt");
-    //treeRootPos.clear();
     // test file open   
     if (inputFile) {        
             double value;
-
-                // read the elements in the file into a vector  
-           /* while ( inputFile >> value ) {
-                    if((char)value != ' ')
-                        treeRootPos.push_back(value);
-            }*/
     }
-
 }
 
 };
 
 }// namespace fp
-#endif //binnedBase_h
+#endif //binnedBase_

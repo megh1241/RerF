@@ -15,11 +15,10 @@
 #include <fstream>
 #include <set>
 
-#define NUM_FILES 5
+#define NUM_FILES 100 
 #define BLOCK_SIZE 128
 int counter = 0;
 std::fstream ff;
-std::map<int, int> nodeCardinalityMap;
 namespace fp{
 
 	template <typename T, typename Q>
@@ -57,14 +56,14 @@ namespace fp{
 			public:
 				int numOfTreesInBin;
 				std::vector< fpBaseNodeStat<T,Q> > bin;
-				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0), uid(0)
+				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0), uid(fpSingleton::getSingleton().returnNumClasses())
             			{
-					ff.open("elapsed_time_binstatclassfars.csv",std::ios::app);
+					ff.open("elapsed_time_binstatclass.csv",std::ios::app);
              
             			}
-                		binStruct(int numTrees) : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(numTrees),currTree(0), uid(0)
+                		binStruct(int numTrees) : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(numTrees),currTree(0), uid(fpSingleton::getSingleton().returnNumClasses())
             			{
-                              		ff.open("elapsed_time_binstatclassfars.csv", std::ios::app);
+                              		ff.open("elapsed_time_binstatclass.csv", std::ios::app);
              
             			}
                 		~binStruct(){
@@ -152,8 +151,8 @@ namespace fp{
 				inline void makeLeafNodes(){
 					for(int i= 0; i < fpSingleton::getSingleton().returnNumClasses(); ++i){
 						bin[i].setSharedClass(i);
-					    	bin[i].setID(uid++);
-                    				bin[i].setSTNum(-2);
+					    	bin[i].setID(i);
+                    				bin[i].setSTNum(-100);
 						//nodeTreeMap.insert(std::pair<int, int>(bin[i].getID(), -1));
                     			}
 					for(int i= fpSingleton::getSingleton().returnNumClasses(); i < fpSingleton::getSingleton().returnNumClasses()+numOfTreesInBin; ++i){
@@ -180,10 +179,6 @@ namespace fp{
 					bin.emplace_back(nodeQueue.back().returnNodeCutValue(), returnDepthOfNode(), nodeQueue.back().returnNodeCutFeature(), uid++, nodeQueue.back().returnNodeSize());
 				    	auto pos = bin.size()-1;
 					bin[pos].setSTNum( nodeQueue.back().exposeTreeNum()); 
-					//auto bin_ele = bin.back();
-                    			//auto tree_num = nodeQueue.back().exposeTreeNum();
-                    			//nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
-                			//nodeCardinalityMap.insert(std::pair<int, int>(bin_ele.getID(), nodeQueue.back().returnNodeSize()));
 				}
 
 
@@ -191,10 +186,6 @@ namespace fp{
 					bin.emplace_back(nodeQueueInter.front().returnNodeCutValue(), returnDepthOfNodeInter(), nodeQueueInter.front().returnNodeCutFeature(), uid++, nodeQueue.front().returnNodeSize());
 				    	auto pos = bin.size()-1;
 					bin[pos].setSTNum( nodeQueueInter.front().exposeTreeNum()); 
-				    	//auto bin_ele = bin.back();
-                    			//auto tree_num = nodeQueueInter.back().exposeTreeNum();
-                    			//nodeTreeMap.insert(std::pair<int, int>(bin_ele.getID(), tree_num));
-                			//nodeCardinalityMap.insert(std::pair<int, int>(bin_ele.getID(), nodeQueueInter.front().returnNodeSize()));
 				}
 
 
@@ -451,9 +442,9 @@ namespace fp{
 					numOfTreesInBin = numTrees;
 					randNum.initialize(randSeed);
 					initializeStructures();
-                            		//auto numClasses = fpSingleton::getSingleton().returnNumClasses();
-                			//for(int i=0; i<numClasses; ++i)
-                        		//	bin[i].setID(i);	
+                            		auto numClasses = fpSingleton::getSingleton().returnNumClasses();
+                			for(int i=0; i<numClasses; ++i)
+                        			bin[i].setID(i);	
                     			if(depthInter == 1)
                         			intertwineRootsLayout();
                     			else if (depthInter > 1)
@@ -487,10 +478,6 @@ namespace fp{
                 		inline std::map<int, int> getNodeTreeMap(){
                     			return nodeTreeMap;
                 		}
-
-                	/*	inline std::map<int, int> getNodeCardinalityMap(){
-                    			return nodeCardinalityMap;
-                		}*/
 
 				inline int returnMaxDepth(){
 					int maxDepth=0;
@@ -655,36 +642,36 @@ namespace fp{
 
                 /////////////////////////START HERE////////////////////////////////////
 				inline void predictBinObservation(int &uniqueCount, std::vector<int>& roots, fpBaseNode<T, Q>*bin, int observationNum,std::vector<int>& preds, identity<int> ){
-                    std::vector<int> currNode(numOfTreesInBin);
+                    			std::vector<int> currNode(numOfTreesInBin);
 					int numberNotInLeaf;
 					int featureNum;
 					T featureVal;
 					int q;
-                    std::vector<int> v;
-                    std::vector<int> v_num_nodes;
-                    auto start = std::chrono::steady_clock::now();
-                    if(roots.size()>0){
-                        for( q=0; q<numOfTreesInBin; ++q){
-                                v_num_nodes.push_back(currNode[q]);
-						    currNode[q] = roots[q];
-					        //	__builtin_prefetch(&bin[currNode[q]], 0, 3);
-					    }
-                    }
-                    else {
-                        for( q=0; q<numOfTreesInBin; ++q){
-                                v_num_nodes.push_back(currNode[q]);
-						    currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();;
-					        //	__builtin_prefetch(&bin[currNode[q]], 0, 3);
-					    }
-                    }
+                    			std::vector<int> v;
+                    			std::vector<int> v_num_nodes;
+                    			auto start = std::chrono::steady_clock::now();
+                    			if(roots.size()>0){
+                        			for( q=0; q<numOfTreesInBin; ++q){
+                                			v_num_nodes.push_back(currNode[q]);
+						    	currNode[q] = roots[q];
+					        	//	__builtin_prefetch(&bin[currNode[q]], 0, 3);
+					    	}
+                    			}
+                    			else {
+                        			for( q=0; q<numOfTreesInBin; ++q){
+                                			v_num_nodes.push_back(currNode[q]);
+						    	currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();;
+					        	//	__builtin_prefetch(&bin[currNode[q]], 0, 3);
+					    	}
+                    			}
 					do{
 						numberNotInLeaf = 0;
 
 						for( q=0; q<numOfTreesInBin; ++q){
 							if(bin[currNode[q]].isInternalNodeFront()){
 								v.push_back(currNode[q]/BLOCK_SIZE);
-                                v_num_nodes.push_back(currNode[q]);
-                                featureNum = bin[currNode[q]].returnFeatureNumber();
+                                				v_num_nodes.push_back(currNode[q]);
+                                				featureNum = bin[currNode[q]].returnFeatureNumber();
 								featureVal = fpSingleton::getSingleton().returnTestFeatureVal(featureNum,observationNum);
 								currNode[q] = bin[currNode[q]].fpBaseNode<T, Q>::nextNode(featureVal);
 								//__builtin_prefetch(&bin[currNode[q]], 0, 3);
@@ -693,21 +680,21 @@ namespace fp{
 						}
 
 					}while(numberNotInLeaf);
-                    auto end = std::chrono::steady_clock::now();
+                    			auto end = std::chrono::steady_clock::now();
 
 					for( q=0; q<numOfTreesInBin; q++){
 #pragma omp atomic update
 						++preds[bin[currNode[q]].returnClass()];
 					}
                    
-                    std::cout<<"Number of nodes traversed: "<<v_num_nodes.size()<<"\n";  
-                    std::cout<<"Elapsed time: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
-                    ff<<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<",";
-                    std::sort(v.begin(), v.end());
-                    uniqueCount = std::set<int>( v.begin(), v.end() ).size();
-                    std::cout<<"unique count: "<< uniqueCount<<"\n";
+                    			std::cout<<"Number of nodes traversed: "<<v_num_nodes.size()<<"\n";  
+                    			std::cout<<"Elapsed time: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
+                    			ff<<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<",";
+                    			std::sort(v.begin(), v.end());
+                    			uniqueCount = std::set<int>( v.begin(), v.end() ).size();
+                    			std::cout<<"unique count: "<< uniqueCount<<"\n";
 				
-                }
+                		}
 
 
 
