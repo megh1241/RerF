@@ -93,22 +93,21 @@ namespace fp {
 				int depth_intertwined = 1;
 				calcBinSizes();
 				fpDisplayProgress printProgress;
-				numBins = 2;
-				fpSingleton::getSingleton().setNumTreeBins(2);
+				//numBins = 1;
+				//fpSingleton::getSingleton().setNumTreeBins(1);
 				bins.resize(numBins);
 		    		std::cout<<"before create bin\n";
 		    		fflush(stdout);
-#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
+//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
 					bins[j].createBin(binSizes[j], binSeeds[j], 1);
 		   		 	std::cout<<"before create bin2\n";
                     			//TODO: set flag for layout
-		    			/*
 					BinLayout<T, Q> binss(bins[j], global_fname) ;
-		    			binss.BINBFSLayout(3);
-		    			binss.BINStatLayout(2);
-		    			binss.BINStatClassLayout(1);
-                    			binss.statLayout();
+		    			//binss.BINBFSLayout(3);
+		    			//binss.BINStatLayout(2);
+		    			//binss.BINStatClassLayout(1);
+                    			//binss.statLayout();
                     			binss.BFSLayout();
                     			bins[j].setBin(binss.getFinalBin());
                     			treeRootPos = binss.treeRootPos;
@@ -117,9 +116,8 @@ namespace fp {
                     			binss.writeToFile();
                     			auto end = std::chrono::steady_clock::now();
                     			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
-                    			*/
                 		}
-				std::cout<<"PRINTING BINSS!!!!!\n";
+				/*std::cout<<"PRINTING BINSS!!!!!\n";
 				for(int j=0; j<numBins; ++j)
 				{
 					std::cout<<"***************************************************\n";
@@ -177,14 +175,7 @@ namespace fp {
 				BinLayout<T, Q> binss(newStructBin, global_fname) ;
 				fpSingleton::getSingleton().setNumTreeBins(1);
                     		binss.BFSLayout();
-		    		/*
-				binss.BINBFSLayout(3);
-		    		binss.BINStatLayout(2);
-		    		binss.BINStatClassLayout(1);
-                    		binss.statLayout();
-                    		binss.BFSLayout();
-				*/
-				binss.writeToFile();
+				binss.writeToFile();*/
 
             		}		
 
@@ -239,7 +230,8 @@ namespace fp {
                 		std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
                 		int uniqueCount;
 				std::fstream f;
-                		f.open("rand_file.bin");
+                		
+				f.open("rand_file.bin");
                 		int i;
                 		for(int j = 0; j < 200000; j++)
                 			f.read((char*)&i, sizeof(i));
@@ -249,7 +241,7 @@ namespace fp {
                     			if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
 		    			else{
-                        			binStruct<T, Q> temp = binStruct<T, Q>(128);
+                        			binStruct<T, Q> temp = binStruct<T, Q>(12);
                         			global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
                         			mmappedObj_vec[observationNumber%NUM_FILES].open(global_str, 0);
                         			data = (fpBaseNode<T, Q>*)mmappedObj_vec[observationNumber%NUM_FILES].getData();

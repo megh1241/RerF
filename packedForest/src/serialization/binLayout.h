@@ -422,7 +422,12 @@ template<typename T, typename Q>
                 }
 
                 int firstNodeInTree = 1;
-                for(int i = 0; i < binstr.numOfTreesInBin; ++i){
+                auto siz1 = bin.size();
+		//for(int i = 0; i < binstr.numOfTreesInBin; ++i){
+                for(int i = 0; i < siz1; ++i){
+		    if(bin[i].returnDepth() != 0)
+			    continue;
+		    //binST.push_back(bin[i+numClasses]);
 		    binST.push_back(bin[i]);
                     firstNodeInTree = 1;
                     while(!binST.empty()){
