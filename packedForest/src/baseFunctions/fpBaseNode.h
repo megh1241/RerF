@@ -248,6 +248,10 @@ class fpBaseNodeStat : public fpBaseNode<T, F>
 		void setID(int idToSet){
 			id = idToSet;
 		}
+		inline void printNode(){
+			fpBaseNode<T, F>::printNode();
+			std::cout<<" id: "<<id<<"\n";
+		}
 
 };
 

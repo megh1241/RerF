@@ -21,8 +21,9 @@
 #include <cstdio>
 #include <string>
 #include <functional>
- using namespace std::placeholders;
-#define NUM_FILES 100 
+#define NUM_FILES 10
+
+using namespace std::placeholders;
 std::map<int, int> map_subtree_to_class;
 std::map<int, int> map_subtree_to_size;
 
@@ -422,7 +423,7 @@ template<typename T, typename Q>
 
                 int firstNodeInTree = 1;
                 for(int i = 0; i < binstr.numOfTreesInBin; ++i){
-                    binST.push_back(bin[i+numClasses]);
+		    binST.push_back(bin[i]);
                     firstNodeInTree = 1;
                     while(!binST.empty()){
                         auto ele = binST.front();

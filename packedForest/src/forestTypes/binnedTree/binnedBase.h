@@ -19,12 +19,12 @@
 #include <map>
 #include <chrono>
 
-std::string global_fname = "/data/binstatclassfars";
+std::string global_fname = "/data3/bfs";
 std::fstream fout;
 std::string global_str;
 std::vector<int> treeRootPos;
 std::vector<int> blocks;
-#define NUM_FILES 100
+#define NUM_FILES 10
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 namespace fp {
@@ -84,38 +84,108 @@ namespace fp {
 
 			inline void growBins(){
 				std::fstream ff4;
-				ff4.open("rand_file.bin", std::ios::out);
-                		int i;
-                		for(int j = 0; j < 20000000; j++)
+				ff4.open("/data/rand_file.bin", std::ios::out);
+                		for(int j = 0; j < 200000; j++)
                 			ff4<<j;
-
 				ff4.close();
+				
+                		int i;
 				int depth_intertwined = 1;
 				calcBinSizes();
 				fpDisplayProgress printProgress;
+				numBins = 2;
+				fpSingleton::getSingleton().setNumTreeBins(2);
 				bins.resize(numBins);
 		    		std::cout<<"before create bin\n";
 		    		fflush(stdout);
-//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
+#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
 					bins[j].createBin(binSizes[j], binSeeds[j], 1);
 		   		 	std::cout<<"before create bin2\n";
-		    			BinLayout<T, Q> binss(bins[j], global_fname) ;
                     			//TODO: set flag for layout
-		    			//binss.BINBFSLayout(1);
-		    			//binss.BINStatLayout(1);
-		    			binss.BINStatClassLayout(3);
-                    			//binss.statLayout();
-                    			//binss.BFSLayout();
+		    			/*
+					BinLayout<T, Q> binss(bins[j], global_fname) ;
+		    			binss.BINBFSLayout(3);
+		    			binss.BINStatLayout(2);
+		    			binss.BINStatClassLayout(1);
+                    			binss.statLayout();
+                    			binss.BFSLayout();
                     			bins[j].setBin(binss.getFinalBin());
                     			treeRootPos = binss.treeRootPos;
-                    
                     			//TODO: set flag to write to file
                     			auto start = std::chrono::steady_clock::now();
                     			binss.writeToFile();
                     			auto end = std::chrono::steady_clock::now();
                     			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
+                    			*/
                 		}
+				std::cout<<"PRINTING BINSS!!!!!\n";
+				for(int j=0; j<numBins; ++j)
+				{
+					std::cout<<"***************************************************\n";
+					for(auto k: bins[j].getBin())
+					{
+						k.printNode();
+					}
+					std::cout<<"***************************************************\n";
+				}
+				//reconcile bins
+				int new_num_trees=0;
+				int count=0;
+				std::vector< fpBaseNodeStat<T,Q> > bin1;
+				int numClasses = fpSingleton::getSingleton().returnNumClasses();
+				for(int j=0; j<numBins; ++j)
+				{
+					std::cout<<"Num trees: "<<new_num_trees<<"\n";
+					new_num_trees += bins[j].getNumTrees();
+					std::vector< fpBaseNodeStat<T,Q> > bin2 = bins[j].getBin();
+					std::cout<<"checkpont 1\n";
+					if(j>=1){
+						std::vector<fpBaseNodeStat<T,Q>> binTemp(bin2.begin() + numClasses, bin2.end());
+						std::vector<fpBaseNodeStat<T,Q>> binTemp2;
+						int offset = bin1.size();
+					std::cout<<"checkpont 2\n";
+						for(auto i: binTemp){
+							i.printNode();
+							i.setID(count);
+							count++;
+							if (i.returnLeftNodeID() >= numClasses)
+								i.setLeftValue(i.returnLeftNodeID() + offset - numClasses);
+							if (i.returnRightNodeID() >= numClasses)
+								i.setRightValue(i.returnRightNodeID() + offset - numClasses);
+						
+							binTemp2.push_back(i);
+						}
+					std::cout<<"checkpont 3\n";
+						bin1.insert(bin1.end(), binTemp2.begin(), binTemp2.end());
+						binTemp2.clear();
+						binTemp.clear();	
+					std::cout<<"checkpont 4\n";
+					}
+					else{
+						count = bin2.size();
+						for(auto i: bin2)
+							i.printNode();
+						bin1= bin2;
+					}
+				}
+				std::cout<<"PRINTING BINSS AFTERWARD!!!!!\n";
+				for(auto j: bin1)
+					j.printNode();
+				std::cout<<"DONE PRINTING AFTERWARD!!!\n";
+				binStruct<T, Q> newStructBin(new_num_trees, bin1);
+				BinLayout<T, Q> binss(newStructBin, global_fname) ;
+				fpSingleton::getSingleton().setNumTreeBins(1);
+                    		binss.BFSLayout();
+		    		/*
+				binss.BINBFSLayout(3);
+		    		binss.BINStatLayout(2);
+		    		binss.BINStatClassLayout(1);
+                    		binss.statLayout();
+                    		binss.BFSLayout();
+				*/
+				binss.writeToFile();
+
             		}		
 
 			inline float reportOOB(){
@@ -171,9 +241,9 @@ namespace fp {
 				std::fstream f;
                 		f.open("rand_file.bin");
                 		int i;
-                		for(int j = 0; j < 2000; j++)
+                		for(int j = 0; j < 200000; j++)
                 			f.read((char*)&i, sizeof(i));
-				f.close();
+				f.close(); 
                 		//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
                 		for(int k = 0; k < numBins; ++k){
                     			if(!fromFile)
@@ -270,7 +340,7 @@ inline float testForest(){
 			++numWrong;
 		}
 	}
-    	fout.open("binstatclassblocksfars.csv", std::ios::out);
+    	fout.open("bfsblockscifar.csv", std::ios::out);
     	for(auto i: blocks)
         	fout<<i<<",";
     	fout.close();
