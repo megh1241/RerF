@@ -93,18 +93,18 @@ namespace fp {
 				int depth_intertwined = 1;
 				calcBinSizes();
 				fpDisplayProgress printProgress;
-				//numBins = 1;
-				//fpSingleton::getSingleton().setNumTreeBins(1);
+				numBins = 2;
+				fpSingleton::getSingleton().setNumTreeBins(2);
 				bins.resize(numBins);
 		    		std::cout<<"before create bin\n";
 		    		fflush(stdout);
-//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
+#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
 					bins[j].createBin(binSizes[j], binSeeds[j], 1);
-		   		 	std::cout<<"before create bin2\n";
+		   		 	/*std::cout<<"before create bin2\n";
                     			//TODO: set flag for layout
 					BinLayout<T, Q> binss(bins[j], global_fname) ;
-		    			//binss.BINBFSLayout(3);
+		    			binss.BINBFSLayout(3);
 		    			//binss.BINStatLayout(2);
 		    			//binss.BINStatClassLayout(1);
                     			//binss.statLayout();
@@ -116,7 +116,8 @@ namespace fp {
                     			binss.writeToFile();
                     			auto end = std::chrono::steady_clock::now();
                     			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
-                		}
+                		*/
+				}
 				/*std::cout<<"PRINTING BINSS!!!!!\n";
 				for(int j=0; j<numBins; ++j)
 				{
@@ -126,7 +127,7 @@ namespace fp {
 						k.printNode();
 					}
 					std::cout<<"***************************************************\n";
-				}
+				}*/
 				//reconcile bins
 				int new_num_trees=0;
 				int count=0;
@@ -134,31 +135,33 @@ namespace fp {
 				int numClasses = fpSingleton::getSingleton().returnNumClasses();
 				for(int j=0; j<numBins; ++j)
 				{
-					std::cout<<"Num trees: "<<new_num_trees<<"\n";
 					new_num_trees += bins[j].getNumTrees();
+					std::cout<<"Num trees: "<<new_num_trees<<"\n";
 					std::vector< fpBaseNodeStat<T,Q> > bin2 = bins[j].getBin();
-					std::cout<<"checkpont 1\n";
 					if(j>=1){
-						std::vector<fpBaseNodeStat<T,Q>> binTemp(bin2.begin() + numClasses, bin2.end());
+						typename std::vector<fpBaseNodeStat<T, Q>>::const_iterator first = bin2.begin() + numClasses;
+						typename std::vector<fpBaseNodeStat<T, Q>>::const_iterator last = bin2.end();
+						std::vector<fpBaseNodeStat<T,Q>> binTemp(first, last);
 						std::vector<fpBaseNodeStat<T,Q>> binTemp2;
 						int offset = bin1.size();
-					std::cout<<"checkpont 2\n";
+						std::cout<<"checkpont 2\n";
 						for(auto i: binTemp){
+							std::cout<<"before\n";
 							i.printNode();
 							i.setID(count);
 							count++;
 							if (i.returnLeftNodeID() >= numClasses)
-								i.setLeftValue(i.returnLeftNodeID() + offset - numClasses);
+								i.setLeftValue(i.returnLeftNodeID() + offset - numClasses -1);
 							if (i.returnRightNodeID() >= numClasses)
-								i.setRightValue(i.returnRightNodeID() + offset - numClasses);
+								i.setRightValue(i.returnRightNodeID() + offset - numClasses-1);
 						
+							std::cout<<"after\n";
+							i.printNode();
 							binTemp2.push_back(i);
 						}
-					std::cout<<"checkpont 3\n";
 						bin1.insert(bin1.end(), binTemp2.begin(), binTemp2.end());
 						binTemp2.clear();
 						binTemp.clear();	
-					std::cout<<"checkpont 4\n";
 					}
 					else{
 						count = bin2.size();
@@ -167,15 +170,17 @@ namespace fp {
 						bin1= bin2;
 					}
 				}
-				std::cout<<"PRINTING BINSS AFTERWARD!!!!!\n";
+				/*
 				for(auto j: bin1)
 					j.printNode();
-				std::cout<<"DONE PRINTING AFTERWARD!!!\n";
+				*/
+				//binStruct<T, Q> newStructBin(new_num_trees, bin1);
 				binStruct<T, Q> newStructBin(new_num_trees, bin1);
 				BinLayout<T, Q> binss(newStructBin, global_fname) ;
-				fpSingleton::getSingleton().setNumTreeBins(1);
                     		binss.BFSLayout();
-				binss.writeToFile();*/
+                    		treeRootPos = binss.treeRootPos;
+				binss.writeToFile();
+				fpSingleton::getSingleton().setNumTreeBins(1);
 
             		}		
 
