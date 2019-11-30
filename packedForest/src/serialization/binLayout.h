@@ -423,20 +423,25 @@ template<typename T, typename Q>
 
                 int firstNodeInTree = 1;
                 auto siz1 = bin.size();
+		int dno=0;
 		//for(int i = 0; i < binstr.numOfTreesInBin; ++i){
-                for(int i = 0; i < siz1; ++i){
+                for(int i = numClasses; i < siz1; ++i){
 		    if(bin[i].returnDepth() != 0)
 			    continue;
+		    std::cout<<"depth zero: "<< dno <<"\n"; 
+		    dno++;
+		    treeRootPos.push_back(finalbin.size()); 
 		    //binST.push_back(bin[i+numClasses]);
 		    binST.push_back(bin[i]);
                     firstNodeInTree = 1;
                     while(!binST.empty()){
                         auto ele = binST.front();
                         binST.pop_front();
-                        if (firstNodeInTree == 1){
+                 /*       if (firstNodeInTree == 1){
                             treeRootPos.push_back(finalbin.size()); 
                             firstNodeInTree = 0;
                         }
+		*/
                         finalbin.push_back(ele);
                         nodeNewIdx.insert(std::pair<int, int>(ele.getID(), finalbin.size()-1));
 
@@ -453,7 +458,7 @@ template<typename T, typename Q>
                             binST.push_back(bin[ele.returnLeftNodeID()]); 
                             binST.push_back(bin[ele.returnRightNodeID()]); 
                         }
-                    }
+                    }	
                 }
 
                 auto siz = finalbin.size();

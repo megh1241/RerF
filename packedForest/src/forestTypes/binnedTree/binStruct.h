@@ -52,9 +52,9 @@ namespace fp{
 				inline bool leftNode(){
 					return true;
 				}
+				int numOfTreesInBin;
 
 			public:
-				int numOfTreesInBin;
 				std::vector< fpBaseNodeStat<T,Q> > bin;
 				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0), uid(fpSingleton::getSingleton().returnNumClasses())
             			{
@@ -69,6 +69,7 @@ namespace fp{
 
                 		binStruct(int numTrees, std::vector< fpBaseNodeStat<T,Q> > bin_here) : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(numTrees),currTree(0), uid(fpSingleton::getSingleton().returnNumClasses())
             			{
+					bin.clear();
 					for(auto i: bin_here)
 						bin.push_back(i);
 					//bin = bin_here;
@@ -545,16 +546,24 @@ namespace fp{
 
 				//PredictForRF
 				inline void predictBinObservation(int observationNum,std::vector<int>& preds, identity<int> ){
-					std::vector<int> currNode(numOfTreesInBin);
+					std::cout<<"Here 0\n";
+					fflush(stdout);
+					std::cout<<"Number of trees in bin: "<<numOfTreesInBin<<"\n";
+					//numOfTreesInBin = 12;
+					fflush(stdout);
+					std::vector<int> currNode(12);
 					int numberNotInLeaf;
 					int featureNum;
 					T featureVal;
 					int q;
-
+					std::cout<<"Here 1\n";
+					fflush(stdout);
 					for( q=0; q<numOfTreesInBin; ++q){
 						currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();
 						__builtin_prefetch(&bin[currNode[q]], 0, 3);
 					}
+					std::cout<<"Here 2\n";
+					fflush(stdout);
 
 					do{
 						numberNotInLeaf = 0;
@@ -572,8 +581,10 @@ namespace fp{
 
 					}while(numberNotInLeaf);
 
+					std::cout<<"Here 3\n";
+					fflush(stdout);
 					for( q=0; q<numOfTreesInBin; q++){
-#pragma omp atomic update
+//#pragma omp atomic update
 						++preds[bin[currNode[q]].returnClass()];
 					}
 				}
@@ -670,7 +681,8 @@ namespace fp{
                                 			v_num_nodes.push_back(currNode[q]);
 						    	currNode[q] = roots[q];
 					        	//	__builtin_prefetch(&bin[currNode[q]], 0, 3);
-					    	}
+					    		std::cout<<"ROOTS: "<<roots[q]<<"\n";
+						}
                     			}
                     			else {
                         			for( q=0; q<numOfTreesInBin; ++q){
@@ -698,7 +710,7 @@ namespace fp{
                     			auto end = std::chrono::steady_clock::now();
 
 					for( q=0; q<numOfTreesInBin; q++){
-#pragma omp atomic update
+//#pragma omp atomic update
 						++preds[bin[currNode[q]].returnClass()];
 					}
                    
@@ -743,7 +755,7 @@ namespace fp{
 					}while(numberNotInLeaf);
 
 					for( q=0; q<numOfTreesInBin; q++){
-#pragma omp atomic update
+//#pragma omp atomic update
 						++preds[bin[currNode[q]].returnClass()];
 					}
 				}
@@ -780,7 +792,7 @@ namespace fp{
 					}while(numberNotInLeaf);
 
 					for( q=0; q<numOfTreesInBin; q++){
-#pragma omp atomic update
+//#pragma omp atomic update
 						++preds[bin[currNode[q]].returnClass()];
 					}
 				}
@@ -812,7 +824,7 @@ namespace fp{
 					}while(numberNotInLeaf);
 
 					for( q=0; q<numOfTreesInBin; q++){
-#pragma omp atomic update
+//#pragma omp atomic update
 						++preds[bin[currNode[q]].returnClass()];
 					}
 				}
@@ -849,7 +861,7 @@ namespace fp{
 					}while(numberNotInLeaf);
 
 					for( q=0; q<numOfTreesInBin; q++){
-#pragma omp atomic update
+//#pragma omp atomic update
 						++preds[bin[currNode[q]].returnClass()];
 					}
 				}
@@ -889,7 +901,7 @@ namespace fp{
 					}while(numberNotInLeaf);
 
 					for( q=0; q<numOfTreesInBin; q++){
-#pragma omp atomic update
+//#pragma omp atomic update
 						++preds[bin[currNode[q]].returnClass()];
 					}
 				}

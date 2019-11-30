@@ -4,7 +4,7 @@
 // see http://create.stephan-brumme.com/disclaimer.html
 //
 
-#pragma once
+//#pragma once
 
 // define fixed size integer types
 #ifdef _MSC_VER

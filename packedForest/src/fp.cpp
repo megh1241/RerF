@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
             }
 
             //forest.setParameter("numTreesInForest", 2048);
-            forest.setParameter("numTreesInForest", 12);
+            forest.setParameter("numTreesInForest", 24);
             forest.setParameter("minParent", 1);
             forest.setParameter("numCores", numCores);
             //forest.setParameter("seed",-1661580697);
