@@ -15,7 +15,7 @@
 #include <fstream>
 #include <set>
 
-#define NUM_FILES 100 
+#define NUM_FILES 20 
 #define BLOCK_SIZE 128
 int counter = 0;
 std::fstream ff;
@@ -688,8 +688,8 @@ namespace fp{
 					}
                    
                     			std::cout<<"Number of nodes traversed: "<<v_num_nodes.size()<<"\n";  
-                    			std::cout<<"Elapsed time: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
-                    			ff<<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<",";
+                    			std::cout<<"Elapsed time: " <<std::chrono::duration<double, std::milli>(end - start).count()<<" miliseconds.\n";
+                    			ff<<std::chrono::duration<double, std::milli>(end - start).count()<<",";
                     			std::sort(v.begin(), v.end());
                     			uniqueCount = std::set<int>( v.begin(), v.end() ).size();
                     			std::cout<<"unique count: "<< uniqueCount<<"\n";

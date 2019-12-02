@@ -19,12 +19,12 @@
 #include <map>
 #include <chrono>
 
-std::string global_fname = "/data/binstatclassfars";
+std::string global_fname = "/data3/bfsars";
 std::fstream fout;
 std::string global_str;
 std::vector<int> treeRootPos;
 std::vector<int> blocks;
-#define NUM_FILES 100
+#define NUM_FILES 20
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 namespace fp {
@@ -104,7 +104,7 @@ namespace fp {
                     			//TODO: set flag for layout
 		    			//binss.BINBFSLayout(1);
 		    			//binss.BINStatLayout(1);
-		    			binss.BINStatClassLayout(3);
+		    			binss.BINStatClassLayout(1);
                     			//binss.statLayout();
                     			//binss.BFSLayout();
                     			bins[j].setBin(binss.getFinalBin());
@@ -114,7 +114,7 @@ namespace fp {
                     			auto start = std::chrono::steady_clock::now();
                     			binss.writeToFile();
                     			auto end = std::chrono::steady_clock::now();
-                    			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()<<" nanoseconds.\n";
+                    			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" nanoseconds.\n";
                 		}
             		}		
 
@@ -270,7 +270,7 @@ inline float testForest(){
 			++numWrong;
 		}
 	}
-    	fout.open("binstatclassblocksfars.csv", std::ios::out);
+    	fout.open("binstatclassblockscifars.csv", std::ios::out);
     	for(auto i: blocks)
         	fout<<i<<",";
     	fout.close();
