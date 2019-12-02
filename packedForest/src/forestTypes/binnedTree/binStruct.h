@@ -58,12 +58,12 @@ namespace fp{
 				std::vector< fpBaseNodeStat<T,Q> > bin;
 				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0), uid(fpSingleton::getSingleton().returnNumClasses())
             			{
-					ff.open("elapsed_time_binstatclass.csv",std::ios::app);
+					ff.open("elapsed_time_bfs.csv",std::ios::app);
              
             			}
                 		binStruct(int numTrees) : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(numTrees),currTree(0), uid(fpSingleton::getSingleton().returnNumClasses())
             			{
-                              		ff.open("elapsed_time_binstatclass.csv", std::ios::app);
+                              		ff.open("elapsed_time_bfs.csv", std::ios::app);
              
             			}
                 		~binStruct(){

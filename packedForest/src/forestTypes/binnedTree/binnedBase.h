@@ -104,9 +104,9 @@ namespace fp {
                     			//TODO: set flag for layout
 		    			//binss.BINBFSLayout(1);
 		    			//binss.BINStatLayout(1);
-		    			binss.BINStatClassLayout(1);
+		    			//binss.BINStatClassLayout(1);
                     			//binss.statLayout();
-                    			//binss.BFSLayout();
+                    			binss.BFSLayout();
                     			bins[j].setBin(binss.getFinalBin());
                     			treeRootPos = binss.treeRootPos;
                     
@@ -270,7 +270,7 @@ inline float testForest(){
 			++numWrong;
 		}
 	}
-    	fout.open("binstatclassblockscifars.csv", std::ios::out);
+    	fout.open("bfs.csv", std::ios::out);
     	for(auto i: blocks)
         	fout<<i<<",";
     	fout.close();

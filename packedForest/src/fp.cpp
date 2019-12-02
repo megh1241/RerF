@@ -133,6 +133,10 @@ int main(int argc, char* argv[]) {
                     forest.setParameter("CSVFileName", "datasets/cifar-10.csv");
                     forest.setParameter("columnWithY", 3072);
                     break;
+                case 9: 
+                    forest.setParameter("CSVFileName", "datasets/BNG_satimage.csv");
+                    forest.setParameter("columnWithY", 37);
+                    break;
                 default:
                     std::cout << "unknown dataset selected" << std::endl;
                     return -1;
