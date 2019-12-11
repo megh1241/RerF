@@ -58,12 +58,12 @@ namespace fp{
 				std::vector< fpBaseNodeStat<T,Q> > bin;
 				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0), uid(fpSingleton::getSingleton().returnNumClasses())
             			{
-					ff.open("elapsed_time_bfs.csv",std::ios::app);
+					ff.open("elapsed_time_binstat.csv",std::ios::app);
              
             			}
                 		binStruct(int numTrees) : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(numTrees),currTree(0), uid(fpSingleton::getSingleton().returnNumClasses())
             			{
-                              		ff.open("elapsed_time_bfs.csv", std::ios::app);
+                              		ff.open("elapsed_time_binstat.csv", std::ios::app);
              
             			}
                 		~binStruct(){
@@ -664,6 +664,7 @@ namespace fp{
 					        	//	__builtin_prefetch(&bin[currNode[q]], 0, 3);
 					    	}
                     			}
+                    			auto start2 = std::chrono::steady_clock::now();
 					do{
 						numberNotInLeaf = 0;
 
@@ -680,15 +681,19 @@ namespace fp{
 						}
 
 					}while(numberNotInLeaf);
-                    			auto end = std::chrono::steady_clock::now();
+                    			auto start3 = std::chrono::steady_clock::now();
 
 					for( q=0; q<numOfTreesInBin; q++){
 #pragma omp atomic update
 						++preds[bin[currNode[q]].returnClass()];
 					}
+                    			auto end = std::chrono::steady_clock::now();
                    
                     			std::cout<<"Number of nodes traversed: "<<v_num_nodes.size()<<"\n";  
-                    			std::cout<<"Elapsed time: " <<std::chrono::duration<double, std::milli>(end - start).count()<<" miliseconds.\n";
+                    			std::cout<<"Elapsed time1: " <<std::chrono::duration<double, std::milli>(end - start3).count()<<" miliseconds.\n";
+                    			std::cout<<"Elapsed time2: " <<std::chrono::duration<double, std::milli>(start3 - start2).count()<<" miliseconds.\n";
+                    			std::cout<<"Elapsed time3: " <<std::chrono::duration<double, std::milli>(start2 - start).count()<<" miliseconds.\n";
+                    			std::cout<<"Elapsed time4: " <<std::chrono::duration<double, std::milli>(end - start).count()<<" miliseconds.\n";
                     			ff<<std::chrono::duration<double, std::milli>(end - start).count()<<",";
                     			std::sort(v.begin(), v.end());
                     			uniqueCount = std::set<int>( v.begin(), v.end() ).size();

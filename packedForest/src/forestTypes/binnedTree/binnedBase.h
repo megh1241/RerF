@@ -83,13 +83,15 @@ namespace fp {
 			}
 
 			inline void growBins(){
+				/*
 				std::fstream ff4;
 				ff4.open("rand_file.bin", std::ios::out);
                 		int i;
                 		for(int j = 0; j < 20000000; j++)
                 			ff4<<j;
-
 				ff4.close();
+				*/
+				
 				int depth_intertwined = 1;
 				calcBinSizes();
 				fpDisplayProgress printProgress;
@@ -103,10 +105,10 @@ namespace fp {
 		    			BinLayout<T, Q> binss(bins[j], global_fname) ;
                     			//TODO: set flag for layout
 		    			//binss.BINBFSLayout(1);
-		    			//binss.BINStatLayout(1);
+		    			binss.BINStatLayout(1);
 		    			//binss.BINStatClassLayout(1);
                     			//binss.statLayout();
-                    			binss.BFSLayout();
+                    			//binss.BFSLayout();
                     			bins[j].setBin(binss.getFinalBin());
                     			treeRootPos = binss.treeRootPos;
                     
@@ -164,16 +166,31 @@ namespace fp {
 			}
 
 
+			inline void repackForest(){
+                                bins[j].createBin(binSizes[j], binSeeds[j], 1);
+                                std::cout<<"before create bin2\n";
+                                        BinLayout<T, Q> binss(bins[j], global_fname) ;
+                                        //TODO: set flag for layout
+                                        //binss.BINBFSLayout(1);
+                                        binss.BINStatLayout(1);
+                                        //binss.BINStatClassLayout(1);
+                                        //binss.statLayout();
+                                        //binss.BFSLayout();
+                                        bins[j].setBin(binss.getFinalBin());
+                                        treeRootPos = binss.treeRootPos;
+
+                                        //TODO: set flag to write to file
+                                        auto start = std::chrono::steady_clock::now();
+                                        binss.writeToFile();
+                                        auto end = std::chrono::steady_clock::now();
+                                        std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" nanoseconds.\n";
+			}
+
 
 			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = global_fname){				
                 		std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
                 		int uniqueCount;
 				std::fstream f;
-                		f.open("rand_file.bin");
-                		int i;
-                		for(int j = 0; j < 2000; j++)
-                			f.read((char*)&i, sizeof(i));
-				f.close();
                 		//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
                 		for(int k = 0; k < numBins; ++k){
                     			if(!fromFile)
@@ -186,7 +203,6 @@ namespace fp {
                         			temp.predictBinObservation(uniqueCount, treeRootPos, data, observationNumber, predictions);
                         			blocks.push_back(uniqueCount);
                         			std::cout<<"Observation number: "<<observationNumber<<"\n";
-                        			fflush(stdout);
                     			}
                 		}
 
@@ -270,7 +286,7 @@ inline float testForest(){
 			++numWrong;
 		}
 	}
-    	fout.open("bfs.csv", std::ios::out);
+    	fout.open("binstat.csv", std::ios::out);
     	for(auto i: blocks)
         	fout<<i<<",";
     	fout.close();

@@ -124,6 +124,12 @@ namespace fp {
 
 					deleteData();
 				}
+				inline void initTestForest(){
+					loadData();
+					setDataDependentParameters();
+					checkDataDependentParameters();
+					initializeForestType();
+				}
 
 
 				inline int predict(std::vector<T>& observation){
@@ -150,16 +156,10 @@ namespace fp {
                                     return forest->returnPairMat();
                             }
 				float testAccuracy(){
-                    std::cout<<"first\n";
-                    fflush(stdout);
-                    float testError;
+					float testError;
 					loadTestData();
-                    std::cout<<"second\n";
-                    fflush(stdout);
 					initializeForestType();
-                    testError = forest->testForest();
-                    std::cout<<"third\n";
-                    fflush(stdout);
+                    			testError = forest->testForest();
 					deleteTestData();
 					return testError;
 				}
