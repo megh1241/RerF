@@ -160,8 +160,8 @@ int main(int argc, char* argv[]) {
             //forest.printForestType();
 
             //std::cout << "error: " << forest.testAccuracy() << "\n";
-            float error = forest.testAccuracy();
-            std::cout<<"Error is: "<<error<<"\n";
+            //float error = forest.testAccuracy();
+            //std::cout<<"Error is: "<<error<<"\n";
         
         }catch(std::exception& e){
             std::cout << "standard error: " << e.what() << std::endl;

@@ -163,8 +163,6 @@ namespace fp {
 				binStats();
 			}
 
-
-
 			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = global_fname){				
                 		std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
                 		int uniqueCount;
