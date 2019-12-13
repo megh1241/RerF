@@ -525,9 +525,9 @@ template<typename T, typename Q>
             }
 
             
-            inline void writeToFile(){
+            inline void writeToFileStat(){
                 std::ofstream f;
-                fpBaseNode<T,Q> nodeToWrite;
+                fpBaseNodeStat<T,Q> nodeToWrite;
                 for(int j = 0; j < NUM_FILES; j++){
                     f.open((filename + std::to_string(j) + ".bin").c_str(), std::ios::out|std::ios::binary);
                     for(auto i: finalbin){
@@ -536,8 +536,21 @@ template<typename T, typename Q>
 		    }
                     f.close();
                 }
-                
             }
+            
+	    inline void writeToFile(){
+                std::ofstream f;
+		fpBaseNode<T,Q> nodeToWrite;
+                for(int j = 0; j < NUM_FILES; j++){
+                    f.open((filename + std::to_string(j) + ".bin").c_str(), std::ios::out|std::ios::binary);
+                    for(auto i: finalbin){
+                        nodeToWrite = i;
+			f.write((char*)&nodeToWrite, sizeof(nodeToWrite));
+		    }
+                    f.close();
+                }
+            }
+            
             
             std::size_t getFilesize(const char* filename) {
                 struct stat st;

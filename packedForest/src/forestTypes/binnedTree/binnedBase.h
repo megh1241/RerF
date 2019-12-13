@@ -19,7 +19,7 @@
 #include <map>
 #include <chrono>
 
-std::string global_fname = "/data3/bfsars";
+std::string global_fname = "/data4/bfsars";
 std::fstream fout;
 std::string global_str;
 std::vector<int> treeRootPos;
@@ -105,8 +105,8 @@ namespace fp {
 		    			BinLayout<T, Q> binss(bins[j], global_fname) ;
                     			//TODO: set flag for layout
 		    			//binss.BINBFSLayout(1);
-		    			binss.BINStatLayout(1);
-		    			//binss.BINStatClassLayout(1);
+		    			//binss.BINStatLayout(1);
+		    			binss.BINStatClassLayout(1);
                     			//binss.statLayout();
                     			//binss.BFSLayout();
                     			bins[j].setBin(binss.getFinalBin());
@@ -166,29 +166,37 @@ namespace fp {
 			}
 
 
-			inline void repackForest(){
-                                bins[j].createBin(binSizes[j], binSeeds[j], 1);
-                                std::cout<<"before create bin2\n";
-                                        BinLayout<T, Q> binss(bins[j], global_fname) ;
+			inline void repackForest(std::string filename_bin){
+				std::fstream f;
+				f.open(filename_bin, std::ios::in);
+				fpBaseNodeStat<T, Q> node_to_read;
+				std::vector<fpBaseNodeStat<T, Q>> bin_vector_temp;
+				while(!f.eof())
+				{
+					f>>node_to_read;
+					bin_vector_temp.push_back(node_to_read);
+
+				}
+                        	binStruct<T, Q> temp = binStruct<T, Q>(128, bin_vector_temp);
+                                BinLayout<T, Q> binss(temp, "/data4/newdata") ;
                                         //TODO: set flag for layout
                                         //binss.BINBFSLayout(1);
-                                        binss.BINStatLayout(1);
+                                        binss.BINStatClassLayout(1);
                                         //binss.BINStatClassLayout(1);
                                         //binss.statLayout();
                                         //binss.BFSLayout();
-                                        bins[j].setBin(binss.getFinalBin());
-                                        treeRootPos = binss.treeRootPos;
 
                                         //TODO: set flag to write to file
                                         auto start = std::chrono::steady_clock::now();
-                                        binss.writeToFile();
+                                        binss.writeToFileStat();
                                         auto end = std::chrono::steady_clock::now();
                                         std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" nanoseconds.\n";
 			}
 
 
 			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = global_fname){				
-                		std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
+                		
+				std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
                 		int uniqueCount;
 				std::fstream f;
                 		//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
@@ -277,6 +285,7 @@ inline float testForest(){
 	deserializeMmap(arrlen);
 	int numTried = 0;
 	int numWrong = 0;
+	//repackForest("/data4/bfsars0.bin");
     	int tot = fpSingleton::getSingleton().returnNumObservations();
     	for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
 		++numTried;
@@ -286,7 +295,7 @@ inline float testForest(){
 			++numWrong;
 		}
 	}
-    	fout.open("binstat.csv", std::ios::out);
+    	fout.open("binstatclass.csv", std::ios::out);
     	for(auto i: blocks)
         	fout<<i<<",";
     	fout.close();
