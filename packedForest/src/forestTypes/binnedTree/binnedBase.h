@@ -192,7 +192,7 @@ namespace fp {
 				std::fstream ff4;
 				ff4.open("/data4/rand_file.bin", std::ios::in);
                 		int i;
-                		for(int j = 0; j < 200000; j++)
+                		for(int j = 0; j < 2000; j++)
                 			ff4>>j;
 				ff4.close();
 				std::fstream f;
@@ -293,7 +293,7 @@ namespace fp {
     				int tot = fpSingleton::getSingleton().returnNumObservations();
     				for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
 					++numTried;
-					int predClass = predictClass((i+120)%tot);
+					int predClass = predictClass(i);
 
 					if(predClass != fpSingleton::getSingleton().returnTestLabel(i)){
 						++numWrong;
