@@ -83,15 +83,6 @@ namespace fp {
 			}
 
 			inline void growBins(){
-				/*
-				std::fstream ff4;
-				ff4.open("rand_file.bin", std::ios::out);
-                		int i;
-                		for(int j = 0; j < 20000000; j++)
-                			ff4<<j;
-				ff4.close();
-				*/
-				
 				int depth_intertwined = 1;
 				calcBinSizes();
 				fpDisplayProgress printProgress;
@@ -198,6 +189,12 @@ namespace fp {
                 		
 				std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
                 		int uniqueCount;
+				std::fstream ff4;
+				ff4.open("/data4/rand_file.bin", std::ios::in);
+                		int i;
+                		for(int j = 0; j < 200000; j++)
+                			ff4>>j;
+				ff4.close();
 				std::fstream f;
                 		//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
                 		for(int k = 0; k < numBins; ++k){
@@ -279,30 +276,37 @@ namespace fp {
                                         return pairMat;
                                 }
 
-inline float testForest(){
-    
-	size_t arrlen = 0;
-	deserializeMmap(arrlen);
-	int numTried = 0;
-	int numWrong = 0;
-	//repackForest("/data4/bfsars0.bin");
-    	int tot = fpSingleton::getSingleton().returnNumObservations();
-    	for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
-		++numTried;
-		int predClass = predictClass(i);
+			inline float testForest(){
+				std::fstream ff4;
+				ff4.open("/data4/rand_file.bin", std::ios::out);
+                		int i;
+                		for(int j = 0; j < 20000000; j++)
+                			ff4<<j;
+				ff4.close();
+			
+				
+				size_t arrlen = 0;
+				deserializeMmap(arrlen);
+				int numTried = 0;
+				int numWrong = 0;
+				//repackForest("/data4/bfsars0.bin");
+    				int tot = fpSingleton::getSingleton().returnNumObservations();
+    				for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
+					++numTried;
+					int predClass = predictClass((i+120)%tot);
 
-		if(predClass != fpSingleton::getSingleton().returnTestLabel(i)){
-			++numWrong;
-		}
-	}
-    	fout.open("binstatclass.csv", std::ios::out);
-    	for(auto i: blocks)
-        	fout<<i<<",";
-    	fout.close();
-	std::cout << "\nnumWrong= " << numWrong << "\n";
+					if(predClass != fpSingleton::getSingleton().returnTestLabel(i)){
+						++numWrong;
+					}
+				}
+    				fout.open("binstatclass.csv", std::ios::out);
+    				for(auto i: blocks)
+        				fout<<i<<",";
+    				fout.close();
+				std::cout << "\nnumWrong= " << numWrong << "\n";
 
-    	return (float)numWrong/(float)numTried;
-}
+    				return (float)numWrong/(float)numTried;
+			}
 
 inline void deserializeMmap(size_t &numNodes){
     // open file    
