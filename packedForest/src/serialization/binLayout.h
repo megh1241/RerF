@@ -21,8 +21,8 @@
 #include <cstdio>
 #include <string>
 #include <functional>
- using namespace std::placeholders;
-#define NUM_FILES 20 
+using namespace std::placeholders;
+#define NUM_FILES 900 
 std::map<int, int> map_subtree_to_class;
 std::map<int, int> map_subtree_to_size;
 

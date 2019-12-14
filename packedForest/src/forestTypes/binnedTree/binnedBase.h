@@ -24,7 +24,7 @@ std::fstream fout;
 std::string global_str;
 std::vector<int> treeRootPos;
 std::vector<int> blocks;
-#define NUM_FILES 20
+#define NUM_FILES 900
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 namespace fp {
