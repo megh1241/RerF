@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
 
 
             //logTime.startFindSplitTimer();
-            //forest.growForest();
+            forest.growForest();
             //logTime.stopFindSplitTimer();
             //logTime.printGrowTime();
 
@@ -160,8 +160,8 @@ int main(int argc, char* argv[]) {
             //forest.printForestType();
 
 	    //std::cout<<"Beginning\n";
-            forest.initTestForest();
-	    std::cout << "error: " << forest.testAccuracy() << "\n";
+            //forest.initTestForest();
+	    //std::cout << "error: " << forest.testAccuracy() << "\n";
         
         }catch(std::exception& e){
             std::cout << "standard error: " << e.what() << std::endl;

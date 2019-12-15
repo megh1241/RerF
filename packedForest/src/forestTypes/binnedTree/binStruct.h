@@ -15,7 +15,7 @@
 #include <fstream>
 #include <set>
 
-#define NUM_FILES 20 
+#define NUM_FILES 900 
 #define BLOCK_SIZE 128
 int counter = 0;
 std::fstream ff;
@@ -58,17 +58,17 @@ namespace fp{
 				std::vector< fpBaseNodeStat<T,Q> > bin;
 				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0), uid(fpSingleton::getSingleton().returnNumClasses())
             			{
-					ff.open("elapsed_time_binstatclass.csv",std::ios::app);
+					ff.open("elapsed_time_bfs.csv",std::ios::app);
              
             			}
                 		binStruct(int numTrees) : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(numTrees),currTree(0), uid(fpSingleton::getSingleton().returnNumClasses())
             			{
-                              		ff.open("elapsed_time_binstatclass.csv", std::ios::app);
+                              		ff.open("elapsed_time_bfs.csv", std::ios::app);
              
             			}
                 		binStruct(int numTrees,  std::vector< fpBaseNodeStat<T,Q> > bin_here) : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(numTrees),currTree(0), bin(bin_here), uid(fpSingleton::getSingleton().returnNumClasses())
             			{
-                              		ff.open("elapsed_time_binstatclass.csv", std::ios::app);
+                              		ff.open("elapsed_time_bfs.csv", std::ios::app);
              
             			}
                 		~binStruct(){

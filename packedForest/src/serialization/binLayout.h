@@ -22,7 +22,7 @@
 #include <string>
 #include <functional>
  using namespace std::placeholders;
-#define NUM_FILES 20 
+#define NUM_FILES 900 
 std::map<int, int> map_subtree_to_class;
 std::map<int, int> map_subtree_to_size;
 
@@ -538,7 +538,7 @@ template<typename T, typename Q>
                 }
             }
             
-	    inline void writeToFile(){
+	    inline void writeToFile(std::vector<int> roots){
                 std::ofstream f;
 		fpBaseNode<T,Q> nodeToWrite;
                 for(int j = 0; j < NUM_FILES; j++){
@@ -548,8 +548,16 @@ template<typename T, typename Q>
 			f.write((char*)&nodeToWrite, sizeof(nodeToWrite));
 		    }
                     f.close();
-                }
-            }
+                
+		}
+
+		std::string treeroot_fname = "treeroots.bin";
+		f.open(treeroot_fname.c_str(), std::ios::out|std::ios::binary);
+		f.write((char*)&roots, sizeof(roots));
+		f.close();
+
+            
+	    }
             
             
             std::size_t getFilesize(const char* filename) {

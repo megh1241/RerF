@@ -97,15 +97,15 @@ namespace fp {
                     			//TODO: set flag for layout
 		    			//binss.BINBFSLayout(1);
 		    			//binss.BINStatLayout(1);
-		    			binss.BINStatClassLayout(1);
+		    			//binss.BINStatClassLayout(1);
                     			//binss.statLayout();
-                    			//binss.BFSLayout();
+                    			binss.BFSLayout();
                     			bins[j].setBin(binss.getFinalBin());
                     			treeRootPos = binss.treeRootPos;
                     
                     			//TODO: set flag to write to file
                     			auto start = std::chrono::steady_clock::now();
-                    			binss.writeToFile();
+                    			binss.writeToFile(treeRootPos);
                     			auto end = std::chrono::steady_clock::now();
                     			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" nanoseconds.\n";
                 		}
@@ -172,14 +172,14 @@ namespace fp {
                                 BinLayout<T, Q> binss(temp, "/data4/newdata") ;
                                         //TODO: set flag for layout
                                         //binss.BINBFSLayout(1);
-                                        binss.BINStatClassLayout(1);
+                                        //binss.BINStatClassLayout(1);
                                         //binss.BINStatClassLayout(1);
                                         //binss.statLayout();
-                                        //binss.BFSLayout();
+                                        binss.BFSLayout();
 
                                         //TODO: set flag to write to file
                                         auto start = std::chrono::steady_clock::now();
-                                        binss.writeToFileStat();
+                                        binss.writeToFile();
                                         auto end = std::chrono::steady_clock::now();
                                         std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" nanoseconds.\n";
 			}
@@ -293,13 +293,13 @@ namespace fp {
     				int tot = fpSingleton::getSingleton().returnNumObservations();
     				for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
 					++numTried;
-					int predClass = predictClass((i+120)%tot);
+					int predClass = predictClass(i);
 
 					if(predClass != fpSingleton::getSingleton().returnTestLabel(i)){
 						++numWrong;
 					}
 				}
-    				fout.open("binstatclass.csv", std::ios::out);
+    				fout.open("bfs.csv", std::ios::out);
     				for(auto i: blocks)
         				fout<<i<<",";
     				fout.close();
