@@ -24,7 +24,7 @@ std::fstream fout;
 std::string global_str;
 std::vector<int> treeRootPos;
 std::vector<int> blocks;
-#define NUM_FILES 20
+#define NUM_FILES 900
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 namespace fp {
@@ -192,7 +192,7 @@ namespace fp {
 				std::fstream ff4;
 				ff4.open("/data4/rand_file.bin", std::ios::in);
                 		int i;
-                		for(int j = 0; j < 200000; j++)
+                		for(int j = 0; j < 2000; j++)
                 			ff4>>j;
 				ff4.close();
 				std::fstream f;

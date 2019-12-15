@@ -21,7 +21,11 @@
 #include <cstdio>
 #include <string>
 #include <functional>
+<<<<<<< HEAD
  using namespace std::placeholders;
+=======
+using namespace std::placeholders;
+>>>>>>> 2e9c21354693c2b47b33b2075c17cb2eea5171bd
 #define NUM_FILES 900 
 std::map<int, int> map_subtree_to_class;
 std::map<int, int> map_subtree_to_size;
