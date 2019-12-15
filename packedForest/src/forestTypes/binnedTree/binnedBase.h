@@ -278,10 +278,17 @@ namespace fp {
 
 			inline float testForest(){
 				std::fstream ff4;
-				ff4.open("/data4/rand_file.bin", std::ios::out);
+				/*ff4.open("/data4/rand_file.bin", std::ios::out);
                 		int i;
                 		for(int j = 0; j < 20000000; j++)
                 			ff4<<j;
+				*/
+				ff4.open("treeroots.bin", std::ios::in);
+                		int i;
+				for(int j=0; j<128 ;j++){
+					ff4>>i;
+					treeRootPos.push_back(i);
+				}
 				ff4.close();
 			
 				
