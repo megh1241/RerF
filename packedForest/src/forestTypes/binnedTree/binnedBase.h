@@ -27,6 +27,7 @@ std::vector<int> blocks;
 #define NUM_FILES 900
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
+MemoryMapped mmappedObj;
 namespace fp {
 
 	template <typename T, typename Q>
@@ -96,10 +97,10 @@ namespace fp {
 		    			BinLayout<T, Q> binss(bins[j], global_fname) ;
                     			//TODO: set flag for layout
 		    			//binss.BINBFSLayout(1);
-		    			//binss.BINStatLayout(1);
+		    			binss.BINStatLayout(1);
 		    			//binss.BINStatClassLayout(1);
                     			//binss.statLayout();
-                    			binss.BFSLayout();
+                    			//binss.BFSLayout();
                     			bins[j].setBin(binss.getFinalBin());
                     			treeRootPos = binss.treeRootPos;
                     
@@ -172,10 +173,10 @@ namespace fp {
                                 BinLayout<T, Q> binss(temp, "/data4/newdata") ;
                                         //TODO: set flag for layout
                                         //binss.BINBFSLayout(1);
-                                        //binss.BINStatClassLayout(1);
+                                        binss.BINStatClassLayout(1);
                                         //binss.BINStatClassLayout(1);
                                         //binss.statLayout();
-                                        binss.BFSLayout();
+                                        //binss.BFSLayout();
 
                                         //TODO: set flag to write to file
                                         auto start = std::chrono::steady_clock::now();
@@ -189,26 +190,22 @@ namespace fp {
                 		
 				std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
                 		int uniqueCount;
-				std::fstream ff4;
-				ff4.open("/data4/rand_file.bin", std::ios::in);
-                		int i;
-                		for(int j = 0; j < 2000; j++)
-                			ff4>>j;
-				ff4.close();
-				std::fstream f;
-                		//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
+                        	binStruct<T, Q> temp = binStruct<T, Q>(16);
+                		#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
                 		for(int k = 0; k < numBins; ++k){
                     			if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
 		    			else{
-                        			binStruct<T, Q> temp = binStruct<T, Q>(128);
                         			global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
-                        			mmappedObj_vec[observationNumber%NUM_FILES].open(global_str, 0);
-                        			data = (fpBaseNode<T, Q>*)mmappedObj_vec[observationNumber%NUM_FILES].getData();
+                        			//mmappedObj.open(global_str, 0); 
+						//mmappedObj_vec[observationNumber%NUM_FILES].open(global_str, 0);
+                        			//data = (fpBaseNode<T, Q>*)mmappedObj.getData();
+                        			//data = (fpBaseNode<T, Q>*)mmappedObj_vec[observationNumber%NUM_FILES].getData();
                         			temp.predictBinObservation(uniqueCount, treeRootPos, data, observationNumber, predictions);
-                        			blocks.push_back(uniqueCount);
+                        			//blocks.push_back(uniqueCount);
                         			std::cout<<"Observation number: "<<observationNumber<<"\n";
                     			}
+					//mmappedObj.close();
                 		}
 
 				//assert(std::accumulate(predictions.begin(), predictions.end(),0) == fpSingleton::getSingleton().returnNumTrees());
@@ -219,7 +216,8 @@ namespace fp {
 						bestClass = j;
 					}
 				}
-                		mmappedObj_vec[observationNumber%NUM_FILES].close();
+                		//mmappedObj_vec[observationNumber%NUM_FILES].close();
+                		//mmappedObj.close();
 			 	return bestClass;
 			}
             
@@ -277,23 +275,11 @@ namespace fp {
                                 }
 
 			inline float testForest(){
-				std::fstream ff4;
-				/*ff4.open("/data4/rand_file.bin", std::ios::out);
-                		int i;
-                		for(int j = 0; j < 20000000; j++)
-                			ff4<<j;
-				*/
-				ff4.open("treeroots.bin", std::ios::in);
-                		int i;
-				for(int j=0; j<128 ;j++){
-					ff4>>i;
-					treeRootPos.push_back(i);
-				}
-				ff4.close();
-			
+				mmappedObj.open("/data4/bfsars5366.bin", 0);
+                        	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
 				
 				size_t arrlen = 0;
-				deserializeMmap(arrlen);
+				//deserializeMmap(arrlen);
 				int numTried = 0;
 				int numWrong = 0;
 				//repackForest("/data4/bfsars0.bin");

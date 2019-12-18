@@ -694,7 +694,7 @@ namespace fp{
 					}
                     			auto end = std::chrono::steady_clock::now();
                    
-                    			std::cout<<"Number of nodes traversed: "<<v_num_nodes.size()<<"\n";  
+                    		/*	std::cout<<"Number of nodes traversed: "<<v_num_nodes.size()<<"\n";  
                     			std::cout<<"Elapsed time1: " <<std::chrono::duration<double, std::milli>(end - start3).count()<<" miliseconds.\n";
                     			std::cout<<"Elapsed time2: " <<std::chrono::duration<double, std::milli>(start3 - start2).count()<<" miliseconds.\n";
                     			std::cout<<"Elapsed time3: " <<std::chrono::duration<double, std::milli>(start2 - start).count()<<" miliseconds.\n";
@@ -703,7 +703,7 @@ namespace fp{
                     			std::sort(v.begin(), v.end());
                     			uniqueCount = std::set<int>( v.begin(), v.end() ).size();
                     			std::cout<<"unique count: "<< uniqueCount<<"\n";
-				
+				*/
                 		}
 
 
