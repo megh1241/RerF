@@ -523,8 +523,8 @@ namespace fp{
 				inline void predictBinObservation(int observationNum, std::vector<int>& preds){
 					predictBinObservation(observationNum,preds, identity<Q>());
 				}
-				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>* data, int observationNum, std::vector<int>& preds){
-                    			predictBinObservation(uniqueCount, roots, data,observationNum,preds, identity<Q>());
+				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>* data, int observationNum, std::vector<int>& preds, std::vector<double>&etime){
+                    			predictBinObservation(uniqueCount, roots, data,observationNum,preds, identity<Q>(), etime);
 				}
 
 				inline void predictBinObservation(std::vector<T>& observation, std::vector<int>& preds){
@@ -646,7 +646,7 @@ namespace fp{
 				}
 
                 /////////////////////////START HERE////////////////////////////////////
-				inline void predictBinObservation(int &uniqueCount, std::vector<int>& roots, fpBaseNode<T, Q>*bin, int observationNum,std::vector<int>& preds, identity<int> ){
+				inline void predictBinObservation(int &uniqueCount, std::vector<int>& roots, fpBaseNode<T, Q>*bin, int observationNum,std::vector<int>& preds, identity<int>, std::vector<double>&etime ){
                     			std::vector<int> currNode(numOfTreesInBin);
 					int numberNotInLeaf;
 					int featureNum;
@@ -693,7 +693,11 @@ namespace fp{
 						++preds[bin[currNode[q]].returnClass()];
 					}
                     			auto end = std::chrono::steady_clock::now();
-                   
+                  
+#pragma omp critical
+					etime.push_back(std::chrono::duration<double, std::milli>(end - start).count());
+                    			std::cout<<"Elapsed time: " <<std::chrono::duration<double, std::milli>(end - start).count()<<" miliseconds.\n";
+                    			std::cout<<"Number of nodes traversed: "<<v_num_nodes.size()<<"\n";  
                     		/*	std::cout<<"Number of nodes traversed: "<<v_num_nodes.size()<<"\n";  
                     			std::cout<<"Elapsed time1: " <<std::chrono::duration<double, std::milli>(end - start3).count()<<" miliseconds.\n";
                     			std::cout<<"Elapsed time2: " <<std::chrono::duration<double, std::milli>(start3 - start2).count()<<" miliseconds.\n";
@@ -708,7 +712,7 @@ namespace fp{
 
 
 
-				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin, int observationNum, std::vector<int>& preds, identity<std::vector<int> >){
+				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin, int observationNum, std::vector<int>& preds, identity<std::vector<int> >,  std::vector<double>&etime){
 					std::vector<int> currNode(numOfTreesInBin);
 					int numberNotInLeaf;
 					T featureVal;
@@ -744,7 +748,7 @@ namespace fp{
 				}
 
 
-				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin,int observationNum, std::vector<int>& preds, identity<weightedFeature>){
+				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin,int observationNum, std::vector<int>& preds, identity<weightedFeature>, std::vector<double>&etime){
 					std::vector<int> currNode(numOfTreesInBin);
 					int numberNotInLeaf;
 					T featureVal;

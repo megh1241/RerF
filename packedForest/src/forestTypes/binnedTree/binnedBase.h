@@ -24,6 +24,8 @@ std::fstream fout;
 std::string global_str;
 std::vector<int> treeRootPos;
 std::vector<int> blocks;
+std::vector<double>etime;
+std::vector<int> sizesbin;
 #define NUM_FILES 900
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
@@ -85,13 +87,15 @@ namespace fp {
 
 			inline void growBins(){
 				int depth_intertwined = 1;
+				int threadnum;
 				calcBinSizes();
 				fpDisplayProgress printProgress;
 				bins.resize(numBins);
-		    		std::cout<<"before create bin\n";
-		    		fflush(stdout);
-//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
+				std::vector<BinLayout<T, Q>> binvector;
+
+#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
+					threadnum = omp_get_thread_num();
 					bins[j].createBin(binSizes[j], binSeeds[j], 1);
 		   		 	std::cout<<"before create bin2\n";
 		    			BinLayout<T, Q> binss(bins[j], global_fname) ;
@@ -106,10 +110,22 @@ namespace fp {
                     
                     			//TODO: set flag to write to file
                     			auto start = std::chrono::steady_clock::now();
-                    			binss.writeToFile(treeRootPos);
-                    			auto end = std::chrono::steady_clock::now();
+                    			//binss.writeToFile(treeRootPos);
+					#pragma omp critical
+					{
+						binvector.push_back(binss);
+				        	sizesbin.push_back((int)binss.finalbin.size());	
+					}
+					auto end = std::chrono::steady_clock::now();
                     			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" nanoseconds.\n";
                 		}
+				for(auto single_bin: binvector)
+					single_bin.writeToFile(treeRootPos);
+				std::fstream fsiz;
+				fsiz.open("/data4/binstart.txt", std::ios::out);
+				for(auto i: sizesbin)
+					fsiz<<i<<"\n";
+				fsiz.close();
             		}		
 
 			inline float reportOOB(){
@@ -187,25 +203,59 @@ namespace fp {
 
 
 			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = global_fname){				
-                		
+				int j, tmp_val;
+				std::fstream fi;
+				fi.open("/data4/rand_file.txt");
+				for(int i=0; i<20000; ++i)
+					fi>>j;	
+				for(int i=0; i<20000; ++i)
+					fi>>j;	
+				for(int i=0; i<20000; ++i)
+					fi>>j;	
+			
+				fi.close();	
+				fi.open("/data4/binstart.txt");
+				sizesbin.clear();
+				int sumsum = 0;
+				for(int i=0; i<fpSingleton::getSingleton().returnNumThreads(); ++i){
+					fi>>tmp_val;
+					sizesbin.push_back(sumsum);
+					sumsum+=tmp_val;
+				}
+				fi.close();
 				std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
                 		int uniqueCount;
-                        	binStruct<T, Q> temp = binStruct<T, Q>(16);
-                		#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
+                        	binStruct<T, Q> temp = binStruct<T, Q>(8);
+                        	//global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
+                        	//mmappedObj.open(global_str, 0); 
+				int threadnum;
+                		//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
                 		for(int k = 0; k < numBins; ++k){
-                    			if(!fromFile)
+                    			 //threadnum = omp_get_thread_num();
+                    			 threadnum = k;
+					 std::cout<<"threadnum: "<<threadnum<<"\n";
+					if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
 		    			else{
-                        			global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
-                        			//mmappedObj.open(global_str, 0); 
+                        			#pragma omp critical
+						global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
+                        			#pragma omp critical
+                        			mmappedObj.open(global_str, 0); 
 						//mmappedObj_vec[observationNumber%NUM_FILES].open(global_str, 0);
-                        			//data = (fpBaseNode<T, Q>*)mmappedObj.getData();
+                        			data = (fpBaseNode<T, Q>*)mmappedObj.getData();
+						/*for(int i=0; i<1000; ++i)
+						{
+							std::cout<<data[i].returnLeftNodeID()<<"\n";
+						}*/
+
+						
                         			//data = (fpBaseNode<T, Q>*)mmappedObj_vec[observationNumber%NUM_FILES].getData();
-                        			temp.predictBinObservation(uniqueCount, treeRootPos, data, observationNumber, predictions);
+                        			temp.predictBinObservation(uniqueCount, treeRootPos, data + sizesbin[threadnum], observationNumber, predictions, etime);
                         			//blocks.push_back(uniqueCount);
-                        			std::cout<<"Observation number: "<<observationNumber<<"\n";
+                        			//std::cout<<"Observation number: "<<observationNumber<<"\n";
+                        			#pragma omp critical
+						mmappedObj.close();
                     			}
-					//mmappedObj.close();
                 		}
 
 				//assert(std::accumulate(predictions.begin(), predictions.end(),0) == fpSingleton::getSingleton().returnNumTrees());
@@ -275,9 +325,14 @@ namespace fp {
                                 }
 
 			inline float testForest(){
-				mmappedObj.open("/data4/bfsars5366.bin", 0);
-                        	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
-				
+			//	mmappedObj.open("/data4/bfsars5366.bin", 0);
+                        //	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
+			
+				std::fstream fi; 
+				fi.open("/data4/randfile.txt", std::ios::out);	
+				for(int i=0; i<10000; ++i)
+					fi<<(i+1)%6;
+				fi.close();
 				size_t arrlen = 0;
 				//deserializeMmap(arrlen);
 				int numTried = 0;
@@ -292,8 +347,12 @@ namespace fp {
 						++numWrong;
 					}
 				}
-    				fout.open("bfs.csv", std::ios::out);
+    				fout.open("blocks_22threads.csv", std::ios::out);
     				for(auto i: blocks)
+        				fout<<i<<",";
+    				fout.close();
+    				fout.open("binstat_time_22threads.csv", std::ios::out);
+    				for(auto i: etime)
         				fout<<i<<",";
     				fout.close();
 				std::cout << "\nnumWrong= " << numWrong << "\n";

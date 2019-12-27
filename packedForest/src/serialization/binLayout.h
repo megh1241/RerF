@@ -31,12 +31,12 @@ template<typename T, typename Q>
     class BinLayout
     {
         binStruct<T, Q> binstr;
-        std::vector<fpBaseNodeStat<T, Q>> finalbin;
         std::deque<fpBaseNodeStat<T, Q>> binQ;
         std::map<int, int> nodeNewIdx;
         std::string filename;
         std::vector<std::string> filename_vec;
         public:
+        std::vector<fpBaseNodeStat<T, Q>> finalbin;
             std::vector<int> treeRootPos;
             BinLayout(binStruct<T, Q> tempbins): binstr(tempbins){
 		
@@ -539,23 +539,24 @@ template<typename T, typename Q>
             }
             
 	    inline void writeToFile(std::vector<int> roots){
-                std::ofstream f;
-		fpBaseNode<T,Q> nodeToWrite;
-                for(int j = 0; j < NUM_FILES; j++){
-                    f.open((filename + std::to_string(j) + ".bin").c_str(), std::ios::out|std::ios::binary);
-                    for(auto i: finalbin){
-                        nodeToWrite = i;
-			f.write((char*)&nodeToWrite, sizeof(nodeToWrite));
-		    }
-                    f.close();
+		#pragma omp critical
+		{
+                	std::ofstream f;
+			fpBaseNode<T,Q> nodeToWrite;
+                	for(int j = 0; j < NUM_FILES; j++){
+                    		f.open((filename + std::to_string(j) + ".bin").c_str(), std::ios::out|std::ios::app|std::ios::binary);
+                    		for(auto i: finalbin){
+                        		nodeToWrite = i;
+					f.write((char*)&nodeToWrite, sizeof(nodeToWrite));
+		    		}
+                    		f.close();
                 
+			}
+			std::string treeroot_fname = "treeroots.bin";
+			f.open(treeroot_fname.c_str(), std::ios::out|std::ios::binary);
+			f.write((char*)&roots, sizeof(roots));
+			f.close();
 		}
-
-		std::string treeroot_fname = "treeroots.bin";
-		f.open(treeroot_fname.c_str(), std::ios::out|std::ios::binary);
-		f.write((char*)&roots, sizeof(roots));
-		f.close();
-
             
 	    }
             

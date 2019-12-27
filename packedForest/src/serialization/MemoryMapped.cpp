@@ -71,7 +71,7 @@ MemoryMapped::MemoryMapped(const std::string& filename, size_t mappedBytes, Cach
 /// close file (see close() )
 MemoryMapped::~MemoryMapped()
 {
-  printf("Enterred MemoryMapped destructor\n");
+  //printf("Enterred MemoryMapped destructor\n");
   close();
 }
 
@@ -125,12 +125,12 @@ bool MemoryMapped::open(const std::string& filename, size_t mappedBytes, CacheHi
 
   // open file
   _file = ::open(filename.c_str(), O_RDONLY | O_LARGEFILE);
-  printf("string here: %s\n", filename.c_str());
+  //printf("string here: %s\n", filename.c_str());
   fflush(stdout);
   if (_file == -1)
   {
-    std::cout<<"ERROR!!!!\n";
-    fflush(stdout);
+    //std::cout<<"ERROR!!!!\n";
+    //fflush(stdout);
     _file = 0;
     return false;
   }
@@ -149,8 +149,8 @@ bool MemoryMapped::open(const std::string& filename, size_t mappedBytes, CacheHi
   if (!_mappedView)
     return false;
 
-    std::cout<<"return TRUE !!!!!!!\n";
-    fflush(stdout);
+    //std::cout<<"return TRUE !!!!!!!\n";
+    //fflush(stdout);
   // everything's fine
   return true;
 }
