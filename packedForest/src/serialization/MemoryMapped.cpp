@@ -297,6 +297,7 @@ bool MemoryMapped::remap(uint64_t offset, size_t mappedBytes)
   // Linux
   // new mapping
   _mappedView = ::mmap64(NULL, mappedBytes, PROT_READ, MAP_SHARED, _file, offset);
+  //_mappedView = ::mmap64(NULL, mappedBytes, PROT_READ||MAP_STACK, MAP_PRIVATE, _file, offset);
   if (_mappedView == MAP_FAILED)
   {
     _mappedBytes = 0;

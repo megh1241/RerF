@@ -119,6 +119,7 @@ namespace fp {
 					auto end = std::chrono::steady_clock::now();
                     			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" nanoseconds.\n";
                 		}
+
 				for(auto single_bin: binvector)
 					single_bin.writeToFile(treeRootPos);
 				std::fstream fsiz;
@@ -217,46 +218,45 @@ namespace fp {
 				fi.open("/data4/binstart.txt");
 				sizesbin.clear();
 				int sumsum = 0;
+				std::cout<<"*************************************\n";
 				for(int i=0; i<fpSingleton::getSingleton().returnNumThreads(); ++i){
 					fi>>tmp_val;
+					std::cout<<"tmp_val: "<<tmp_val<<"\n";
+					std::cout<<"sumsum: "<<sumsum<<"\n";
 					sizesbin.push_back(sumsum);
 					sumsum+=tmp_val;
 				}
+				std::cout<<"*************************************\n";
 				fi.close();
 				std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
                 		int uniqueCount;
-                        	binStruct<T, Q> temp = binStruct<T, Q>(8);
+                        	binStruct<T, Q> temp = binStruct<T, Q>(16);
                         	//global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
                         	//mmappedObj.open(global_str, 0); 
 				int threadnum;
+				global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
+                       		mmappedObj.open(global_str, 0); 
+                        	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
                 		//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
-                		for(int k = 0; k < numBins; ++k){
+                		//for(int k = 0; k < numBins; ++k){
+                		for(int k = 0; k < 1; ++k){
                     			 //threadnum = omp_get_thread_num();
                     			 threadnum = k;
 					 std::cout<<"threadnum: "<<threadnum<<"\n";
 					if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
 		    			else{
-                        			#pragma omp critical
 						global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
-                        			#pragma omp critical
-                        			mmappedObj.open(global_str, 0); 
-						//mmappedObj_vec[observationNumber%NUM_FILES].open(global_str, 0);
-                        			data = (fpBaseNode<T, Q>*)mmappedObj.getData();
-						/*for(int i=0; i<1000; ++i)
-						{
-							std::cout<<data[i].returnLeftNodeID()<<"\n";
-						}*/
-
-						
-                        			//data = (fpBaseNode<T, Q>*)mmappedObj_vec[observationNumber%NUM_FILES].getData();
-                        			temp.predictBinObservation(uniqueCount, treeRootPos, data + sizesbin[threadnum], observationNumber, predictions, etime);
+                        			//#pragma omp critical
+                        		//	mmappedObj.open(global_str, 0); 
+                        	//		temp.predictBinObservation(uniqueCount, treeRootPos, data + sizesbin[k], observationNumber, predictions, etime);
+                        			temp.predictBinObservation(uniqueCount, treeRootPos, data, observationNumber, predictions, etime);
                         			//blocks.push_back(uniqueCount);
-                        			//std::cout<<"Observation number: "<<observationNumber<<"\n";
-                        			#pragma omp critical
-						mmappedObj.close();
+                        			//#pragma omp critical
+						//mmappedObj.close();
                     			}
                 		}
+				mmappedObj.close();
 
 				//assert(std::accumulate(predictions.begin(), predictions.end(),0) == fpSingleton::getSingleton().returnNumTrees());
 
@@ -339,7 +339,10 @@ namespace fp {
 				int numWrong = 0;
 				//repackForest("/data4/bfsars0.bin");
     				int tot = fpSingleton::getSingleton().returnNumObservations();
+                       		//mmappedObj.open(global_str, 0); 
+                        	//data = (fpBaseNode<T, Q>*)mmappedObj.getData();
     				for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
+    				//for (int i = 0; i < 1; i++){
 					++numTried;
 					int predClass = predictClass(i);
 
@@ -347,6 +350,7 @@ namespace fp {
 						++numWrong;
 					}
 				}
+				//mmappedObj.close();
     				fout.open("blocks_22threads.csv", std::ios::out);
     				for(auto i: blocks)
         				fout<<i<<",";

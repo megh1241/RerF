@@ -190,13 +190,20 @@ class alignas(32) fpBaseNode
             out << obj.left << "\n" <<obj.right<<"\n"<<obj.cutValue<<"\n";
         }
 
-		inline void virtual printNode(){
-			if(isInternalNode()){
+		inline void printNode(){
+		/*	if(isInternalNode()){
 				std::cout << "internal ";
 			}else{
 				std::cout << "leaf ";
-			}
-			std::cout << "cutValue " << cutValue << ", left " << left << ", right " << right << ", depth " << depth << "\n";
+			}*/
+			std::cout << "cutValue " << cutValue <<"\n";
+		       	fflush(stdout);
+			std::cout << ", left " << left <<"\n";
+		       	fflush(stdout);
+			std::cout<<", right " << right <<"\n";
+		       	fflush(stdout);
+			std::cout<<", depth " << depth <<"\n";
+		       	fflush(stdout);
 		}
 
         friend std::ostream & operator << (std::ostream &out, fpBaseNode<T, F> & obj){
