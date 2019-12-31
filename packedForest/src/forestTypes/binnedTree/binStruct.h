@@ -523,7 +523,7 @@ namespace fp{
 				inline void predictBinObservation(int observationNum, std::vector<int>& preds){
 					predictBinObservation(observationNum,preds, identity<Q>());
 				}
-				inline void predictBinObservation(int uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>* data, int observationNum, std::vector<int> preds, std::vector<double>etime){
+				inline void predictBinObservation(int uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>* data, int observationNum, std::vector<int> &preds, std::vector<double>etime){
                     			predictBinObservation(uniqueCount, roots, data,observationNum,preds, identity<Q>(), etime);
 				}
 
@@ -674,11 +674,7 @@ namespace fp{
 						numberNotInLeaf = 0;
 
 						for( q=0; q<numOfTreesInBin; ++q){
-							std::cout<<"Before printing!\n";
-							fflush(stdout);
-							bin[currNode[q]].printNode();
-							std::cout<<"after printing!\n";
-							fflush(stdout);
+#pragma omp critical 
 							if(bin[currNode[q]].isInternalNodeFront()){
 						//		v.push_back(currNode[q]/BLOCK_SIZE);
                                 		//		v_num_nodes.push_back(currNode[q]);
@@ -693,7 +689,8 @@ namespace fp{
 					}while(numberNotInLeaf);
 
 					for( q=0; q<numOfTreesInBin; q++){
-#pragma omp atomic update
+//#pragma omp atomic update
+#pragma omp critical 
 						++preds[bin[currNode[q]].returnClass()];
 					}
                   

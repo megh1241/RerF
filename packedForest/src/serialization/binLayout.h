@@ -539,8 +539,8 @@ template<typename T, typename Q>
             }
             
 	    inline void writeToFile(std::vector<int> roots){
-	//	#pragma omp critical
-	//	{
+		#pragma omp critical
+		{
                 	std::ofstream f;
 			fpBaseNode<T,Q> nodeToWrite;
                 	for(int j = 0; j < NUM_FILES; j++){
@@ -556,7 +556,7 @@ template<typename T, typename Q>
 			f.open(treeroot_fname.c_str(), std::ios::out|std::ios::binary);
 			f.write((char*)&roots, sizeof(roots));
 			f.close();
-	//	}
+		}
             
 	    }
             

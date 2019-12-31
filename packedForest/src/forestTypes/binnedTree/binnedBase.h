@@ -206,7 +206,7 @@ namespace fp {
 			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = global_fname){				
 				int j, tmp_val;
 				std::fstream fi;
-				fi.open("/data4/rand_file.txt");
+				/*fi.open("/data4/rand_file.txt");
 				for(int i=0; i<20000; ++i)
 					fi>>j;	
 				for(int i=0; i<20000; ++i)
@@ -215,45 +215,37 @@ namespace fp {
 					fi>>j;	
 			
 				fi.close();	
+				*/
+				//std::cout<<"observation: "<<observationNumber<<"\n";
+				//fflush(stdout);
 				fi.open("/data4/binstart.txt");
 				sizesbin.clear();
 				int sumsum = 0;
-				std::cout<<"*************************************\n";
 				for(int i=0; i<fpSingleton::getSingleton().returnNumThreads(); ++i){
 					fi>>tmp_val;
-					std::cout<<"tmp_val: "<<tmp_val<<"\n";
-					std::cout<<"sumsum: "<<sumsum<<"\n";
 					sizesbin.push_back(sumsum);
 					sumsum+=tmp_val;
 				}
-				std::cout<<"*************************************\n";
 				fi.close();
 				std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
                 		int uniqueCount;
-                        	binStruct<T, Q> temp = binStruct<T, Q>(16);
-                        	//global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
-                        	//mmappedObj.open(global_str, 0); 
-				int threadnum;
+                        	binStruct<T, Q> temp = binStruct<T, Q>(64);
 				global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
                        		mmappedObj.open(global_str, 0); 
                         	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
-                		//#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
-                		//for(int k = 0; k < numBins; ++k){
-                		for(int k = 0; k < 1; ++k){
-                    			 //threadnum = omp_get_thread_num();
-                    			 threadnum = k;
-					 std::cout<<"threadnum: "<<threadnum<<"\n";
+				treeRootPos.clear();
+				#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
+                		for(int k = 0; k < numBins; ++k){
+                		//for(int k = 0; k < 1; ++k){
+					int threadnum;
+                    			 threadnum = omp_get_thread_num();
+                			fpBaseNode<T, Q> * mmapped_file_pos = data + sizesbin[k];	
+                    			// threadnum = k;
 					if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
 		    			else{
-						global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
-                        			//#pragma omp critical
-                        		//	mmappedObj.open(global_str, 0); 
-                        	//		temp.predictBinObservation(uniqueCount, treeRootPos, data + sizesbin[k], observationNumber, predictions, etime);
-                        			temp.predictBinObservation(uniqueCount, treeRootPos, data, observationNumber, predictions, etime);
+						temp.predictBinObservation(uniqueCount, treeRootPos, mmapped_file_pos, observationNumber, predictions, etime);
                         			//blocks.push_back(uniqueCount);
-                        			//#pragma omp critical
-						//mmappedObj.close();
                     			}
                 		}
 				mmappedObj.close();

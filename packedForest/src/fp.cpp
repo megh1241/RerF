@@ -152,7 +152,8 @@ int main(int argc, char* argv[]) {
 
 
             //logTime.startFindSplitTimer();
-           // forest.growForest();
+            //forest.growForest();
+
             //logTime.stopFindSplitTimer();
             //logTime.printGrowTime();
 
