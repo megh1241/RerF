@@ -523,8 +523,8 @@ namespace fp{
 				inline void predictBinObservation(int observationNum, std::vector<int>& preds){
 					predictBinObservation(observationNum,preds, identity<Q>());
 				}
-				inline void predictBinObservation(int uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>* data, int observationNum, std::vector<int> &preds, std::vector<double>etime){
-                    			predictBinObservation(uniqueCount, roots, data,observationNum,preds, identity<Q>(), etime);
+				inline void predictBinObservation(int uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>* data, int observationNum, std::vector<int> &preds ){
+                    			predictBinObservation(uniqueCount, roots, data,observationNum,preds, identity<Q>());
 				}
 
 				inline void predictBinObservation(std::vector<T>& observation, std::vector<int>& preds){
@@ -646,7 +646,7 @@ namespace fp{
 				}
 
                 /////////////////////////START HERE////////////////////////////////////
-				inline void predictBinObservation(int uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin, int observationNum,std::vector<int> &preds, identity<int>, std::vector<double>etime ){
+				inline void predictBinObservation(int uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin, int observationNum,std::vector<int> &preds, identity<int> ){
                     			std::vector<int> currNode(numOfTreesInBin);
 					int numberNotInLeaf;
 					int featureNum;
@@ -713,7 +713,7 @@ namespace fp{
 
 
 
-				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin, int observationNum, std::vector<int>& preds, identity<std::vector<int> >,  std::vector<double>&etime){
+				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin, int observationNum, std::vector<int>& preds, identity<std::vector<int> > ){
 					std::vector<int> currNode(numOfTreesInBin);
 					int numberNotInLeaf;
 					T featureVal;
@@ -749,7 +749,7 @@ namespace fp{
 				}
 
 
-				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin,int observationNum, std::vector<int>& preds, identity<weightedFeature>, std::vector<double>&etime){
+				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin,int observationNum, std::vector<int>& preds, identity<weightedFeature> ){
 					std::vector<int> currNode(numOfTreesInBin);
 					int numberNotInLeaf;
 					T featureVal;

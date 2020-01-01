@@ -26,6 +26,7 @@ std::vector<int> treeRootPos;
 std::vector<int> blocks;
 std::vector<double>etime;
 std::vector<int> sizesbin;
+std::fstream f_time;
 #define NUM_FILES 900
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
@@ -206,7 +207,7 @@ namespace fp {
 			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = global_fname){				
 				int j, tmp_val;
 				std::fstream fi;
-				/*fi.open("/data4/rand_file.txt");
+				fi.open("/data4/rand_file.txt");
 				for(int i=0; i<20000; ++i)
 					fi>>j;	
 				for(int i=0; i<20000; ++i)
@@ -215,7 +216,7 @@ namespace fp {
 					fi>>j;	
 			
 				fi.close();	
-				*/
+			
 				//std::cout<<"observation: "<<observationNumber<<"\n";
 				//fflush(stdout);
 				fi.open("/data4/binstart.txt");
@@ -233,6 +234,7 @@ namespace fp {
 				global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
                        		mmappedObj.open(global_str, 0); 
                         	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
+				auto start = std::chrono::steady_clock::now();
 				treeRootPos.clear();
 				#pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
                 		for(int k = 0; k < numBins; ++k){
@@ -244,12 +246,16 @@ namespace fp {
 					if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
 		    			else{
-						temp.predictBinObservation(uniqueCount, treeRootPos, mmapped_file_pos, observationNumber, predictions, etime);
+						temp.predictBinObservation(uniqueCount, treeRootPos, mmapped_file_pos, observationNumber, predictions);
                         			//blocks.push_back(uniqueCount);
                     			}
                 		}
+				auto end = std::chrono::steady_clock::now();
 				mmappedObj.close();
-
+				
+			//	std::cout<<"elapsed time: " <<std::chrono::duration<double, std::milli>(end - start).count()<<" miliseconds.\n";
+				etime.push_back(std::chrono::duration<double, std::milli>(end - start).count());
+				//f_time<<std::chrono::duration<double, std::milli>(end - start).count()<<"\n";
 				//assert(std::accumulate(predictions.begin(), predictions.end(),0) == fpSingleton::getSingleton().returnNumTrees());
 
 				int bestClass = 0;
@@ -325,6 +331,7 @@ namespace fp {
 				for(int i=0; i<10000; ++i)
 					fi<<(i+1)%6;
 				fi.close();
+			
 				size_t arrlen = 0;
 				//deserializeMmap(arrlen);
 				int numTried = 0;
@@ -343,14 +350,10 @@ namespace fp {
 					}
 				}
 				//mmappedObj.close();
-    				fout.open("blocks_22threads.csv", std::ios::out);
-    				for(auto i: blocks)
-        				fout<<i<<",";
-    				fout.close();
-    				fout.open("binstat_time_22threads.csv", std::ios::out);
-    				for(auto i: etime)
-        				fout<<i<<",";
-    				fout.close();
+				f_time.open("elapsed_time_parallel.csv", std::ios::out);
+				for(auto t: etime)
+					f_time<<t<<",";
+				f_time.close();
 				std::cout << "\nnumWrong= " << numWrong << "\n";
 
     				return (float)numWrong/(float)numTried;
