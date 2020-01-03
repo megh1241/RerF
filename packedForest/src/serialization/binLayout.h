@@ -22,7 +22,11 @@
 #include <string>
 #include <functional>
 #define NUM_FILES 900 
+
 using namespace std::placeholders;
+using std::placeholders::_1;
+using std::placeholders::_2;
+
 std::map<int, int> map_subtree_to_class;
 std::map<int, int> map_subtree_to_size;
 
@@ -36,24 +40,20 @@ template<typename T, typename Q>
         std::string filename;
         std::vector<std::string> filename_vec;
         public:
-        std::vector<fpBaseNodeStat<T, Q>> finalbin;
-            std::vector<int> treeRootPos;
-            BinLayout(binStruct<T, Q> tempbins): binstr(tempbins){
-		
-	    }
-            BinLayout(binStruct<T, Q> tempbins, std::string fname): binstr(tempbins){
-                //TODO: initialize in fpSingleton
-		  /*for(auto i: binstr.bin){
-			i.printNode();
-			fflush(stdout);
-		    }*/
-                filename = fname;
-	    }
+        	std::vector<fpBaseNodeStat<T, Q>> finalbin;
+            	std::vector<int> treeRootPos;
+            	BinLayout(binStruct<T, Q> tempbins): binstr(tempbins){
+
+	    	}
+
+            	BinLayout(binStruct<T, Q> tempbins, std::string fname): binstr(tempbins){
+                	filename = fname;
+	    	}
             
             inline std::string returnFilename(){
                /* Return the file in which the forest was written to */
                 return filename;
-            };
+            }
             
             
             
@@ -62,11 +62,10 @@ template<typename T, typename Q>
                 std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
                 int numNodesToProc = std::pow(2, depthIntertwined) - 2; 
-                int d;
                 auto numClasses = fpSingleton::getSingleton().returnNumClasses();
                 
 		if(depthIntertwined == 1){
-			for(int i=0; i<binstr.numOfTreesInBin; ++i)
+			for(int i=0; i<binstr.returnNumTrees(); ++i)
 				bin[i+numClasses].setSTNum(-1*depthIntertwined);
 			for(auto i: bin)
 				finalbin.push_back(i);
@@ -78,7 +77,7 @@ template<typename T, typename Q>
                     nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));
                 }
 
-                for(auto i = 0; i < binstr.numOfTreesInBin; ++i) {
+                for(auto i = 0; i < binstr.returnNumTrees(); ++i) {
 		    bin[i+numClasses].setSTNum(-1*depthIntertwined);
                     binQ.push_back(bin[i+numClasses]);
 		}
@@ -88,7 +87,7 @@ template<typename T, typename Q>
                     //if(nodeTreeMap[binQ.front().getID()] != i)
                       //  continue;
 
-                while(currLevel <= numNodesToProc*binstr.numOfTreesInBin) {
+                while(currLevel <= numNodesToProc*binstr.returnNumTrees()) {
                         currLevel += 2;
                         auto ele = binQ.front();
                         binQ.pop_front();
@@ -141,7 +140,7 @@ template<typename T, typename Q>
                         }
                     }
                 }
-                auto siz = finalbin.size();
+                int siz = finalbin.size();
                 for (auto i=numClasses; i<siz; i++){
                     finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
                     finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
@@ -154,7 +153,6 @@ template<typename T, typename Q>
                 std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
                 int numNodesToProc = std::pow(2, depthIntertwined) - 2; 
-                int d;
                 auto numClasses = fpSingleton::getSingleton().returnNumClasses();
                 
 		if(depthIntertwined == 1){
@@ -169,7 +167,7 @@ template<typename T, typename Q>
                     nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));
                 }
 
-                for(auto i = 0; i < binstr.numOfTreesInBin; ++i)
+                for(auto i = 0; i < binstr.returnNumTrees(); ++i)
                     binQ.push_back(bin[i+numClasses]);
 
                 // Intertwined levels
@@ -177,7 +175,7 @@ template<typename T, typename Q>
                     //if(nodeTreeMap[binQ.front().getID()] != i)
                       //  continue;
 
-                while(currLevel <= numNodesToProc*binstr.numOfTreesInBin) {
+                while(currLevel <= numNodesToProc*binstr.returnNumTrees()) {
                         currLevel += 2;
                         auto ele = binQ.front();
                         binQ.pop_front();
@@ -237,7 +235,7 @@ template<typename T, typename Q>
                         }
                     }
                 }
-                auto siz = finalbin.size();
+                int siz = finalbin.size();
                 for (auto i=numClasses; i<siz; i++){
                     finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
                     finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
@@ -269,7 +267,6 @@ template<typename T, typename Q>
 		std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 
                 int numNodesToProc = std::pow(2, depthIntertwined) - 2; 
-                int d;
                 auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 		/*if(depthIntertwined == 1){
 			for(auto i: bin)
@@ -286,14 +283,14 @@ template<typename T, typename Q>
                    
 		}
 
-                for(auto i = 0; i < binstr.numOfTreesInBin; ++i){
+                for(auto i = 0; i < binstr.returnNumTrees(); ++i){
 		    bin[i+numClasses].setSTNum(-1*depthIntertwined);
                     binQ.push_back(bin[i+numClasses]);
 		}
 
                 // Intertwined levels
                 int currLevel = 0; 
-                while(currLevel <= numNodesToProc*binstr.numOfTreesInBin) {
+                while(currLevel <= numNodesToProc*binstr.returnNumTrees()) {
                         currLevel += 2;
                         auto ele = binQ.front();
                         binQ.pop_front();
@@ -390,7 +387,7 @@ template<typename T, typename Q>
 		    map_subtree_to_class[stno] = subtree_class;
 		    map_subtree_to_size[stno] = numNodesInST;
                 }
-		auto siz = finalbin.size();
+		int siz = finalbin.size();
 		std::sort(finalbin.begin(), finalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
 		nodeNewIdx.clear();
                 for(auto i=0; i < siz; ++i)
@@ -421,7 +418,7 @@ template<typename T, typename Q>
                 }
 
                 int firstNodeInTree = 1;
-                for(int i = 0; i < binstr.numOfTreesInBin; ++i){
+                for(int i = 0; i < binstr.returnNumTrees(); ++i){
                     binST.push_back(bin[i+numClasses]);
                     firstNodeInTree = 1;
                     while(!binST.empty()){
@@ -450,7 +447,7 @@ template<typename T, typename Q>
                     }
                 }
 
-                auto siz = finalbin.size();
+                int siz = finalbin.size();
                 for (auto i=numClasses; i<siz; i++){
                     finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
                     finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
@@ -475,7 +472,7 @@ template<typename T, typename Q>
                 }
 
                 int firstNodeInTree = 1;
-                for(int i = 0; i < binstr.numOfTreesInBin; ++i){
+                for(int i = 0; i < binstr.returnNumTrees(); ++i){
                     binST.push_back(bin[i+numClasses]);
                     firstNodeInTree = 1;
                     while(!binST.empty()){
@@ -516,7 +513,7 @@ template<typename T, typename Q>
                     }
                 }
 
-                auto siz = finalbin.size();
+                int siz = finalbin.size();
                 for (auto i=numClasses; i<siz; i++){
                     finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
                     finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);

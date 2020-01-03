@@ -34,6 +34,7 @@ namespace fp{
 				std::deque<processingNodeBin<T,Q> > nodeQueueLeft;
 				int numberOfNodes;
 
+				int numOfTreesInBin;
 				int currTree;
                 		int uid;
          		       	std::map<int, int> nodeTreeMap;
@@ -54,7 +55,6 @@ namespace fp{
 				}
 
 			public:
-				int numOfTreesInBin;
 				std::vector< fpBaseNodeStat<T,Q> > bin;
 				binStruct() : OOBAccuracy(-1.0),correctOOB(0),totalOOB(0),numberOfNodes(0),numOfTreesInBin(0),currTree(0), uid(fpSingleton::getSingleton().returnNumClasses())
             			{
@@ -400,6 +400,7 @@ namespace fp{
                 		}
 
                 		inline void intertwineMultipleLevelsLayout(int depthInter){
+                   			int topNodeTreeNum = 0, d = 0;
                     			for(; currTree < numOfTreesInBin; ++currTree){
 						setSharedVectors();
                         			loadFirstNodeInter();
@@ -412,7 +413,6 @@ namespace fp{
                         			nodeQueueInter.push_back(ele);
                     			nodeQueueRight.clear();
                     
-                   			int topNodeTreeNum=0, d = 0, numNodesInterleaved = std::pow(2, depthInter) - 2;
                    			while(d++ <  depthInter){
                        				for(int currTree=0; currTree< numOfTreesInBin; ++currTree){
                             				topNodeTreeNum=nodeQueueInter.front().exposeTreeNum();
@@ -439,9 +439,6 @@ namespace fp{
                     			}
                 		}
 
-                		inline void intertwineClassLayout(){
-                    			int a =9;
-                		}
 
 				inline void createBin(int numTrees, int randSeed, int depthInter){
 					numOfTreesInBin = numTrees;
@@ -454,8 +451,6 @@ namespace fp{
                         			intertwineRootsLayout();
                     			else if (depthInter > 1)
                         			intertwineMultipleLevelsLayout(depthInter);
-                    			else
-                        			intertwineClassLayout();
 
                     			//printBin();    
                     			removeStructures();
@@ -654,7 +649,6 @@ namespace fp{
 					int q;
                     			//std::vector<int> v;
                     			//std::vector<int> v_num_nodes;
-                    			auto start = std::chrono::steady_clock::now();
                     			if(roots.size()>0){
                         			for( q=0; q<numOfTreesInBin; ++q){
                                 			//v_num_nodes.push_back(currNode[q]);
@@ -669,7 +663,6 @@ namespace fp{
 					        	//	__builtin_prefetch(&bin[currNode[q]], 0, 3);
 					    	}
                     			}
-                    			auto start2 = std::chrono::steady_clock::now();
 					do{
 						numberNotInLeaf = 0;
 

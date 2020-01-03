@@ -126,6 +126,14 @@ namespace fp {
 				return fpForestInfo.returnForestType();
 			}
 
+			inline std::string& returnLayout(){
+				return fpForestInfo.returnLayout();
+			}
+
+			inline int returnDepthIntertwined(){
+				return fpForestInfo.returnDepthIntertwined();
+			}
+			
 			inline int returnNumFeatures(){
 				return fpForestInfo.returnNumFeatures();
 			}

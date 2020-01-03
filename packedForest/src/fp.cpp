@@ -1,25 +1,23 @@
 #include "packedForest.h"
 #include <iostream>
 #include <exception>
+#include <cstring>
 
 int main(int argc, char* argv[]) {
-    if (argc != 4) return -1;
+    std::cout<<"Format: ./bin/fp <alg> <dataset> <num cores> <layout> <depth intertwined> <train/test>\n";
+
+    if (argc != 7) 
+	    return -1;
+    
+    
     int alg = atoi(argv[1]);
     int dataSet = atoi(argv[2]);
     int numCores = atoi(argv[3]);
-
-    // fp::timeLogger logTime;
-    /*
-        logTime.startFindSplitTimer();
-         fp::inNodeClassIndices test(100000000);
-          logTime.stopFindSplitTimer();
-
-           logTime.startSortTimer();
-            fp::stratifiedInNodeClassIndices testw(100000000);
-             logTime.stopSortTimer();
-
-              logTime.printGrowTime();
-               */
+    std::string layout_user(argv[4]);
+    int depth_intertwined = atoi(argv[5]);
+    std::string train_or_test(argv[6]);
+    
+    
     if (alg == 0) {
         // Remove and change this block for testing.
         std::cout << "test algorithm selected without code." << std::endl;
@@ -149,21 +147,18 @@ int main(int argc, char* argv[]) {
             forest.setParameter("numCores", numCores);
             //forest.setParameter("seed",-1661580697);
             forest.setParameter("seed",1);
+	    forest.setParameter("layout", layout_user);
+	    forest.setParameter("depthIntertwined", depth_intertwined);
+
+	    std::string train_str("train");
+	    if(train_or_test.compare(train_str) == 0)
+            	forest.growForest();
+	    else {
+            	forest.initTestForest();
+		std::cout << "error: " << forest.testAccuracy() << "\n";
+	    }
 
 
-            //logTime.startFindSplitTimer();
-            //forest.growForest();
-
-            //logTime.stopFindSplitTimer();
-            //logTime.printGrowTime();
-
-            //forest.printParameters();
-            //forest.printForestType();
-
-	    //std::cout<<"Beginning\n";
-            forest.initTestForest();
-	    std::cout << "error: " << forest.testAccuracy() << "\n";
-        
         }catch(std::exception& e){
             std::cout << "standard error: " << e.what() << std::endl;
         }

@@ -50,7 +50,9 @@ namespace fp {
 
 			std::string forestType;
 			std::string CSVFileName;
+			std::string layout;
 
+			int depthIntertwined;
 			int seed;
 			randomNumberRerFMWC randNum;
 
@@ -84,7 +86,9 @@ namespace fp {
 				patchHeightMax = 0;
 				patchWidthMin = 0;
 				patchWidthMax = 0;
+				depthIntertwined = 0;
 				forestType.clear();
+				layout.clear();
 				CSVFileName.clear();
 				//initRandom();
 			}
@@ -116,6 +120,10 @@ namespace fp {
 
 			inline std::string& returnForestType(){
 				return forestType;
+			}
+			
+			inline std::string& returnLayout(){
+				return layout;
 			}
 
 			inline int returnColumnWithY() const{
@@ -158,6 +166,10 @@ namespace fp {
 
 			inline int returnNumThreads() const{
 				return numCores;
+			}
+			
+			inline int returnDepthIntertwined() const{
+				return depthIntertwined;
 			}
 
 			inline bool loadDataFromCSV(){
@@ -252,6 +264,8 @@ namespace fp {
 					forestType = parameterValue;
 				}else if(parameterName == "CSVFileName"){
 					CSVFileName = parameterValue;
+				}else if(parameterName == "layout"){
+					layout = parameterValue;
 				}else{
 					throw std::runtime_error("Unknown parameter type.(string)");
 				}
@@ -322,6 +336,8 @@ namespace fp {
 					numTreeBins = parameterValue;
 				}else if(parameterName == "useRowMajor"){
 					useRowMajor = (bool)parameterValue;
+				}else if(parameterName == "depthIntertwined"){
+					depthIntertwined = parameterValue;
 				}else if(parameterName == "methodToUse"){
 					methodToUse = parameterValue;
 					if(!(methodToUse == 1 || methodToUse == 2)){
@@ -362,6 +378,8 @@ namespace fp {
 				std::cout << "numCores -> " << numCores << "\n";
 				std::cout << "seed -> " << seed << "\n";
 				std::cout << "numTreeBins -> " << numTreeBins << "\n";
+				std::cout << "Layout -> " << layout << "\n";
+				std::cout << "Depth of the Bin -> " << depthIntertwined << "\n";
 
 				if(methodToUse == 2){
 					std::cout << "imageHeight -> " << imageHeight << "\n";

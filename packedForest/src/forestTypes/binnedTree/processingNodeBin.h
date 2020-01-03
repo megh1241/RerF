@@ -25,7 +25,7 @@ namespace fp{
 	template<typename T, typename Q>
 		class processingNodeBin{
 			public:
-                nodeIterators nodeIndices;
+                	nodeIterators nodeIndices;
 			protected:
 				int treeNum;
 				int parentNodeNumber;
@@ -50,7 +50,6 @@ namespace fp{
 					for (int i=0; i<fpSingleton::getSingleton().returnNumFeatures(); ++i){
 						featuresToTry.push_back(i);
 					}
-					int tempSwap;
 
 					// This is an efficient way to shuffle the first "mtry" elements of the feature vector
 					// in order to sample features w/o replacement.
@@ -419,7 +418,7 @@ namespace fp{
 
 			public:
 
-				processingNodeBin(int tr, int pN, int d, randomNumberRerFMWC& randNumBin): treeNum(tr), parentNodeNumber(pN), depth(d), propertiesOfThisNode(fpSingleton::getSingleton().returnNumClasses()), propertiesOfLeftNode(fpSingleton::getSingleton().returnNumClasses()),propertiesOfRightNode(fpSingleton::getSingleton().returnNumClasses()),nodeIndices(fpSingleton::getSingleton().returnNumClasses()){
+				processingNodeBin(int tr, int pN, int d, randomNumberRerFMWC& randNumBin): nodeIndices(fpSingleton::getSingleton().returnNumClasses()), treeNum(tr), parentNodeNumber(pN), depth(d), propertiesOfThisNode(fpSingleton::getSingleton().returnNumClasses()), propertiesOfLeftNode(fpSingleton::getSingleton().returnNumClasses()),propertiesOfRightNode(fpSingleton::getSingleton().returnNumClasses()){
 					randNum = &randNumBin;	
 				}
 
