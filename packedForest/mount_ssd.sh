@@ -14,3 +14,5 @@ sudo update-alternatives --config gcc
 
 sudo apt install make
 make
+mkdir datasets
+cd datasets
