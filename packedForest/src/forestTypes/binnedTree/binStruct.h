@@ -686,6 +686,7 @@ namespace fp{
 #pragma omp critical 
 						++preds[bin[currNode[q]].returnClass()];
 					}
+#pragma omp critical 
                     			uniqueCount = std::set<int>( v.begin(), v.end() ).size();
                   
 //#pragma omp critical

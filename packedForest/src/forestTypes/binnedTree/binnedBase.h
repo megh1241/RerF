@@ -227,22 +227,19 @@ namespace fp {
 				else
 					sizesbin.push_back(0);
 			
-				std::cout<<"exited here!\n";
-				fflush(stdout);	
 				treeRootPos.clear();
 
 				//Read the tree root positions for BFS and Stat layouts
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();	
-				if(layout_str.compare("bfs") || layout_str.compare("stat")){
+				if(layout_str.compare("bfs") == 0 || layout_str.compare("stat") == 0){
 					int rootpos;
-					fi.open("/data4/treeroots.csv");
+					fi.open("treeroots.csv");
 					while(!fi.eof()){
                     				fi>>rootpos;
 						treeRootPos.push_back(rootpos);
 					}
 					fi.close();
 				}
-
 
 				std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
                         	treesPerBin = fpSingleton::getSingleton().returnNumTrees() / fpSingleton::getSingleton().returnNumThreads();
@@ -253,7 +250,6 @@ namespace fp {
                         	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
 				auto start = std::chrono::steady_clock::now();
 				int num_threads = fpSingleton::getSingleton().returnNumThreads();
-
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int k = 0; k < numBins; ++k){
                 			int uniqueCount = 0;
@@ -349,9 +345,11 @@ namespace fp {
 				}
 				std::cout << "\nnumWrong= " << numWrong << "\n";
 				
-
+				int depth_inter = fpSingleton::getSingleton().returnDepthIntertwined();
+				std::string depth_str = std::to_string(depth_inter);
+				
 				//Write elapsed times to file
-				f_time.open("elapsed_time_" + layout_str + ".csv", std::ios::out);
+				f_time.open("elapsed_time_" + layout_str + "_depth_"+ depth_str + ".csv", std::ios::out);
 				for(auto t: etime)
 					f_time<<t<<",";
 				f_time.close();
@@ -359,7 +357,7 @@ namespace fp {
 				//Write number of blocks to file (do not write in case of parallel bin experiment)
 				int num_threads = fpSingleton::getSingleton().returnNumThreads(); 
 				if(num_threads == 1){
-					fblock.open("blocks_" + layout_str + ".csv", std::ios::out|std::ios::app);
+					fblock.open("blocks_" + layout_str + "_depth_" + depth_str + ".csv", std::ios::out|std::ios::app);
 					for (auto block: blocks)
 						fblock<<block<<",";
 					fblock.close();
