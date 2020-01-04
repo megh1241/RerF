@@ -518,7 +518,7 @@ namespace fp{
 				inline void predictBinObservation(int observationNum, std::vector<int>& preds){
 					predictBinObservation(observationNum,preds, identity<Q>());
 				}
-				inline void predictBinObservation(int uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>* data, int observationNum, std::vector<int> &preds ){
+				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>* data, int observationNum, std::vector<int> &preds ){
                     			predictBinObservation(uniqueCount, roots, data,observationNum,preds, identity<Q>());
 				}
 
@@ -641,13 +641,13 @@ namespace fp{
 				}
 
                 /////////////////////////START HERE////////////////////////////////////
-				inline void predictBinObservation(int uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin, int observationNum,std::vector<int> &preds, identity<int> ){
+				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin, int observationNum,std::vector<int> &preds, identity<int> ){
                     			std::vector<int> currNode(numOfTreesInBin);
 					int numberNotInLeaf;
 					int featureNum;
 					T featureVal;
 					int q;
-                    			//std::vector<int> v;
+                    			std::vector<int> v;
                     			//std::vector<int> v_num_nodes;
                     			if(roots.size()>0){
                         			for( q=0; q<numOfTreesInBin; ++q){
@@ -669,7 +669,7 @@ namespace fp{
 						for( q=0; q<numOfTreesInBin; ++q){
 #pragma omp critical 
 							if(bin[currNode[q]].isInternalNodeFront()){
-						//		v.push_back(currNode[q]/BLOCK_SIZE);
+								v.push_back(currNode[q]/BLOCK_SIZE);
                                 		//		v_num_nodes.push_back(currNode[q]);
                                 				featureNum = bin[currNode[q]].returnFeatureNumber();
 								featureVal = fpSingleton::getSingleton().returnTestFeatureVal(featureNum,observationNum);
@@ -686,6 +686,7 @@ namespace fp{
 #pragma omp critical 
 						++preds[bin[currNode[q]].returnClass()];
 					}
+                    			uniqueCount = std::set<int>( v.begin(), v.end() ).size();
                   
 //#pragma omp critical
 //					etime.push_back(std::chrono::duration<double, std::milli>(end - start).count());
