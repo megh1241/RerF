@@ -68,7 +68,7 @@ namespace fp {
 				binSeeds.resize(numBins);
 				for(int i = 0; i < numBins; ++i){
 					binSeeds[i] = fpSingleton::getSingleton().genRandom(std::numeric_limits<int>::max());
-                }
+                		}
 			}
 
 			inline void printForestType(){

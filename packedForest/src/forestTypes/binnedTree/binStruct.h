@@ -653,14 +653,14 @@ namespace fp{
                         			for( q=0; q<numOfTreesInBin; ++q){
                                 			//v_num_nodes.push_back(currNode[q]);
 						    	currNode[q] = roots[q];
-					        	//	__builtin_prefetch(&bin[currNode[q]], 0, 3);
+					        		__builtin_prefetch(&bin[currNode[q]], 0, 3);
 					    	}
                     			}
                     			else {
                         			for( q=0; q<numOfTreesInBin; ++q){
                                 		//	v_num_nodes.push_back(currNode[q]);
 						    	currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();;
-					        	//	__builtin_prefetch(&bin[currNode[q]], 0, 3);
+					        		__builtin_prefetch(&bin[currNode[q]], 0, 3);
 					    	}
                     			}
 					do{
@@ -674,7 +674,7 @@ namespace fp{
                                 				featureNum = bin[currNode[q]].returnFeatureNumber();
 								featureVal = fpSingleton::getSingleton().returnTestFeatureVal(featureNum,observationNum);
 								currNode[q] = bin[currNode[q]].fpBaseNode<T, Q>::nextNode(featureVal);
-								//__builtin_prefetch(&bin[currNode[q]], 0, 3);
+								__builtin_prefetch(&bin[currNode[q]], 0, 3);
 								++numberNotInLeaf;
 							}
 						}
