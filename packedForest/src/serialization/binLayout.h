@@ -222,12 +222,12 @@ namespace fp{
 
 						else {
 							if(bin[ele.returnLeftNodeID()].getCard() > bin[ele.returnRightNodeID()].getCard()){
-								binQ.push_back(bin[ele.returnLeftNodeID()]); 
-								binQ.push_back(bin[ele.returnRightNodeID()]); 
+								binST.push_back(bin[ele.returnLeftNodeID()]); 
+								binST.push_back(bin[ele.returnRightNodeID()]); 
 							}
 							else{
-								binQ.push_back(bin[ele.returnRightNodeID()]); 
-								binQ.push_back(bin[ele.returnLeftNodeID()]); 
+								binST.push_back(bin[ele.returnRightNodeID()]); 
+								binST.push_back(bin[ele.returnLeftNodeID()]); 
 							}
 						}
 					}
@@ -272,12 +272,8 @@ namespace fp{
 				  }*/
 
 
-				if(depthIntertwined == 1)
-					numNodesToProc = 1;
-
 				for(auto i = 0; i < numClasses; ++i){
 					finalbin.push_back(bin[i]);
-
 				}
 
 				for(auto i = 0; i < binstr.returnNumTrees(); ++i){
@@ -395,8 +391,8 @@ namespace fp{
 					finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
 				}
 				nodeNewIdx.clear();
-
 				std::cout<<"Size of final bin in binstatclass!!!!!!!:  "<<siz<<"\n";
+
 			}
 
 
