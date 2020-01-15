@@ -59,7 +59,7 @@ namespace fp{
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
-				int numNodesToProc = std::pow(2, depthIntertwined) - 2; 
+				int numNodesToProc = std::pow(2, depthIntertwined) ; 
 				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 
 				if(depthIntertwined == 1){
@@ -149,7 +149,7 @@ namespace fp{
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
-				int numNodesToProc = std::pow(2, depthIntertwined) - 2; 
+				int numNodesToProc = std::pow(2, depthIntertwined) ; 
 				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 
 				if(depthIntertwined == 1){
@@ -158,20 +158,21 @@ namespace fp{
 					return;
 				}
 
-
 				for(auto i = 0; i < numClasses; ++i){
 					finalbin.push_back(bin[i]);
 					nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));
 				}
 
-				for(auto i = 0; i < binstr.returnNumTrees(); ++i)
+				for(auto i = 0; i < binstr.returnNumTrees(); ++i){
 					binQ.push_back(bin[i+numClasses]);
+				}
 
 				// Intertwined levels
 				int currLevel = 0; 
 				//if(nodeTreeMap[binQ.front().getID()] != i)
-				//  continue;
+				//  continue
 
+				
 				while(currLevel <= numNodesToProc*binstr.returnNumTrees()) {
 					currLevel += 2;
 					auto ele = binQ.front();
@@ -249,6 +250,9 @@ namespace fp{
 				if(node1.getSTNum() < 0 || node2.getSTNum() < 0)
 					return node1.getSTNum() < node2.getSTNum();
 
+				if (node1.getSTNum() != node2.getSTNum())
+					return node1.getSTNum() < node2.getSTNum();
+				
 				//sort by class if nodes belong to subtrees of different majority class
 				if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
 					return map_subtree_to_class[node1.getSTNum()] < map_subtree_to_class[node1.getSTNum()];
@@ -262,15 +266,15 @@ namespace fp{
 				int num_classes_in_subtree = 0;
 				//std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
-
-				int numNodesToProc = std::pow(2, depthIntertwined) - 2; 
+				std::cout<<"size of initial bin: "<<bin.size()<<"\n";
+				int numNodesToProc = std::pow(2, depthIntertwined); 
 				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 				/*if(depthIntertwined == 1){
-				  for(auto i: bin)
-				  finalbin.push_back(i);
+				  for(auto i: bin){
+				  	finalbin.push_back(i);
+				  }
 				  return;
 				  }*/
-
 
 				for(auto i = 0; i < numClasses; ++i){
 					finalbin.push_back(bin[i]);
@@ -283,7 +287,9 @@ namespace fp{
 
 				// Intertwined levels
 				int currLevel = 0; 
+			
 				while(currLevel <= numNodesToProc*binstr.returnNumTrees()) {
+					std::cout<<"enterred here but should not: \n";
 					currLevel += 2;
 					auto ele = binQ.front();
 					binQ.pop_front();
@@ -309,6 +315,12 @@ namespace fp{
 					}
 
 				}
+				std::vector<fpBaseNodeStat<T, Q>> newfinalbin;
+				std::vector<fpBaseNodeStat<T, Q>> newfinalbin2;
+				for(auto i: finalbin)
+					newfinalbin2.push_back(i);	
+				
+				int inter_siz = newfinalbin2.size();
 
 				// STAT per (sub)tree layout 
 				int stno = -1; 
@@ -350,7 +362,7 @@ namespace fp{
 							bin[ele.returnLeftNodeID()].setSTNum(stno);
 						}
 						else {
-							if(bin[ele.returnLeftNodeID()].getCard() > bin[ele.returnRightNodeID()].getCard()){
+							if(bin[ele.returnLeftNodeID()].getCard() >  bin[ele.returnRightNodeID()].getCard()){
 								binST.push_back(bin[ele.returnLeftNodeID()]); 
 								bin[ele.returnLeftNodeID()].setSTNum(stno);
 								binST.push_back(bin[ele.returnRightNodeID()]); 
@@ -381,11 +393,21 @@ namespace fp{
 					map_subtree_to_size[stno] = numNodesInST;
 				}
 				int siz = finalbin.size();
-				std::sort(finalbin.begin(), finalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
+				for(int i = inter_siz; i<siz; ++i)
+					newfinalbin.push_back(finalbin[i]);
+				std::sort(newfinalbin.begin(), newfinalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
+				finalbin.clear();
+				for(auto i:newfinalbin2)
+					finalbin.push_back(i);
+				for(auto i:newfinalbin)
+					finalbin.push_back(i);
 				nodeNewIdx.clear();
-				for(auto i=0; i < siz; ++i)
+				siz = finalbin.size();
+				std::cout<<"printing finalbin here here here\n";
+				for(auto i=0; i < siz; ++i){
+					std::cout<<finalbin[i].getID()<<"\n";
 					nodeNewIdx.insert(std::pair<int, int>(finalbin[i].getID(), i));
-
+				}
 				for (auto i=numClasses; i<siz; i++){
 					finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
 					finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
@@ -493,13 +515,13 @@ namespace fp{
 								binST.push_back(bin[ele.returnRightNodeID()]);
 							}
 							else{
-								if(bin[ele.returnLeftNodeID()].getCard() > bin[ele.returnRightNodeID()].getCard()){
-									binST.push_back(bin[ele.returnLeftNodeID()]); 
+								if(bin[ele.returnLeftNodeID()].getCard() < bin[ele.returnRightNodeID()].getCard()){
 									binST.push_back(bin[ele.returnRightNodeID()]); 
+									binST.push_back(bin[ele.returnLeftNodeID()]); 
 								}
 								else{
-									binST.push_back(bin[ele.returnRightNodeID()]); 
 									binST.push_back(bin[ele.returnLeftNodeID()]); 
+									binST.push_back(bin[ele.returnRightNodeID()]); 
 								}
 							}	    
 						}

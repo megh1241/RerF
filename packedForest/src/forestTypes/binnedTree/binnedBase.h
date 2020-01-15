@@ -127,13 +127,16 @@ namespace fp {
 				for(auto single_bin: binvector)
 					single_bin.writeToFile(treeRootPos);
 				
+				std::fstream fsiz;
+				fsiz.open("/data4/binstart.txt", std::ios::out);
 				if(numBins > 1){
-					std::fstream fsiz;
-					fsiz.open("/data4/binstart.txt", std::ios::out);
 					for(auto i: sizesbin)
 						fsiz<<i<<"\n";
-					fsiz.close();
 				}
+				else if(numBins == 1){
+					fsiz<<0<<"\n";
+				}
+				fsiz.close();
 				
             		}		
 
@@ -206,8 +209,7 @@ namespace fp {
 			}
 
 
-			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = global_fname){				
-				int tmp_val ;
+			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = global_fname){							  int tmp_val ;
 				int treesPerBin;
 				readRandomClearCache();
 				std::fstream fi;
@@ -232,6 +234,7 @@ namespace fp {
 				//Read the tree root positions for BFS and Stat layouts
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();	
 				if(layout_str.compare("bfs") == 0 || layout_str.compare("stat") == 0){
+					std::cout<<"reading roots from file!!!!\n";
 					int rootpos;
 					fi.open("treeroots.csv");
 					while(!fi.eof()){
@@ -250,6 +253,7 @@ namespace fp {
                         	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
 				auto start = std::chrono::steady_clock::now();
 				int num_threads = fpSingleton::getSingleton().returnNumThreads();
+
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int k = 0; k < numBins; ++k){
                 			int uniqueCount = 0;
