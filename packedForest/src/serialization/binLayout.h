@@ -294,7 +294,6 @@ namespace fp{
 				int subtree_class = -1;
 				//std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
-				std::cout<<"size of initial bin: "<<bin.size()<<"\n";
 
 				//number of nodes of a binary tree as a function of height
 				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
@@ -348,7 +347,6 @@ namespace fp{
 					currLevel++;
 				}
 
-				std::cout<<"BinQ size after processing BIN: "<<binQ.size()<<"\n";
 
 				//initial subtree size map for each subtree num
 				for(int i=0; i<=currLevel+2; ++i)
@@ -457,7 +455,6 @@ namespace fp{
 
 				nodeNewIdx.clear();
 				for(auto i=0; i < siz; ++i){
-					std::cout<<finalbin[i].getID()<<"\n";
 					nodeNewIdx.insert(std::pair<int, int>(finalbin[i].getID(), i));
 				}
 
@@ -471,7 +468,6 @@ namespace fp{
 				
 				nodeNewIdx.clear();
 				for(auto i=0; i < siz; ++i){
-					std::cout<<finalbin[i].getID()<<"\n";
 					nodeNewIdx.insert(std::pair<int, int>(finalbin[i].getID(), i));
 				}
 				siz = finalbin.size();
@@ -480,7 +476,6 @@ namespace fp{
 					finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
 				}
 				nodeNewIdx.clear();
-				std::cout<<"Size of final bin in binstatclass!!!!!!!:  "<<siz<<"\n";
 
 			}
 

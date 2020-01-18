@@ -251,8 +251,8 @@ namespace fp {
 				global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
                        		mmappedObj.open(global_str, 0); 
                         	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
-				auto start = std::chrono::steady_clock::now();
 				int num_threads = fpSingleton::getSingleton().returnNumThreads();
+				auto start = std::chrono::steady_clock::now();
 
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int k = 0; k < numBins; ++k){
