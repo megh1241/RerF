@@ -273,8 +273,8 @@ namespace fp{
 
 
 				//sort by class if nodes belong to subtrees of different majority class
-				if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node1.getSTNum()])
-					return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] > class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
+				if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
+					return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] < class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
 
 				//if classes are the same sort by size of subtree
 					
@@ -289,7 +289,7 @@ namespace fp{
 				int total_tree_card = 0;
 				int num_classes_in_subtree = 0;
 				int stno = 0;
-				double eps = 0.2;
+				double eps = 0.6;
 				int card[10] = {0};
 				int max = -1;
 				int subtree_class = -1;
@@ -393,8 +393,8 @@ namespace fp{
 							card[ele.returnClass()] += ele.getCard();
 							total_tree_card += ele.getCard();
 						}
-						binST.pop_front(); 
 						map_subtree_to_size[ele.getSTNum()]++;
+						binST.pop_front(); 
 						finalbin.push_back(ele);
 						if((ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) && (ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()))
 							continue;
@@ -463,15 +463,20 @@ namespace fp{
 				}
 
 
-				std::cout<<"Printing map_subtree_to_size!\n";
-				for(int i = 0; i<currLevel+2 ; i++)
+				/*std::cout<<"Printing map_subtree_to_size!\n";
+				for(int i = 0; i<currLevel+3 ; i++)
 					std::cout<<map_subtree_to_size[i]<<"\n";
+
+				std::cout<<"Printing map_subtree_to_class!\n";
+				for(int i = 0; i<currLevel+3 ; i++)
+					std::cout<<map_subtree_to_class[i]<<"\n";
 
 				std::cout<<"Printing class_size_in_st!\n";
 				for(int i=0; i<20; ++i)
 				{
 					std::cout<<"i: "<<i<<" class_size_in_st[i]: "<<class_size_in_st[i]<<"\n";
 				}
+				*/
 				std::sort(newfinalbin.begin(), newfinalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
 				finalbin.clear();
 				for(auto i:newfinalbin2)
