@@ -31,6 +31,7 @@ using std::placeholders::_2;
 
 std::map<int, int> map_subtree_to_class;
 std::map<int, int> map_subtree_to_size;
+int class_size_in_st[20];
 
 namespace fp{
 	template<typename T, typename Q>
@@ -273,7 +274,7 @@ namespace fp{
 
 				//sort by class if nodes belong to subtrees of different majority class
 				if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node1.getSTNum()])
-					return map_subtree_to_class[node1.getSTNum()] < map_subtree_to_class[node2.getSTNum()];
+					return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] > class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
 
 				//if classes are the same sort by size of subtree
 					
@@ -292,6 +293,8 @@ namespace fp{
 				int card[10] = {0};
 				int max = -1;
 				int subtree_class = -1;
+				std::memset(class_size_in_st, 0, 20*sizeof(class_size_in_st[0])); 
+				
 				//std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 
@@ -423,19 +426,20 @@ namespace fp{
 					//compute max class
 					if(curr_subtree != old_subtree){
 						max = -1;
-						subtree_class = 1000;
+						subtree_class = 12;
 					}
 					//if(num_classes_in_subtree > 0)
 					//	eps = 1 / (double)num_classes_in_subtree;
 					if(total_tree_card > 0){
 						for(int i=0; i<numClasses; ++i){
-							//std::cout<<card[i]<<" / "<<total_tree_card<<"\n";
+							std::cout<<card[i]<<" / "<<total_tree_card<<"\n";
 							if(card[i] > max && ((double)(card[i]) / (double)(total_tree_card) > eps)){
 								subtree_class = i;
 								max = card[i];
 							}
 						}
 					}
+					class_size_in_st[subtree_class]++;
 					map_subtree_to_class[curr_subtree] = subtree_class;
 					old_subtree = curr_subtree;
 				}
@@ -459,6 +463,15 @@ namespace fp{
 				}
 
 
+				std::cout<<"Printing map_subtree_to_size!\n";
+				for(int i = 0; i<currLevel+2 ; i++)
+					std::cout<<map_subtree_to_size[i]<<"\n";
+
+				std::cout<<"Printing class_size_in_st!\n";
+				for(int i=0; i<20; ++i)
+				{
+					std::cout<<"i: "<<i<<" class_size_in_st[i]: "<<class_size_in_st[i]<<"\n";
+				}
 				std::sort(newfinalbin.begin(), newfinalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
 				finalbin.clear();
 				for(auto i:newfinalbin2)
