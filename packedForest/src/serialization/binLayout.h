@@ -385,12 +385,13 @@ namespace fp{
 					binST.push_back(ele);
 					//if(curr_subtree != old_subtree){
 						std::memset(card, 0, 20*sizeof(card[0])); 
+				//	if(curr_subtree != old_subtree){
 						total_tree_card = 0;
 						num_classes_in_subtree=0;
 					//stno++;
 				//	numNodesInST = 0;
 
-					//}
+				//	}
 					while(!binST.empty()){
 						auto ele = binST.front();
 				//		numNodesInST++;
@@ -408,16 +409,21 @@ namespace fp{
 						binST.pop_front(); 
 						finalbin.push_back(ele);
 						if((ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) && (ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()))
+						{
+							currLevel+=2;
 							continue;
+						}
 
 						else if(ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) {
 							bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
 							binST.push_front(bin[ele.returnRightNodeID()]);
+							currLevel++;
 						}
 
 						else if(ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()){
 							bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
 							binST.push_front(bin[ele.returnLeftNodeID()]); 
+							currLevel++;
 						}
 						else {
 							if(bin[ele.returnLeftNodeID()].getCard() <=  bin[ele.returnRightNodeID()].getCard()){
@@ -436,10 +442,10 @@ namespace fp{
 					}
 					new_st++;
 					//compute max class
-					//if(curr_subtree != old_subtree){
+				//	if(curr_subtree != old_subtree){
 						max = -1;
 						subtree_class = 12;
-					//}
+				//	}
 					//if(num_classes_in_subtree > 0)
 					//	eps = 1 / (double)num_classes_in_subtree;
 					if(total_tree_card > 0){
@@ -460,14 +466,13 @@ namespace fp{
 					map_subtree_to_class[curr_subtree] = subtree_class;
 					old_subtree = curr_subtree;
 				}
-				/*std::cout<<"PRINTING CLASS: !!\n";
+				std::cout<<"PRINTING CLASS: !!\n";
 				for(auto const& item: map_subtree_to_class)
 					std::cout<<item.first<<": "<<item.second<<"\n";
 				std::cout<<"PRINTING SIZE: !!\n";
 				for(auto const& item: map_subtree_to_size)
 					std::cout<<item.first<<": "<<item.second<<"\n";
 			
-				*/
 				int siz = finalbin.size();
 				
 				newfinalbin.clear();
