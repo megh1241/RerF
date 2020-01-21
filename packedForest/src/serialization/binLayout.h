@@ -450,7 +450,7 @@ namespace fp{
 					//	eps = 1 / (double)num_classes_in_subtree;
 					if(total_tree_card > 0){
 						for(int i=0; i<numClasses; ++i){
-							std::cout<<card[i]<<" / "<<total_tree_card<<"\n";
+						//	std::cout<<card[i]<<" / "<<total_tree_card<<"\n";
 							if(card[i] > max && ((double)(card[i]) / (double)(total_tree_card) > eps)){
 								subtree_class = i;
 								max = card[i];
@@ -466,13 +466,13 @@ namespace fp{
 					map_subtree_to_class[curr_subtree] = subtree_class;
 					old_subtree = curr_subtree;
 				}
-				std::cout<<"PRINTING CLASS: !!\n";
+				/*std::cout<<"PRINTING CLASS: !!\n";
 				for(auto const& item: map_subtree_to_class)
 					std::cout<<item.first<<": "<<item.second<<"\n";
 				std::cout<<"PRINTING SIZE: !!\n";
 				for(auto const& item: map_subtree_to_size)
 					std::cout<<item.first<<": "<<item.second<<"\n";
-			
+				*/
 				int siz = finalbin.size();
 				
 				newfinalbin.clear();
@@ -485,7 +485,7 @@ namespace fp{
 				}
 
 
-				std::cout<<"Printing map_subtree_to_size!\n";
+				/*std::cout<<"Printing map_subtree_to_size!\n";
 				for(int i = 0; i<currLevel+3 ; i++)
 					std::cout<<map_subtree_to_size[i]<<"\n";
 
@@ -508,6 +508,7 @@ namespace fp{
 				}	
 					std::cout<<"i: "<<i<<" class_size_in_st[i]: "<<class_size_in_st[i]<<"\n";
 				}
+				*/
 				std::sort(newfinalbin.begin(), newfinalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
 				finalbin.clear();
 				for(auto i:newfinalbin2)
@@ -515,7 +516,7 @@ namespace fp{
 				for(auto i:newfinalbin)
 					finalbin.push_back(i);
 			
-				std::cout<<"Printing newfinalbin2!\n";
+				/*std::cout<<"Printing newfinalbin2!\n";
 				std::cout<<"*******************************************\n";	
 				for(auto i: newfinalbin2)
 				{
@@ -524,7 +525,7 @@ namespace fp{
 					std::cout<<"class: "<<map_subtree_to_class[i.getSTNum()]<<"\n";
 					std::cout<<"size: "<<map_subtree_to_size[i.getSTNum()]<<"\n";
 					std::cout<<"*******************************************\n";	
-				}	
+				}*/	
 				nodeNewIdx.clear();
 				for(auto i=0; i < siz; ++i){
 					nodeNewIdx.insert(std::pair<int, int>(finalbin[i].getID(), i));
