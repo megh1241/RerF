@@ -23,7 +23,7 @@
 #include <functional>
 #include <cstring>
 #include <iostream>
-#define NUM_FILES 900 
+#define NUM_FILES 90 
 
 using namespace std::placeholders;
 using std::placeholders::_1;
@@ -289,7 +289,7 @@ namespace fp{
 				int total_tree_card = 0;
 				int num_classes_in_subtree = 0;
 				int stno = 0;
-				double eps = 0.6;
+				double eps = 0.1;
 				int card[10] = {0};
 				int max = -1;
 				int subtree_class = -1;
@@ -323,16 +323,21 @@ namespace fp{
 					binQ.pop_front();
 					finalbin.push_back(ele);
 					if((ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) && (ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()))
+					{
+						currLevel+=2;
 						continue;
+					}
 
 					else if(ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()){
 						bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
 						binQ.push_back(bin[ele.returnRightNodeID()]);
+						currLevel++;
 					}
 
 					else if(ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()){
 						bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
 						binQ.push_back(bin[ele.returnLeftNodeID()]); 
+						currLevel++;
 					}
 
 					else {
@@ -367,21 +372,23 @@ namespace fp{
 				//int numNodesInST = 0;
 				int curr_subtree = binQ.front().getSTNum();
 				int old_subtree=-1;
-
+				int new_st = currLevel;
 				while(!binQ.empty()){
 					std::deque<fpBaseNodeStat<T, Q>> binST;
 					auto ele = binQ.front();
 					binQ.pop_front();
 					binST.push_back(ele);
 					curr_subtree = ele.getSTNum();
-					if(curr_subtree != old_subtree){
+					ele.setSTNum(new_st);
+					new_st++;
+				//	if(curr_subtree != old_subtree){
 						std::memset(card, 0, 10*sizeof(card[0])); 
 						total_tree_card = 0;
 						num_classes_in_subtree=0;
 					//stno++;
 				//	numNodesInST = 0;
 
-					}
+				//	}
 					while(!binST.empty()){
 						auto ele = binST.front();
 				//		numNodesInST++;
@@ -397,16 +404,21 @@ namespace fp{
 						binST.pop_front(); 
 						finalbin.push_back(ele);
 						if((ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) && (ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()))
+						{
+							currLevel+=2;
 							continue;
+						}
 
 						else if(ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) {
 							bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
 							binST.push_front(bin[ele.returnRightNodeID()]);
+							currLevel++;
 						}
 
 						else if(ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()){
 							bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
 							binST.push_front(bin[ele.returnLeftNodeID()]); 
+							currLevel++;
 						}
 						else {
 							if(bin[ele.returnLeftNodeID()].getCard() <=  bin[ele.returnRightNodeID()].getCard()){
@@ -424,10 +436,10 @@ namespace fp{
 						}
 					}
 					//compute max class
-					if(curr_subtree != old_subtree){
+				//	if(curr_subtree != old_subtree){
 						max = -1;
 						subtree_class = 12;
-					}
+				//	}
 					//if(num_classes_in_subtree > 0)
 					//	eps = 1 / (double)num_classes_in_subtree;
 					if(total_tree_card > 0){
@@ -443,14 +455,13 @@ namespace fp{
 					map_subtree_to_class[curr_subtree] = subtree_class;
 					old_subtree = curr_subtree;
 				}
-				/*std::cout<<"PRINTING CLASS: !!\n";
+				std::cout<<"PRINTING CLASS: !!\n";
 				for(auto const& item: map_subtree_to_class)
 					std::cout<<item.first<<": "<<item.second<<"\n";
 				std::cout<<"PRINTING SIZE: !!\n";
 				for(auto const& item: map_subtree_to_size)
 					std::cout<<item.first<<": "<<item.second<<"\n";
 			
-				*/
 				int siz = finalbin.size();
 				
 				newfinalbin.clear();
