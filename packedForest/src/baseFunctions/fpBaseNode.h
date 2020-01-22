@@ -204,6 +204,8 @@ class alignas(32) fpBaseNode
 		       	fflush(stdout);
 			std::cout<<", depth " << depth <<"\n";
 		       	fflush(stdout);
+			std::cout<<"_______________________________\n";
+		       	fflush(stdout);
 		}
 
         friend std::ostream & operator << (std::ostream &out, fpBaseNode<T, F> & obj){
@@ -254,6 +256,13 @@ class fpBaseNodeStat : public fpBaseNode<T, F>
 		
 		void setID(int idToSet){
 			id = idToSet;
+		}
+		void printID(){
+			std::cout<<"Self ID: "<<id<<"\n";
+			std::cout<<"ST Num: "<<subtreeNum<<"\n";
+		}
+		void printSTNum(){
+			std::cout<<"ST Num: "<<subtreeNum<<"\n";
 		}
 
 };
