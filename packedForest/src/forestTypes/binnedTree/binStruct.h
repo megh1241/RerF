@@ -347,6 +347,10 @@ namespace fp{
 				inline int returnNumTrees(){
 					return numOfTreesInBin;
 				}
+				
+				inline int setNumTrees(int tr){
+					numOfTreesInBin = tr;
+				}
 
 
 				inline void processInternalNode(){
