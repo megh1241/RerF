@@ -276,8 +276,8 @@ namespace fp{
 
 
 				//sort by class if nodes belong to subtrees of different majority class
-				if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
-					return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] < class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
+				//if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
+				//	return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] < class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
 
 				//if classes are the same sort by size of subtree
 					
@@ -289,6 +289,7 @@ namespace fp{
 			}
 
 			inline void BINStatClassLayout(int depthIntertwined){
+				
 				int total_tree_card = 0;
 				int num_classes_in_subtree = 0;
 				int stno = 0;
@@ -300,11 +301,12 @@ namespace fp{
 				
 				//std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
-
+				binstr.setNumTrees(128);
 				//number of nodes of a binary tree as a function of height
 				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
-				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
-
+				//auto numClasses = fpSingleton::getSingleton().returnNumClasses();
+				fpSingleton::getSingleton().setNumClasses(10);
+				auto numClasses = 10;
 				std::cout<<"printing bin INIT\n";
 				std::cout<<"*******************************************\n";
 				for(auto i: bin){
@@ -318,7 +320,8 @@ namespace fp{
 
 				}
 				//roots of trees
-				for(auto i = 0; i < binstr.returnNumTrees(); ++i){
+				//for(auto i = 0; i < binstr.returnNumTrees(); ++i){
+				for(auto i = 0; i < 128; ++i){
 					//bin[i+numClasses].setSTNum(stno++);
 					binQTemp.push_back(bin[i+numClasses]);
 				}
@@ -329,7 +332,8 @@ namespace fp{
 		
 				int posInLevel = 0;
 				//process intertwined(BIN) levels	
-				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
+				//while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
+				while(currLevel < numNodesToProc*128) {
 					auto ele = binQTemp.front();
 					ele.printID();
 					ele.printNode();
@@ -510,7 +514,7 @@ namespace fp{
 				}
 
 
-				/*std::cout<<"Printing map_subtree_to_size!\n";
+				std::cout<<"Printing map_subtree_to_size!\n";
 				for(int i = 0; i<currLevel+3 ; i++)
 					std::cout<<map_subtree_to_size[i]<<"\n";
 
@@ -533,7 +537,6 @@ namespace fp{
 				}	
 					std::cout<<"i: "<<i<<" class_size_in_st[i]: "<<class_size_in_st[i]<<"\n";
 				}
-				*/
 				std::sort(newfinalbin.begin(), newfinalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
 				finalbin.clear();
 				for(auto i:newfinalbin2)

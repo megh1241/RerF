@@ -3,6 +3,7 @@ sudo mkdir -p /data4
 sudo mount -o discard /dev/nvme0n1 "/data4"
 sudo chmod o+rwx /data4
 
+
 sudo apt-get install -y software-properties-common
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 sudo apt update
