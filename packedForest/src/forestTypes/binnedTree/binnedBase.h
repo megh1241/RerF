@@ -97,24 +97,10 @@ namespace fp {
 				int depth = fpSingleton::getSingleton().returnDepthIntertwined();
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
-					//bins[j].createBin(binSizes[j], binSeeds[j], 1);
+					bins[j].createBin(binSizes[j], binSeeds[j], 1);
 		    			
-
-                    			fpBaseNodeStat<T,Q> node;	
-					std::vector<fpBaseNodeStat<T,Q>> bin2;
-					//BinLayout<T, Q> bins_serialize(bins[j], global_fname) ;
-					std::fstream fbinbin; 
-					fbinbin.open("finalbinfile.bin", std::ios::in|std::ios::binary);
-					while(!fbinbin.eof())
-					{
-						fbinbin.read((char*)&node, sizeof(node));
-						bin2.push_back(node);
-					}
-
-					fbinbin.close();
-					bins[j].setBin(bin2);
 					BinLayout<T, Q> bins_serialize(bins[j], global_fname) ;
-					//bins[j].setBin(bins_serialize.getFinalBin());
+					bins[j].setBin(bins_serialize.getFinalBin());
 					
 
 					//bins_serialize.setBin();
