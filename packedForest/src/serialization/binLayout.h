@@ -202,8 +202,7 @@ namespace fp{
 				//if(nodeTreeMap[binQ.front().getID()] != i)
 				//  continue
 
-				//while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
-				while(currLevel < numNodesToProc*128) {
+				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
 					auto ele = binQTemp.front();
 					ele.printID();
 					ele.printNode();
@@ -317,17 +316,16 @@ namespace fp{
 				//If nodes belong to the same subtree sort by new node index
 				if(node1.getSTNum() == node2.getSTNum())
 					return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
-				return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
 
 
 				//sort by class if nodes belong to subtrees of different majority class
-				//if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
-				//	return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] < class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
+				if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
+					return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] < class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
 
 				//if classes are the same sort by size of subtree
 					
 				//f(map_subtree_to_size[node1.getSTNum()] == map_subtree_to_size[node2.getSTNum()])
-				//	return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
+				return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
 				
 				//return map_subtree_to_size[node1.getSTNum()] < map_subtree_to_size[node2.getSTNum()];
 				
@@ -373,8 +371,7 @@ namespace fp{
 		
 				int posInLevel = 0;
 				//process intertwined(BIN) levels	
-				//while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
-				while(currLevel < numNodesToProc*128) {
+				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
 					auto ele = binQTemp.front();
 					ele.printID();
 					ele.printNode();
@@ -463,10 +460,17 @@ namespace fp{
 						ele.setSTNum(new_st);
 						//if ele is a leaf node, then check the class and cardinality
 						//if(!ele.isInternalNode() && ele.returnClass()<numClasses){
-						if( ele.returnClass()<numClasses){
-							if(card[ele.returnClass()] == 0)
+						if( ele.returnLeftNodeID()<numClasses){
+							if(card[ele.returnLeftNodeID()] == 0)
 								num_classes_in_subtree++;
-							card[ele.returnClass()] += ele.getCard();
+							card[ele.returnLeftNodeID()] += ele.getCard();
+							total_tree_card += ele.getCard();
+							leaf_present = 1;
+						}
+						if( ele.returnRightNodeID()<numClasses){
+							if(card[ele.returnRightNodeID()] == 0)
+								num_classes_in_subtree++;
+							card[ele.returnRightNodeID()] += ele.getCard();
 							total_tree_card += ele.getCard();
 							leaf_present = 1;
 						}
@@ -563,7 +567,7 @@ namespace fp{
 				std::cout<<"*******************************************\n";	
 					std::cout<<"i: "<<i<<" class_size_in_st[i]: "<<class_size_in_st[i]<<"\n";
 				}
-				//std::sort(newfinalbin.begin(), newfinalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
+				std::sort(newfinalbin.begin(), newfinalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
 				finalbin.clear();
 				for(auto i:newfinalbin2)
 					finalbin.push_back(i);
