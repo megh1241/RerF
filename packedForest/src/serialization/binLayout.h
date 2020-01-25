@@ -175,6 +175,11 @@ namespace fp{
 
 			inline void BINStatLayout(int depthIntertwined){
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
+				
+				binstr.setNumTrees(128);
+				fpSingleton::getSingleton().setNumClasses(10);
+				auto numClasses = 10;
+				
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
 				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
@@ -318,8 +323,8 @@ namespace fp{
 
 
 				//sort by class if nodes belong to subtrees of different majority class
-				if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
-					return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] < class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
+				//if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
+				//	return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] < class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
 
 				//if classes are the same sort by size of subtree
 					
@@ -347,9 +352,9 @@ namespace fp{
 				//number of nodes of a binary tree as a function of height
 				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
 				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
-				//binstr.setNumTrees(128);
-				//fpSingleton::getSingleton().setNumClasses(10);
-				//auto numClasses = 10;
+				binstr.setNumTrees(128);
+				fpSingleton::getSingleton().setNumClasses(10);
+				auto numClasses = 10;
 				std::cout<<"printing bin INIT\n";
 				std::cout<<"*******************************************\n";
 
@@ -466,6 +471,7 @@ namespace fp{
 							card[ele.returnLeftNodeID()] += ele.getCard();
 							total_tree_card += ele.getCard();
 							leaf_present = 1;
+							map_subtree_to_size[ele.getSTNum()]+=ele.getCard();
 						}
 						if( ele.returnRightNodeID()<numClasses){
 							if(card[ele.returnRightNodeID()] == 0)
@@ -473,8 +479,8 @@ namespace fp{
 							card[ele.returnRightNodeID()] += ele.getCard();
 							total_tree_card += ele.getCard();
 							leaf_present = 1;
+							map_subtree_to_size[ele.getSTNum()]+=ele.getCard();
 						}
-						map_subtree_to_size[ele.getSTNum()]++;
 						binST.pop_front(); 
 						finalbin.push_back(ele);
 						if((ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) && (ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()))
