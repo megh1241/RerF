@@ -296,8 +296,10 @@ namespace fp{
 
 				//sort by class if nodes belong to subtrees of different majority class
 				if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
-					return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] < class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
+					return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] > class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
 
+				if(map_subtree_to_size[node1.getSTNum()] != map_subtree_to_size[node1.getSTNum()])
+					return map_subtree_to_size[node1.getSTNum()] > map_subtree_to_size[node1.getSTNum()];
 				//if classes are the same sort by size of subtree	
 				return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
 				
@@ -455,25 +457,25 @@ namespace fp{
 						}
 
 						else if(ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) {
-							bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
+						//	bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
 							binST.push_front(bin[ele.returnRightNodeID()]);
 						}
 
 						else if(ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()){
-							bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
+						//	bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
 							binST.push_front(bin[ele.returnLeftNodeID()]); 
 						}
 						else {
 							if(bin[ele.returnLeftNodeID()].getCard() <=  bin[ele.returnRightNodeID()].getCard()){
-								bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
+								//bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
 								binST.push_front(bin[ele.returnLeftNodeID()]); 
-								bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
+								//bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
 								binST.push_front(bin[ele.returnRightNodeID()]); 
 							}
 							else{
-								bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
+								//bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
 								binST.push_front(bin[ele.returnRightNodeID()]); 
-								bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
+								//bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
 								binST.push_front(bin[ele.returnLeftNodeID()]); 
 							}
 						}
