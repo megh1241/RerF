@@ -92,8 +92,7 @@ namespace fp{
 				//if(nodeTreeMap[binQ.front().getID()] != i)
 				//  continue;
 				
-				//while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
-				while(currLevel < numNodesToProc*128) {
+				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
 					auto ele = binQTemp.front();
 					ele.printID();
 					ele.printNode();
@@ -176,6 +175,10 @@ namespace fp{
 
 			inline void BINStatLayout(int depthIntertwined){
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
+				
+				binstr.setNumTrees(128);
+				fpSingleton::getSingleton().setNumClasses(10);
+				
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
 				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
@@ -324,10 +327,7 @@ namespace fp{
 
 				//if classes are the same sort by size of subtree
 					
-				//f(map_subtree_to_size[node1.getSTNum()] == map_subtree_to_size[node2.getSTNum()])
 				return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
-				
-				//return map_subtree_to_size[node1.getSTNum()] < map_subtree_to_size[node2.getSTNum()];
 				
 			}
 
@@ -346,10 +346,9 @@ namespace fp{
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 				//number of nodes of a binary tree as a function of height
 				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
-				//auto numClasses = fpSingleton::getSingleton().returnNumClasses();
+				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 				binstr.setNumTrees(128);
 				fpSingleton::getSingleton().setNumClasses(10);
-				auto numClasses = 10;
 				std::cout<<"printing bin INIT\n";
 				std::cout<<"*******************************************\n";
 
@@ -359,8 +358,8 @@ namespace fp{
 
 				}
 				//roots of trees
-				//for(auto i = 0; i < binstr.returnNumTrees(); ++i){
-				for(auto i = 0; i < 128; ++i){
+				for(auto i = 0; i < binstr.returnNumTrees(); ++i){
+				//for(auto i = 0; i < 128; ++i){
 					//bin[i+numClasses].setSTNum(stno++);
 					binQTemp.push_back(bin[i+numClasses]);
 				}
@@ -419,7 +418,7 @@ namespace fp{
 
 
 				//initial subtree size map for each subtree num
-				for(int i=0; i<=currLevel*90; ++i)
+				for(int i=0; i<=currLevel*9; ++i)
 					map_subtree_to_size[i] = 0;
 
 				std::vector<fpBaseNodeStat<T, Q>> newfinalbin;
@@ -466,6 +465,7 @@ namespace fp{
 							card[ele.returnLeftNodeID()] += ele.getCard();
 							total_tree_card += ele.getCard();
 							leaf_present = 1;
+							map_subtree_to_size[ele.getSTNum()]+=ele.getCard();
 						}
 						if( ele.returnRightNodeID()<numClasses){
 							if(card[ele.returnRightNodeID()] == 0)
@@ -473,8 +473,8 @@ namespace fp{
 							card[ele.returnRightNodeID()] += ele.getCard();
 							total_tree_card += ele.getCard();
 							leaf_present = 1;
+							map_subtree_to_size[ele.getSTNum()]+=ele.getCard();
 						}
-						map_subtree_to_size[ele.getSTNum()]++;
 						binST.pop_front(); 
 						finalbin.push_back(ele);
 						if((ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) && (ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()))
