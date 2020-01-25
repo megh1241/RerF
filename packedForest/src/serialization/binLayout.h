@@ -184,12 +184,6 @@ namespace fp{
 				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
 				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 
-			/*	if(depthIntertwined == 1){
-					for(auto i: bin)
-						finalbin.push_back(i);
-					return;
-				}*/
-
 				for(auto i = 0; i < numClasses; ++i){
 					finalbin.push_back(bin[i]);
 					nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));
@@ -202,8 +196,6 @@ namespace fp{
 				// Intertwined levels
 				int currLevel = 0;
 				int posInLevel = 0; 
-				//if(nodeTreeMap[binQ.front().getID()] != i)
-				//  continue
 
 				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
 					auto ele = binQTemp.front();
@@ -285,26 +277,7 @@ namespace fp{
 						}
 					}
 				}
-				/*std::cout<<"PRINTING BIN\n";
-				std::fstream fbin, fbin2;
-				fbin.open("bin_init.txt", std::ios::out);
-				for(auto i: bin){
-					fbin<<i.getID()<<",";
-					fbin<<i.returnLeftNodeID()<<",";
-					fbin<<i.returnRightNodeID()<<",";
-					fbin<<i.returnCutValue()<<"\n";
-				}
-				fbin.close();
-				std::cout<<"PRINTING FINAL BIN\n";
-				fbin2.open("bin_final.txt", std::ios::out);
-				for(auto i: finalbin){
-					fbin2<<i.getID()<<",";
-					fbin2<<i.returnLeftNodeID()<<",";
-					fbin2<<i.returnRightNodeID()<<",";
-					fbin2<<i.returnCutValue()<<"\n";
-				}
-				fbin2.close();
-				*/
+				
 				int siz = finalbin.size();
 				for (auto i=numClasses; i<siz; i++){
 					finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
@@ -325,8 +298,7 @@ namespace fp{
 				if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
 					return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] < class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
 
-				//if classes are the same sort by size of subtree
-					
+				//if classes are the same sort by size of subtree	
 				return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
 				
 			}
@@ -346,9 +318,9 @@ namespace fp{
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 				//number of nodes of a binary tree as a function of height
 				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
-				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 				binstr.setNumTrees(128);
 				fpSingleton::getSingleton().setNumClasses(10);
+				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 				std::cout<<"printing bin INIT\n";
 				std::cout<<"*******************************************\n";
 
