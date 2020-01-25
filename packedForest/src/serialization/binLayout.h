@@ -178,7 +178,6 @@ namespace fp{
 				
 				binstr.setNumTrees(128);
 				fpSingleton::getSingleton().setNumClasses(10);
-				auto numClasses = 10;
 				
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
@@ -354,7 +353,6 @@ namespace fp{
 				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 				binstr.setNumTrees(128);
 				fpSingleton::getSingleton().setNumClasses(10);
-				auto numClasses = 10;
 				std::cout<<"printing bin INIT\n";
 				std::cout<<"*******************************************\n";
 
