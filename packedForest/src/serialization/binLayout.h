@@ -323,11 +323,11 @@ namespace fp{
 
 				//if classes are the same sort by size of subtree
 					
-				//f(map_subtree_to_size[node1.getSTNum()] == map_subtree_to_size[node2.getSTNum()])
-				//	return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
+				if(map_subtree_to_size[node1.getSTNum()] == map_subtree_to_size[node2.getSTNum()])
+					return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
 				
-				//return map_subtree_to_size[node1.getSTNum()] < map_subtree_to_size[node2.getSTNum()];
-				return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
+				return map_subtree_to_size[node1.getSTNum()] < map_subtree_to_size[node2.getSTNum()];
+				//return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
 				
 			}
 
@@ -346,10 +346,10 @@ namespace fp{
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 				//number of nodes of a binary tree as a function of height
 				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
-				//auto numClasses = fpSingleton::getSingleton().returnNumClasses();
-				binstr.setNumTrees(128);
-				fpSingleton::getSingleton().setNumClasses(10);
-				auto numClasses = 10;
+				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
+				//binstr.setNumTrees(128);
+				//fpSingleton::getSingleton().setNumClasses(10);
+				//auto numClasses = 10;
 				std::cout<<"printing bin INIT\n";
 				std::cout<<"*******************************************\n";
 
@@ -359,8 +359,8 @@ namespace fp{
 
 				}
 				//roots of trees
-				//for(auto i = 0; i < binstr.returnNumTrees(); ++i){
-				for(auto i = 0; i < 128; ++i){
+				for(auto i = 0; i < binstr.returnNumTrees(); ++i){
+				//for(auto i = 0; i < 128; ++i){
 					//bin[i+numClasses].setSTNum(stno++);
 					binQTemp.push_back(bin[i+numClasses]);
 				}
@@ -371,8 +371,7 @@ namespace fp{
 		
 				int posInLevel = 0;
 				//process intertwined(BIN) levels	
-				//while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
-				while(currLevel < numNodesToProc*128) {
+				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
 					auto ele = binQTemp.front();
 					ele.printID();
 					ele.printNode();
@@ -420,7 +419,7 @@ namespace fp{
 
 
 				//initial subtree size map for each subtree num
-				for(int i=0; i<=currLevel*90; ++i)
+				for(int i=0; i<=currLevel*9; ++i)
 					map_subtree_to_size[i] = 0;
 
 				std::vector<fpBaseNodeStat<T, Q>> newfinalbin;
@@ -461,10 +460,17 @@ namespace fp{
 						ele.setSTNum(new_st);
 						//if ele is a leaf node, then check the class and cardinality
 						//if(!ele.isInternalNode() && ele.returnClass()<numClasses){
-						if( ele.returnClass()<numClasses){
-							if(card[ele.returnClass()] == 0)
+						if( ele.returnLeftNodeID()<numClasses){
+							if(card[ele.returnLeftNodeID()] == 0)
 								num_classes_in_subtree++;
-							card[ele.returnClass()] += ele.getCard();
+							card[ele.returnLeftNodeID()] += ele.getCard();
+							total_tree_card += ele.getCard();
+							leaf_present = 1;
+						}
+						if( ele.returnRightNodeID()<numClasses){
+							if(card[ele.returnRightNodeID()] == 0)
+								num_classes_in_subtree++;
+							card[ele.returnRightNodeID()] += ele.getCard();
 							total_tree_card += ele.getCard();
 							leaf_present = 1;
 						}
