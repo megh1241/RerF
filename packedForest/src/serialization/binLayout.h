@@ -273,6 +273,7 @@ namespace fp{
 				//If nodes belong to the same subtree sort by new node index
 				if(node1.getSTNum() == node2.getSTNum())
 					return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
+				return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
 
 
 				//sort by class if nodes belong to subtrees of different majority class
@@ -281,10 +282,10 @@ namespace fp{
 
 				//if classes are the same sort by size of subtree
 					
-				if(map_subtree_to_size[node1.getSTNum()] == map_subtree_to_size[node2.getSTNum()])
-					return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
+				//f(map_subtree_to_size[node1.getSTNum()] == map_subtree_to_size[node2.getSTNum()])
+				//	return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
 				
-				return map_subtree_to_size[node1.getSTNum()] < map_subtree_to_size[node2.getSTNum()];
+				//return map_subtree_to_size[node1.getSTNum()] < map_subtree_to_size[node2.getSTNum()];
 				
 			}
 
@@ -309,10 +310,6 @@ namespace fp{
 				auto numClasses = 10;
 				std::cout<<"printing bin INIT\n";
 				std::cout<<"*******************************************\n";
-				for(auto i: bin){
-					i.printID();
-					i.printNode();
-				}
 
 				for(auto i = 0; i<numClasses; ++i){
 					finalbin.push_back(bin[i]);
@@ -370,13 +367,6 @@ namespace fp{
 					
 					currLevel++;
 				}
-				std::cout<<"*******************************************\n";
-				std::cout<<"printing bin after INTER\n";
-				for(auto i: finalbin){
-					i.printID();
-					i.printNode();
-				}
-				std::cout<<"*******************************************\n";
 
 
 				while(!binQTemp.empty()){
@@ -527,32 +517,14 @@ namespace fp{
 				{
 				std::cout<<"Printing newfinalbin!\n";
 				std::cout<<"*******************************************\n";	
-				for(auto i: newfinalbin)
-				{
-					std::cout<<"id: "<<i.getID()<<"\n";
-					std::cout<<"ST Num: "<<i.getSTNum()<<"\n";
-					std::cout<<"class: "<<map_subtree_to_class[i.getSTNum()]<<"\n";
-					std::cout<<"size: "<<map_subtree_to_size[i.getSTNum()]<<"\n";
-					std::cout<<"*******************************************\n";	
-				}	
 					std::cout<<"i: "<<i<<" class_size_in_st[i]: "<<class_size_in_st[i]<<"\n";
 				}
-				std::sort(newfinalbin.begin(), newfinalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
+				//std::sort(newfinalbin.begin(), newfinalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
 				finalbin.clear();
 				for(auto i:newfinalbin2)
 					finalbin.push_back(i);
 				for(auto i:newfinalbin)
 					finalbin.push_back(i);
-				std::cout<<"printing bin FINAL\n";
-				for(auto i: finalbin){
-					i.printID();
-					std::cout<<"class: "<<map_subtree_to_class[i.getSTNum()]<<"\n";	
-					std::cout<<"size: "<<map_subtree_to_size[i.getSTNum()]<<"\n";
-					std::cout<<"class st size: "<<class_size_in_st[ map_subtree_to_class[i.getSTNum()]]<<"\n";
-					i.printNode();
-				}
-
-
 			
 				/*std::cout<<"Printing newfinalbin2!\n";
 				std::cout<<"*******************************************\n";	
