@@ -92,8 +92,7 @@ namespace fp{
 				//if(nodeTreeMap[binQ.front().getID()] != i)
 				//  continue;
 				
-				//while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
-				while(currLevel < numNodesToProc*128) {
+				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
 					auto ele = binQTemp.front();
 					ele.printID();
 					ele.printNode();
@@ -202,8 +201,7 @@ namespace fp{
 				//if(nodeTreeMap[binQ.front().getID()] != i)
 				//  continue
 
-				//while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
-				while(currLevel < numNodesToProc*128) {
+				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
 					auto ele = binQTemp.front();
 					ele.printID();
 					ele.printNode();
@@ -317,12 +315,11 @@ namespace fp{
 				//If nodes belong to the same subtree sort by new node index
 				if(node1.getSTNum() == node2.getSTNum())
 					return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
-				return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
 
 
 				//sort by class if nodes belong to subtrees of different majority class
-				//if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
-				//	return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] < class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
+				if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
+					return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] < class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
 
 				//if classes are the same sort by size of subtree
 					
@@ -330,6 +327,7 @@ namespace fp{
 				//	return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
 				
 				//return map_subtree_to_size[node1.getSTNum()] < map_subtree_to_size[node2.getSTNum()];
+				return nodeNewIdx[node1.getID()] < nodeNewIdx[node2.getID()];
 				
 			}
 
