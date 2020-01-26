@@ -51,6 +51,7 @@ int main(int argc, char* argv[]) {
                 case 7:
                     forest.setParameter("forestType", "binnedBase");
                     forest.setParameter("numTreeBins", numCores);
+                    //forest.setParameter("maxDepth", 20);
                     break;
                 case 8:
                     forest.setParameter("forestType", "binnedBaseRerF");
@@ -132,8 +133,8 @@ int main(int argc, char* argv[]) {
                     forest.setParameter("columnWithY", 3072);
                     break;
                 case 9: 
-                    forest.setParameter("CSVFileName", "datasets/BNG_satimage.csv");
-                    forest.setParameter("columnWithY", 36);
+                    forest.setParameter("CSVFileName", "res/mnist_small.csv");
+                    forest.setParameter("columnWithY", 0);
                     break;
                 default:
                     std::cout << "unknown dataset selected" << std::endl;

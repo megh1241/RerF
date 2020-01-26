@@ -463,19 +463,20 @@ namespace fp{
 						if( ele.returnLeftNodeID()<numClasses){
                                                         if(card[ele.returnLeftNodeID()] == 0)
                                                                 num_classes_in_subtree++;
-                                                        card[ele.returnLeftNodeID()] += ele.getCard();
-                                                        total_tree_card += ele.getCard();
+                                                        card[ele.returnLeftNodeID()] += ele.getLeftLeafCard();
+							map_subtree_to_size[ele.getSTNum()]+=ele.getLeftLeafCard();
+                                                        total_tree_card += ele.getLeftLeafCard();
                                                         leaf_present = 1;
                                                 }
                                                 if( ele.returnRightNodeID()<numClasses){
                                                         if(card[ele.returnRightNodeID()] == 0)
                                                                 num_classes_in_subtree++;
-                                                        card[ele.returnRightNodeID()] += ele.getCard();
-                                                        total_tree_card += ele.getCard();
+                                                        card[ele.returnRightNodeID()] += ele.getRightLeafCard();
+                                                        total_tree_card += ele.getRightLeafCard();
+							map_subtree_to_size[ele.getSTNum()]+=ele.getRightLeafCard();
                                                         leaf_present = 1;
                                                 }
 
-						map_subtree_to_size[ele.getSTNum()]++;
 						binST.pop_front(); 
 						finalbin.push_back(ele);
 						if((ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) && (ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()))

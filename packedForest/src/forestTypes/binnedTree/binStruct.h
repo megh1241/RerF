@@ -230,8 +230,10 @@ namespace fp{
 
 					if(nodeQueue.back().returnIsLeftNode()){
 						bin[nodeQueue.back().returnParentNodeNumber()].setLeftValue(nodeQueue.back().returnNodeClass());
+                        			bin[nodeQueue.back().returnParentNodeNumber()].setLeftLeafCard(nodeQueue.back().returnNodeSize());
 					}else{
 						bin[nodeQueue.back().returnParentNodeNumber()].setRightValue(nodeQueue.back().returnNodeClass());
+                        			bin[nodeQueue.back().returnParentNodeNumber()].setRightLeafCard(nodeQueue.back().returnNodeSize());
 					}
 				}
 
@@ -253,8 +255,10 @@ namespace fp{
 
 					if(nodeQueueInter.front().returnIsLeftNode()){
 						bin[nodeQueueInter.front().returnParentNodeNumber()].setLeftValue(nodeQueueInter.front().returnNodeClass());
+                        			bin[nodeQueue.back().returnParentNodeNumber()].setLeftLeafCard(nodeQueue.back().returnNodeSize());
 					}else{
 						bin[nodeQueueInter.front().returnParentNodeNumber()].setRightValue(nodeQueueInter.front().returnNodeClass());
+                        			bin[nodeQueue.back().returnParentNodeNumber()].setRightLeafCard(nodeQueue.back().returnNodeSize());
 					}
 				}
 

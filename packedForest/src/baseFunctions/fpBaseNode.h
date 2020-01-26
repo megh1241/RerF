@@ -224,6 +224,8 @@ class fpBaseNodeStat : public fpBaseNode<T, F>
 {
 		int cardinality;
         	int id;
+		int left_leaf_card;
+		int right_leaf_card;
 		//subtreeNum = -2 indicates class, =-1 indicates interleaved BIN
 		int subtreeNum;
 	public:
@@ -250,6 +252,23 @@ class fpBaseNodeStat : public fpBaseNode<T, F>
 			return cardinality;
 		}
 		
+		void setLeftLeafCard(int cardi){
+                        left_leaf_card = cardi;
+                }
+
+                void setRightLeafCard(int cardi){
+                        right_leaf_card = cardi;
+                }
+
+		int getLeftLeafCard(){
+			return left_leaf_card;
+		}
+
+		int getRightLeafCard(){
+			return right_leaf_card;
+		}
+
+
 		int getID(){
 			return id;
 		}
