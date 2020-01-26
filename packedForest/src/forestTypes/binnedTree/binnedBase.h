@@ -29,7 +29,7 @@ std::vector<double>etime;
 std::vector<int> sizesbin;
 std::fstream f_time;
 std::fstream fblock;
-#define NUM_FILES 90
+#define NUM_FILES 900
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 MemoryMapped mmappedObj;
