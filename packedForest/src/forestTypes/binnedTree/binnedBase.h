@@ -126,8 +126,10 @@ namespace fp {
 					treeRootPos = bins_serialize.treeRootPos;
                 		}
 
-				for(auto single_bin: binvector)
+				for(auto single_bin: binvector){
 					single_bin.writeToFile(treeRootPos);
+					single_bin.writeToFileStat();
+				}
 				
 				std::fstream fsiz;
 				fsiz.open("/data4/binstart.txt", std::ios::out);

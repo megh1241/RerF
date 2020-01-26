@@ -722,8 +722,8 @@ namespace fp{
 			inline void writeToFileStat(){
 				std::ofstream f;
 				fpBaseNodeStat<T,Q> nodeToWrite;
-				for(int j = 0; j < NUM_FILES; j++){
-					f.open((filename + std::to_string(j) + ".bin").c_str(), std::ios::out|std::ios::binary);
+				for(int j = 0; j < 1; j++){
+					f.open(("cifar_trained_stat" + std::to_string(j) + ".bin").c_str(), std::ios::out|std::ios::binary);
 					for(auto i: finalbin){
 						nodeToWrite = i;
 						f.write((char*)&nodeToWrite, sizeof(nodeToWrite));
