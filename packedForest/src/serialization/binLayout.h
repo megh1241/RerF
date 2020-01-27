@@ -82,8 +82,7 @@ namespace fp{
 				}
 
 				for(auto i = 0; i < binstr.returnNumTrees(); ++i) {
-					bin[i+numClasses].setSTNum(-1*depthIntertwined);
-					binQ.push_back(bin[i+numClasses]);
+					binQTemp.push_back(bin[i+numClasses]);
 				}
 
 				// Intertwined levels
@@ -692,20 +691,14 @@ namespace fp{
 							binST.push_front(bin[ele.returnLeftNodeID()]); 
 
 						else{
-							if(bin[ele.returnLeftNodeID()].getCard() > bin[ele.returnRightNodeID()].getCard()){ 
-								binST.push_front(bin[ele.returnLeftNodeID()]); 
-								binST.push_front(bin[ele.returnRightNodeID()]);
-							}
-							else{
 								if(bin[ele.returnLeftNodeID()].getCard() <= bin[ele.returnRightNodeID()].getCard()){
-									binST.push_front(bin[ele.returnRightNodeID()]); 
 									binST.push_front(bin[ele.returnLeftNodeID()]); 
+									binST.push_front(bin[ele.returnRightNodeID()]); 
 								}
 								else{
-									binST.push_front(bin[ele.returnLeftNodeID()]); 
 									binST.push_front(bin[ele.returnRightNodeID()]); 
+									binST.push_front(bin[ele.returnLeftNodeID()]); 
 								}
-							}	    
 						}
 					}
 				}

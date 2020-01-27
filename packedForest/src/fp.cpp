@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
                     forest.setParameter("columnWithY", 3072);
                     break;
                 case 9: 
-                    forest.setParameter("CSVFileName", "res/mnist_small.csv");
+                    forest.setParameter("CSVFileName", "res/fashion-mnist_train.csv");
                     forest.setParameter("columnWithY", 0);
                     break;
                 default:
