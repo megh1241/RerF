@@ -66,6 +66,8 @@ namespace fp{
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
 				int numNodesToProc = std::pow(2, depthIntertwined) -1 ; 
+				binstr.setNumTrees(128);
+				fpSingleton::getSingleton().setNumClasses(10);
 				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 
 				/*if(depthIntertwined == 1){
@@ -176,6 +178,8 @@ namespace fp{
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
 				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
+				binstr.setNumTrees(128);
+				fpSingleton::getSingleton().setNumClasses(10);
 				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 
 			/*	if(depthIntertwined == 1){
@@ -344,9 +348,9 @@ namespace fp{
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 				//number of nodes of a binary tree as a function of height
 				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
-				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 				binstr.setNumTrees(128);
 				fpSingleton::getSingleton().setNumClasses(10);
+				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
 				std::cout<<"printing bin INIT\n";
 				std::cout<<"*******************************************\n";
 
@@ -597,6 +601,9 @@ namespace fp{
 
 			inline void BFSLayout(){
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
+
+				binstr.setNumTrees(128);
+				fpSingleton::getSingleton().setNumClasses(10);
 				int numClasses = fpSingleton::getSingleton().returnNumClasses();
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 				std::deque<fpBaseNodeStat<T, Q>> binST;
@@ -652,6 +659,8 @@ namespace fp{
 
 			inline void statLayout(){
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
+				binstr.setNumTrees(128);
+				fpSingleton::getSingleton().setNumClasses(10);
 				int numClasses = fpSingleton::getSingleton().returnNumClasses();
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 				std::deque<fpBaseNodeStat<T, Q>> binST;
