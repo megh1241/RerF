@@ -657,7 +657,8 @@ namespace fp{
 					int q;
                     			std::vector<int> v;
                     			//std::vector<int> v_num_nodes;
-                    			if(roots.size()>0){
+                    		auto start = std::chrono::steady_clock::now();
+					if(roots.size()>0){
                         			for( q=0; q<numOfTreesInBin; ++q){
                                 			//v_num_nodes.push_back(currNode[q]);
 						    	currNode[q] = roots[q];
@@ -689,6 +690,7 @@ namespace fp{
 
 					}while(numberNotInLeaf);
 
+                    		auto end = std::chrono::steady_clock::now();
 					for( q=0; q<numOfTreesInBin; q++){
 //#pragma omp atomic update
 #pragma omp critical 
@@ -700,7 +702,7 @@ namespace fp{
 //#pragma omp critical
 //					etime.push_back(std::chrono::duration<double, std::milli>(end - start).count());
 
-					//std::cout<<"elapsed time: " <<std::chrono::duration<double, std::milli>(end - start).count()<<" miliseconds.\n";
+					std::cout<<"elapsed time: " <<std::chrono::duration<double, std::milli>(end - start).count()<<" miliseconds.\n";
                     		//	std::cout<<"Number of nodes traversed: "<<v_num_nodes.size()<<"\n";  
                     		/*	std::cout<<"Number of nodes traversed: "<<v_num_nodes.size()<<"\n";  
                     			std::cout<<"Elapsed time1: " <<std::chrono::duration<double, std::milli>(end - start3).count()<<" miliseconds.\n";

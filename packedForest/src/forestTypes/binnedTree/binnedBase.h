@@ -238,7 +238,6 @@ namespace fp {
 				//Read the tree root positions for BFS and Stat layouts
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();	
 				if(layout_str.compare("bfs") == 0 || layout_str.compare("stat") == 0){
-					std::cout<<"reading roots from file!!!!\n";
 					int rootpos;
 					fi.open("treeroots.csv");
 					while(!fi.eof()){
