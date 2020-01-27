@@ -96,7 +96,52 @@ namespace fp {
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();
 				int depth = fpSingleton::getSingleton().returnDepthIntertwined();
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
-				for(int j = 0; j < numBins; ++j){
+					for(int j = 0; j < numBins; ++j){
+					//bins[j].createBin(binSizes[j], binSeeds[j], 1);
+
+
+                    			fpBaseNodeStat<T,Q> node;
+					std::vector<fpBaseNodeStat<T,Q>> bin2;
+					//BinLayout<T, Q> bins_serialize(bins[j], global_fname) ;
+					std::fstream fbinbin;
+					fbinbin.open("cifar_trained_stat0.bin", std::ios::in|std::ios::binary);
+					while(!fbinbin.eof())
+					{
+						fbinbin.read((char*)&node, sizeof(node));
+						bin2.push_back(node);
+					}
+
+					fbinbin.close();
+					bins[j].setBin(bin2);
+					BinLayout<T, Q> bins_serialize(bins[j], global_fname) ;
+					//bins[j].setBin(bins_serialize.getFinalBin());
+
+
+					//bins_serialize.setBin();
+					if(layout_str.compare("bfs") == 0)
+                        			bins_serialize.BFSLayout();
+					else if(layout_str.compare("stat") == 0)
+                        			bins_serialize.statLayout();
+					else if(layout_str.compare("binbfs") == 0)
+                        			bins_serialize.BINBFSLayout(depth);
+					else if(layout_str.compare("binstat") == 0)
+                        			bins_serialize.BINStatLayout(depth);
+                        		else
+                        			bins_serialize.BINStatClassLayout(depth);
+
+                    			auto start = std::chrono::steady_clock::now();
+					#pragma omp critical
+					{
+						binvector.push_back(bins_serialize);
+				        	sizesbin.push_back((int)bins_serialize.finalbin.size());
+					}
+					auto end = std::chrono::steady_clock::now();
+                    			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" nanoseconds.\n";
+					treeRootPos = bins_serialize.treeRootPos;
+                		}
+				
+				
+				/*for(int j = 0; j < numBins; ++j){
 					bins[j].createBin(binSizes[j], binSeeds[j], 1);
 		    			
 					BinLayout<T, Q> bins_serialize(bins[j], global_fname) ;
@@ -124,11 +169,11 @@ namespace fp {
 					auto end = std::chrono::steady_clock::now();
                     			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" nanoseconds.\n";
 					treeRootPos = bins_serialize.treeRootPos;
-                		}
+                		}*/
 
 				for(auto single_bin: binvector){
 					single_bin.writeToFile(treeRootPos);
-					single_bin.writeToFileStat();
+					//single_bin.writeToFileStat();
 				}
 				
 				std::fstream fsiz;

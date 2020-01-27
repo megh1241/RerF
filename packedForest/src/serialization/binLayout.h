@@ -94,8 +94,6 @@ namespace fp{
 				
 				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
 					auto ele = binQTemp.front();
-					ele.printID();
-					ele.printNode();
 					binQTemp.pop_front();
 					if(ele.getID()>= numClasses) {
 						ele.setSTNum(currLevel);
@@ -319,7 +317,7 @@ namespace fp{
 
 				//sort by class if nodes belong to subtrees of different majority class
 				if(map_subtree_to_class[node1.getSTNum()] != map_subtree_to_class[node2.getSTNum()])
-					return class_size_in_st[map_subtree_to_class[node1.getSTNum()]] < class_size_in_st[map_subtree_to_class[node2.getSTNum()]];
+					return map_subtree_to_class[node1.getSTNum()] < map_subtree_to_class[node2.getSTNum()];
 
 				//if classes are the same sort by size of subtree
 					
@@ -347,9 +345,8 @@ namespace fp{
 				//number of nodes of a binary tree as a function of height
 				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
 				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
-				//binstr.setNumTrees(128);
-				//fpSingleton::getSingleton().setNumClasses(10);
-				//auto numClasses = 10;
+				binstr.setNumTrees(128);
+				fpSingleton::getSingleton().setNumClasses(10);
 				std::cout<<"printing bin INIT\n";
 				std::cout<<"*******************************************\n";
 
@@ -372,8 +369,6 @@ namespace fp{
 				//process intertwined(BIN) levels	
 				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
 					auto ele = binQTemp.front();
-					ele.printID();
-					ele.printNode();
 					binQTemp.pop_front();
 					if(ele.getID()>= numClasses) {
 						ele.setSTNum(currLevel);
@@ -535,13 +530,12 @@ namespace fp{
 					map_subtree_to_class[curr_subtree] = subtree_class;
 					old_subtree = curr_subtree;
 				}
-				/*std::cout<<"PRINTING CLASS: !!\n";
+				std::cout<<"PRINTING CLASS: !!\n";
 				for(auto const& item: map_subtree_to_class)
 					std::cout<<item.first<<": "<<item.second<<"\n";
 				std::cout<<"PRINTING SIZE: !!\n";
 				for(auto const& item: map_subtree_to_size)
 					std::cout<<item.first<<": "<<item.second<<"\n";
-				*/
 				int siz = finalbin.size();
 				
 				newfinalbin.clear();
