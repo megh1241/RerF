@@ -215,7 +215,6 @@ namespace fp {
 
 			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = global_fname){							  int tmp_val ;
 				int treesPerBin;
-				readRandomClearCache();
 				std::fstream fi;
 
 				//Read locations of the first node of each bin when there are multiple bins
@@ -264,7 +263,7 @@ namespace fp {
 
 				while(!finm.eof())
 				{
-					finm>>newnode;
+					finm.read((char*)&newnode, sizeof(newnode));
 					data_vec.push_back(newnode);
 				}
 
@@ -279,7 +278,7 @@ namespace fp {
 					if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
 		    			else{
-						temp.predictBinObservation(uniqueCount, treeRootPos, data, observationNumber, predictions);
+						temp.predictBinObservation(uniqueCount, treeRootPos, data_vec, observationNumber, predictions);
                         			if(num_threads == 1)
 							blocks.push_back(uniqueCount);
                     			}
