@@ -23,7 +23,7 @@
 #include <functional>
 #include <cstring>
 #include <iostream>
-#define NUM_FILES 900 
+#define NUM_FILES 2 
 
 using namespace std::placeholders;
 using std::placeholders::_1;

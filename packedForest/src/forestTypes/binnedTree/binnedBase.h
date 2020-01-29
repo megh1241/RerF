@@ -29,7 +29,7 @@ std::vector<double>etime;
 std::vector<int> sizesbin;
 std::fstream f_time;
 std::fstream fblock;
-#define NUM_FILES 900
+#define NUM_FILES 2
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 MemoryMapped mmappedObj;
@@ -253,19 +253,33 @@ namespace fp {
 				
 				binStruct<T, Q> temp = binStruct<T, Q>(treesPerBin);
 				global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
-                       		mmappedObj.open(global_str, 0); 
-                        	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
+                       		//mmappedObj.open(global_str, 0); 
+                        	//data = (fpBaseNode<T, Q>*)mmappedObj.getData();
+				std::vector<fpBaseNode<T, Q>> data_vec;
+
+				//FOR IN MEMORY
+				std::fstream finm;
+				finm.open("/data4/bfsars0.bin", std::ios::in|std::ios::binary);
+				fpBaseNode<T, Q> newnode;
+
+				while(!finm.eof())
+				{
+					finm>>newnode;
+					data_vec.push_back(newnode);
+				}
+
+				data = data_vec.data();
 				int num_threads = fpSingleton::getSingleton().returnNumThreads();
 				auto start = std::chrono::steady_clock::now();
 
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int k = 0; k < numBins; ++k){
                 			int uniqueCount = 0;
-                			fpBaseNode<T, Q> * mmapped_file_pos = data + sizesbin[k];	
+                			//fpBaseNode<T, Q> * mmapped_file_pos = data + sizesbin[k];	
 					if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
 		    			else{
-						temp.predictBinObservation(uniqueCount, treeRootPos, mmapped_file_pos, observationNumber, predictions);
+						temp.predictBinObservation(uniqueCount, treeRootPos, data, observationNumber, predictions);
                         			if(num_threads == 1)
 							blocks.push_back(uniqueCount);
                     			}
