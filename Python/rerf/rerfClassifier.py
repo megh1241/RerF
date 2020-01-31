@@ -134,7 +134,7 @@ class rerfClassifier(BaseEstimator, ClassifierMixin):
 
     def __init__(
         self,
-        projection_matrix="RerF",
+        projection_matrix="Base",
         n_estimators=500,
         max_depth=None,
         min_samples_split=1,

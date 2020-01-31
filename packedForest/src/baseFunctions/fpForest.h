@@ -125,12 +125,19 @@ namespace fp {
 					deleteData();
 				}
 
+				
+				inline void initTestForest(){
+                                        loadData();
+                                        setDataDependentParameters();
+                                        checkDataDependentParameters();
+                                        initializeForestType();
+                                }
 
 				inline int predict(std::vector<T>& observation){
 					return forest->predictClass(observation);
 				}
 
-        inline std::vector<int> predictPost(std::vector<T>& observation){
+        			inline std::vector<int> predictPost(std::vector<T>& observation){
 					return forest->predictClassPost(observation);
 				}
 
@@ -146,12 +153,14 @@ namespace fp {
 					return OOBaccuracy;
 				}
 
-                inline std::map<std::pair<int, int>, double> returnPairMat(){
+                		inline std::map<std::pair<int, int>, double> returnPairMat(){
                                     return forest->returnPairMat();
-                            }
+                            	}	
+				
 				float testAccuracy(){
 					float testError;
 					loadTestData();
+					initializeForestType();
 					testError = forest->testForest();
 					deleteTestData();
 					return testError;

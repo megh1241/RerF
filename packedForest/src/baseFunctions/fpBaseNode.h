@@ -138,15 +138,85 @@ class alignas(32) fpBaseNode
 			feature.push_back(fVal);
 		}
 
-
-		inline void virtual printNode(){
-			if(isInternalNode()){
-				std::cout << "internal ";
-			}else{
-				std::cout << "leaf ";
-			}
-			std::cout << "cutValue " << cutValue << ", left " << left << ", right " << right << ", depth " << depth << "\n";
-		}
+                inline void printNode(){
+                        std::cout << "cutValue " << cutValue <<"\n";
+                        fflush(stdout);
+                        std::cout << ", left " << left <<"\n";
+                        fflush(stdout);
+                        std::cout<<", right " << right <<"\n";
+                        fflush(stdout);
+                        std::cout<<", depth " << depth <<"\n";
+                        fflush(stdout);
+                        std::cout<<"_______________________________\n";
+                        fflush(stdout);
+                }
 
 };
+
+template <typename T, typename F>
+class fpBaseNodeStat : public fpBaseNode<T, F>
+{
+                int cardinality;
+                int id;
+                int left_leaf_card;
+                int right_leaf_card;
+                int subtreeNum;
+        public:
+                fpBaseNodeStat(){
+                        fpBaseNode<T, F>();
+                }
+                fpBaseNodeStat(T cutValue, int depth, F feature, int uid, int card){
+                        cardinality = card;
+                        id = uid;
+                        this->setCutValue(cutValue);
+                        this->setFeatureValue(feature);
+                        this->setDepth(depth);
+                }
+
+                void setSTNum(int num){
+                        subtreeNum = num;
+                }
+
+                int getSTNum(){
+                        return subtreeNum;
+                }
+
+                int getCard(){
+                        return cardinality;
+                }
+
+                void setLeftLeafCard(int cardi){
+                        left_leaf_card = cardi;
+                }
+
+                void setRightLeafCard(int cardi){
+                        right_leaf_card = cardi;
+                }
+
+                int getLeftLeafCard(){
+                        return left_leaf_card;
+                }
+
+                int getRightLeafCard(){
+                        return right_leaf_card;
+                }
+
+                int getID(){
+                        return id;
+                }
+
+                void setID(int idToSet){
+                        id = idToSet;
+                }
+
+                void printID(){
+                        std::cout<<"Self ID: "<<id<<"\n";
+                        std::cout<<"ST Num: "<<subtreeNum<<"\n";
+                }
+                void printSTNum(){
+                        std::cout<<"ST Num: "<<subtreeNum<<"\n";
+                }
+
+};
+
 #endif //fpBaseNode_h

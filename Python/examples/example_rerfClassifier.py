@@ -54,10 +54,10 @@ print(clf)
 # Train the model using the training sets y_pred=clf.predict(X_test)
 clf.fit(X_train, y_train)
 
-y_pred = clf.predict(X_test)
+y_pred = clf.predict(X_train)
 
 # Import scikit-learn metrics module for accuracy calculation
 from sklearn import metrics
 
 # Model Accuracy, how often is the classifier correct?
-print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+print("Accuracy:", metrics.accuracy_score(y_train, y_pred))

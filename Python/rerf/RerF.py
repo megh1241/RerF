@@ -16,7 +16,7 @@ def fastRerF(
     mtry=None,
     mtryMult=1.5,
     fractionOfFeaturesToTest=None,
-    seed=None,
+    seed=1,
     imageHeight=0,
     imageWidth=0,
     patchHeightMax=0,
