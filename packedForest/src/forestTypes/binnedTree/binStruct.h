@@ -702,7 +702,7 @@ namespace fp{
 //#pragma omp critical
 //					etime.push_back(std::chrono::duration<double, std::milli>(end - start).count());
 
-					std::cout<<"elapsed time: " <<std::chrono::duration<double, std::milli>(end - start).count()<<" miliseconds.\n";
+					//std::cout<<"elapsed time: " <<std::chrono::duration<double, std::milli>(end - start).count()<<" miliseconds.\n";
                     		//	std::cout<<"Number of nodes traversed: "<<v_num_nodes.size()<<"\n";  
                     		/*	std::cout<<"Number of nodes traversed: "<<v_num_nodes.size()<<"\n";  
                     			std::cout<<"Elapsed time1: " <<std::chrono::duration<double, std::milli>(end - start3).count()<<" miliseconds.\n";

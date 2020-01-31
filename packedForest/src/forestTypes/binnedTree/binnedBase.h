@@ -127,10 +127,11 @@ namespace fp {
                 		}
 
 				for(auto single_bin: binvector){
-					single_bin.writeToFile(treeRootPos);
+					single_bin.writeToFile(treeRootPos, numBins);
 					single_bin.writeToFileStat();
 				}
 				
+				/*
 				std::fstream fsiz;
 				fsiz.open("/data4/binstart.txt", std::ios::out);
 				if(numBins > 1){
@@ -141,6 +142,7 @@ namespace fp {
 					fsiz<<0<<"\n";
 				}
 				fsiz.close();
+				*/
 				
             		}		
 

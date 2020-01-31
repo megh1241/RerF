@@ -725,7 +725,7 @@ namespace fp{
 				}
 			}
 
-			inline void writeToFile(std::vector<int> roots){
+			inline void writeToFile(std::vector<int> roots, int numBins){
 #pragma omp critical
 				{
 					std::ofstream f;
@@ -740,10 +740,19 @@ namespace fp{
 
 					}
 					std::string treeroot_fname = "treeroots.csv";
-					f.open(treeroot_fname.c_str(), std::ios::out);
+					f.open(treeroot_fname.c_str(), std::ios::out|std::ios::app);
 					for (auto root: roots)
 						f<<root<<"\n";
 					f.close();
+
+                                	f.open("/data4/binstart.txt", std::ios::out | std::ios::app);
+                                	if(numBins > 1){
+                                                f<<finalbin.size()<<"\n";
+                                	}
+                                	else if(numBins == 1){
+                                        	f<<0<<"\n";
+                                	}
+                                	f.close();
 				}
 
 			}
