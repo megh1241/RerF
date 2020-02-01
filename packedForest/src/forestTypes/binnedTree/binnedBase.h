@@ -97,10 +97,11 @@ namespace fp {
 				int depth = fpSingleton::getSingleton().returnDepthIntertwined();
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
-					bins[j].createBin(binSizes[j], binSeeds[j], 1);
+					binStruct<T, Q> tempbin;
+					tempbin.createBin(binSizes[j], binSeeds[j], 1);
 		    			
-					BinLayout<T, Q> bins_serialize(bins[j], global_fname) ;
-					bins[j].setBin(bins_serialize.getFinalBin());
+					BinLayout<T, Q> bins_serialize(tempbin, global_fname) ;
+					tempbin.setBin(bins_serialize.getFinalBin());
 					
 
 					//bins_serialize.setBin();
@@ -119,7 +120,8 @@ namespace fp {
 					#pragma omp critical
 					{
 						binvector.push_back(bins_serialize);
-				        	sizesbin.push_back((int)bins_serialize.finalbin.size());	
+				 		bins[j] = tempbin;
+						//       	sizesbin.push_back((int)bins_serialize.finalbin.size());	
 					}
 					auto end = std::chrono::steady_clock::now();
                     			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" nanoseconds.\n";
@@ -128,7 +130,7 @@ namespace fp {
 
 				for(auto single_bin: binvector){
 					single_bin.writeToFile(treeRootPos, numBins);
-					single_bin.writeToFileStat();
+			//		single_bin.writeToFileStat();
 				}
 				
 				/*
