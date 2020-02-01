@@ -88,7 +88,40 @@ namespace fp {
 				}
 			}
 
+			BinLayout<T, Q> mergeBinLayoutVecs(std::vector<BinLayout<T, Q>>layoutVec){
+				int count = 0, mainsize = 0, offset = 0;
+				int numClasses = fpSingleton::getSingleton().returnNumClasses();
+				std::vector<fpBaseNodeStat<T, Q>> finalBinVec;
+				for(auto binl : layoutVec){
+					if(count == 0){
+						finalBinVec = binl.getFinalBin();
+						mainsize = finalBinVec.size();
+					}
+					else{
+						offset = mainsize - numClasses;
+						std::vector<fpBaseNodeStat<T, Q>> currVec = binl.getFinalBin();
+						for(int i=numClasses; i<currVec.size(); ++i){
+							if(currVec[i].getID() >= numClasses)
+								currVec[i].setID(currVec[i].getID() + offset);
+							if(currVec[i].returnLeftNodeID() >= numClasses)
+								currVec[i].setLeftValue( currVec[i].returnLeftNodeID() + offset);
+							if(currVec[i].returnRightNodeID() >= numClasses)
+								currVec[i].setRightValue( currVec[i].returnRightNodeID() + offset);
+							finalBinVec.push_back(currVec[i]);
+						}
+						mainsize = finalBinVec.size();
+					}
+					count++;
+				}
+				binStruct<T, Q> tempbin;
+				tempbin.setBin(finalBinVec);
+				BinLayout<T, Q> mergedBin(tempbin, global_fname);
+				return mergedBin;
+				
+			}
+
 			inline void growBins(){
+				int mergeVec = 1;
 				calcBinSizes();
 				fpDisplayProgress printProgress;
 				bins.resize(numBins);
@@ -123,14 +156,25 @@ namespace fp {
 				 		bins[j] = tempbin;
 						//       	sizesbin.push_back((int)bins_serialize.finalbin.size());	
 					}
+
 					auto end = std::chrono::steady_clock::now();
                     			std::cout<<"Time to serialize/write to file: " <<std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<<" nanoseconds.\n";
 					treeRootPos = bins_serialize.treeRootPos;
                 		}
 
+				if(fpSingleton::getSingleton().returnNumThreads() > 1 && mergeVec == 1)
+				{
+						BinLayout<T, Q> mergedBin = mergeBinLayoutVecs(binvector);
+						mergedBin.writeToFile(treeRootPos, 1);
+						mergedBin.writeToFileStat();
+				}
+
+				else
+				{
 				for(auto single_bin: binvector){
 					single_bin.writeToFile(treeRootPos, numBins);
-			//		single_bin.writeToFileStat();
+					single_bin.writeToFileStat();
+				}
 				}
 				
 				/*
