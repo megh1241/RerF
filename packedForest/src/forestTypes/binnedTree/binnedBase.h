@@ -196,7 +196,7 @@ namespace fp {
 				std::fstream fi;
 				int j;
 				fi.open("/data4/rand_file.txt");
-				for(int i=0; i<20000; ++i)
+				for(int i=0; i<30000; ++i)
 					fi>>j;	
 				for(int i=0; i<20000; ++i)
 					fi>>j;	
@@ -209,7 +209,7 @@ namespace fp {
 			inline void writeRandomToFile(){
 				std::fstream fi; 
 				fi.open("/data4/rand_file.txt", std::ios::out);	
-				for(int i=0; i<80000; ++i)
+			for(int i=0; i<90000; ++i)
 					fi<<(i+1)%6<<"\n";
 				fi.close();
 			}
@@ -259,9 +259,13 @@ namespace fp {
 				int num_threads = fpSingleton::getSingleton().returnNumThreads();
 				auto start = std::chrono::steady_clock::now();
 
+				//std::cout<<"Num threads! "<< fpSingleton::getSingleton().returnNumThreads() <<"\n";
+//std::cout<<"***************************************\n";
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int k = 0; k < numBins; ++k){
                 			int uniqueCount = 0;
+					//std::cout<<"sizesbin[k]: "<<sizesbin[k]<<"\n";
+					//fflush(stdout);
                 			fpBaseNode<T, Q> * mmapped_file_pos = data + sizesbin[k];	
 					if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
@@ -271,6 +275,7 @@ namespace fp {
 							blocks.push_back(uniqueCount);
                     			}
                 		}
+//std::cout<<"***************************************\n";
 				auto end = std::chrono::steady_clock::now();
 				mmappedObj.close();
 				
@@ -344,6 +349,7 @@ namespace fp {
 				
 				int numTried = 0;
 				int numWrong = 0;
+    				//for (int i = 0; i < 1; i++){
     				for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
 					++numTried;
 					int predClass = predictClass(i);

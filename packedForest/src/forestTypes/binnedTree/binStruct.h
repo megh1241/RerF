@@ -656,8 +656,9 @@ namespace fp{
 					T featureVal;
 					int q;
                     			std::vector<int> v;
+
                     			//std::vector<int> v_num_nodes;
-                    		auto start = std::chrono::steady_clock::now();
+                    			//auto start = std::chrono::steady_clock::now();
 					if(roots.size()>0){
                         			for( q=0; q<numOfTreesInBin; ++q){
                                 			//v_num_nodes.push_back(currNode[q]);
@@ -668,7 +669,7 @@ namespace fp{
                     			else {
                         			for( q=0; q<numOfTreesInBin; ++q){
                                 		//	v_num_nodes.push_back(currNode[q]);
-						    	currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();;
+						    	currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();
 					        		__builtin_prefetch(&bin[currNode[q]], 0, 3);
 					    	}
                     			}
@@ -676,9 +677,9 @@ namespace fp{
 						numberNotInLeaf = 0;
 
 						for( q=0; q<numOfTreesInBin; ++q){
-#pragma omp critical 
+//#pragma omp critical 
 							if(bin[currNode[q]].isInternalNodeFront()){
-								v.push_back(currNode[q]/BLOCK_SIZE);
+					//			v.push_back(currNode[q]/BLOCK_SIZE);
                                 		//		v_num_nodes.push_back(currNode[q]);
                                 				featureNum = bin[currNode[q]].returnFeatureNumber();
 								featureVal = fpSingleton::getSingleton().returnTestFeatureVal(featureNum,observationNum);
@@ -690,14 +691,14 @@ namespace fp{
 
 					}while(numberNotInLeaf);
 
-                    		auto end = std::chrono::steady_clock::now();
+                    		//auto end = std::chrono::steady_clock::now();
 					for( q=0; q<numOfTreesInBin; q++){
 //#pragma omp atomic update
 #pragma omp critical 
 						++preds[bin[currNode[q]].returnClass()];
 					}
-#pragma omp critical 
-                    			uniqueCount = std::set<int>( v.begin(), v.end() ).size();
+//#pragma omp critical 
+  //                  			uniqueCount = std::set<int>( v.begin(), v.end() ).size();
                   
 //#pragma omp critical
 //					etime.push_back(std::chrono::duration<double, std::milli>(end - start).count());
