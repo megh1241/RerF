@@ -61,6 +61,11 @@ namespace fp{
 				return filename;
 			}
 
+			inline void setFilename(std::string fname){
+				/* Return the file in which the forest was written to */
+				filename = fname;
+			}
+
 			inline void BINBFSLayout(int depthIntertwined){
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
