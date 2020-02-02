@@ -616,8 +616,8 @@ namespace fp{
 					T featureVal;
 					int weightNum;
 					int  q;
-
-
+					int num_threads = fpSingleton::getSingleton().returnNumThreads();
+					
 					for( q=0; q<numOfTreesInBin; ++q){
 						currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();
 						//__builtin_prefetch(&bin[currNode[q]], 0, 3);
@@ -651,19 +651,22 @@ namespace fp{
                 /////////////////////////START HERE////////////////////////////////////
 				inline void predictBinObservation(int &uniqueCount, std::vector<int> roots, fpBaseNode<T, Q>*bin, int observationNum,std::vector<int> &preds, identity<int> ){
                     			std::vector<int> currNode(numOfTreesInBin);
+					int num_threads = fpSingleton::getSingleton().returnNumThreads();
 					int numberNotInLeaf;
 					int featureNum;
 					T featureVal;
 					int q;
                     			std::vector<int> v;
 
-                    			//std::vector<int> v_num_nodes;
+					std::cout<<"Number of trees in bin!: "<<numOfTreesInBin<<"\n";
+					std::cout<<"Number of classes!: "<< fpSingleton::getSingleton().returnNumClasses()<<"\n";
+					std::vector<int> v_num_nodes;
                     			//auto start = std::chrono::steady_clock::now();
 					if(roots.size()>0){
                         			for( q=0; q<numOfTreesInBin; ++q){
                                 			//v_num_nodes.push_back(currNode[q]);
 						    	currNode[q] = roots[q];
-					        		__builtin_prefetch(&bin[currNode[q]], 0, 3);
+							__builtin_prefetch(&bin[currNode[q]], 0, 3);
 					    	}
                     			}
                     			else {
@@ -679,8 +682,9 @@ namespace fp{
 						for( q=0; q<numOfTreesInBin; ++q){
 //#pragma omp critical 
 							if(bin[currNode[q]].isInternalNodeFront()){
-					//			v.push_back(currNode[q]/BLOCK_SIZE);
-                                		//		v_num_nodes.push_back(currNode[q]);
+								v.push_back(currNode[q]/BLOCK_SIZE);
+                                				if(num_threads == 1)
+									v_num_nodes.push_back(currNode[q]);
                                 				featureNum = bin[currNode[q]].returnFeatureNumber();
 								featureVal = fpSingleton::getSingleton().returnTestFeatureVal(featureNum,observationNum);
 								currNode[q] = bin[currNode[q]].fpBaseNode<T, Q>::nextNode(featureVal);
@@ -698,7 +702,8 @@ namespace fp{
 						++preds[bin[currNode[q]].returnClass()];
 					}
 //#pragma omp critical 
-  //                  			uniqueCount = std::set<int>( v.begin(), v.end() ).size();
+					if(num_threads == 1)
+                   			uniqueCount = std::set<int>( v.begin(), v.end() ).size();
                   
 //#pragma omp critical
 //					etime.push_back(std::chrono::duration<double, std::milli>(end - start).count());

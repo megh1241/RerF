@@ -663,6 +663,10 @@ namespace fp{
 			inline std::vector<fpBaseNodeStat<T, Q>> getFinalBin(){
 				return finalbin;
 			}
+			inline void setFinalBin(std::vector<fpBaseNodeStat<T, Q>> toset){
+				finalbin = toset;
+			}
+
 
 			inline void statLayout(){
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();

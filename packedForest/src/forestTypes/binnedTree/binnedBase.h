@@ -137,6 +137,9 @@ namespace fp {
                                 int siz = finalBinVec.size();
 
 
+				for(int i=0; i<siz; ++i)
+					finalBinVec[i].setID(i);
+
 				for(auto i: finalBinVec){
 					bin.push_back(i);
 				}
@@ -158,7 +161,7 @@ namespace fp {
 					finalBinVec.push_back(node);
 				}
 
-
+				nodeNewIdx.clear();
 				for(int i=0; i<siz; ++i){
 					nodeNewIdx.insert(std::pair<int, int>(finalBinVec[i].getID(), i));
 				}
@@ -175,6 +178,7 @@ namespace fp {
 				}
 				tempbin.setBin(finalBinVec);
 				BinLayout<T, Q> mergedBin(tempbin, global_fname);
+				mergedBin.setFinalBin(finalBinVec);
 				return mergedBin;
 				
 			}
@@ -452,7 +456,8 @@ namespace fp {
 				writeRandomToFile();		
 				
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();
-				
+			
+				std::cout<<"Number of classes: !!\n"<<	fpSingleton::getSingleton().returnNumClasses()<<"\n";
 				int numTried = 0;
 				int numWrong = 0;
     				//for (int i = 0; i < 1; i++){
