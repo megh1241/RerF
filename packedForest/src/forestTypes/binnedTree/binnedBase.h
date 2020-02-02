@@ -92,6 +92,21 @@ namespace fp {
 				int count = 0, mainsize = 0, offset = 0;
 				int numClasses = fpSingleton::getSingleton().returnNumClasses();
 				std::vector<fpBaseNodeStat<T, Q>> finalBinVec;
+				std::vector<fpBaseNodeStat<T, Q>> reVec;
+				std::vector<fpBaseNodeStat<T, Q>> roots;
+				std::map<int, int> nodeNewIdx;
+
+
+				for(auto binl : layoutVec)
+				{
+					std::vector<fpBaseNodeStat<T, Q>> currVec = binl.getFinalBin();
+					std::cout<<"************************\n";
+					for(auto i: currVec){
+					std::cout<<"id: "<<i.getID()<<"\n";
+					i.printNode();
+					}
+
+				}
 				for(auto binl : layoutVec){
 					if(count == 0){
 						finalBinVec = binl.getFinalBin();
@@ -113,7 +128,51 @@ namespace fp {
 					}
 					count++;
 				}
+				std::cout<<"\n\n PRINTINF LATERTATYFSTUY\n\n";
+				for(auto i: finalBinVec){
+					std::cout<<"id: "<<i.getID()<<"\n";
+					i.printNode();
+				}
+				std::vector<fpBaseNodeStat<T, Q>> bin;
+                                int siz = finalBinVec.size();
+
+
+				for(auto i: finalBinVec){
+					bin.push_back(i);
+				}
+				//for(int i=0; i<bin.size(); i++)
+				//	bin[i].setID(i);
+				//sort finalBinVec
+				for(auto node: finalBinVec)
+				{
+					if(node.getDepth() <= 0)
+						roots.push_back(node);
+					else
+						reVec.push_back(node);
+				}
+				finalBinVec.clear();
+				for(auto node: roots){
+					finalBinVec.push_back(node);
+				}
+				for(auto node: reVec){
+					finalBinVec.push_back(node);
+				}
+
+
+				for(int i=0; i<siz; ++i){
+					nodeNewIdx.insert(std::pair<int, int>(finalBinVec[i].getID(), i));
+				}
+
+                                for (auto i=numClasses; i<siz; i++){
+                                        finalBinVec[i].setLeftValue(nodeNewIdx[bin[finalBinVec[i].returnLeftNodeID()].getID()]);
+                                        finalBinVec[i].setRightValue(nodeNewIdx[bin[finalBinVec[i].returnRightNodeID()].getID()]);
+                                }
 				binStruct<T, Q> tempbin;
+				std::cout<<"\n\n PRINTINF FINALLL\n\n";
+				for(auto i: finalBinVec){
+					std::cout<<"id: "<<i.getID()<<"\n";
+					i.printNode();
+				}
 				tempbin.setBin(finalBinVec);
 				BinLayout<T, Q> mergedBin(tempbin, global_fname);
 				return mergedBin;
@@ -164,6 +223,7 @@ namespace fp {
 
 				if(fpSingleton::getSingleton().returnNumThreads() > 1 && mergeVec == 1)
 				{
+						std::cout<<"CONDITION!!!!!\n";
 						BinLayout<T, Q> mergedBin = mergeBinLayoutVecs(binvector);
 						mergedBin.writeToFile(treeRootPos, 1);
 						mergedBin.writeToFileStat();

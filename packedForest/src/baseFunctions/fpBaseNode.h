@@ -32,6 +32,10 @@ class alignas(32) fpBaseNode
 		inline int returnDepth(){
 			return depth;
 		}
+		
+		inline int getDepth(){
+			return depth;
+		}
 
 		inline void setDepth(int dep){
 			depth = dep;

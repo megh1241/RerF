@@ -311,6 +311,10 @@ namespace fp{
 					finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
 				}
 
+				for (auto i=0; i<siz; i++){
+					finalbin[i].setID(i);
+				}
+				
 			}
 
 			inline bool myCompFunction(fpBaseNodeStat<T, Q> &node1, fpBaseNodeStat<T, Q> &node2)
