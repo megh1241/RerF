@@ -95,10 +95,11 @@ namespace fp {
 				std::vector<BinLayout<T, Q>> binvector;
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();
 				int depth = fpSingleton::getSingleton().returnDepthIntertwined();
+				int treesPerBin = fpSingleton::getSingleton().returnNumTrees() / fpSingleton::getSingleton().returnNumThreads();
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
 					binStruct<T, Q> tempbin;
-					tempbin.createBin(binSizes[j], binSeeds[j], 1);
+					tempbin.createBin(treesPerBin, binSeeds[j], 1);
 		    			
 					BinLayout<T, Q> bins_serialize(tempbin, global_fname) ;
 					tempbin.setBin(bins_serialize.getFinalBin());
