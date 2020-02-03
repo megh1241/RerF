@@ -6,7 +6,7 @@
 int main(int argc, char* argv[]) {
     std::cout<<"Format: ./bin/fp <alg> <dataset> <num cores> <layout> <depth intertwined> <train/test>\n";
 
-    if (argc != 7) 
+    if (argc != 8) 
 	    return -1;
     
     
@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     std::string layout_user(argv[4]);
     int depth_intertwined = atoi(argv[5]);
     std::string train_or_test(argv[6]);
-    
+    int batchsize = atoi(argv[7]); 
     
     if (alg == 0) {
         // Remove and change this block for testing.
@@ -150,6 +150,7 @@ int main(int argc, char* argv[]) {
             forest.setParameter("seed",1);
 	    forest.setParameter("layout", layout_user);
 	    forest.setParameter("depthIntertwined", depth_intertwined);
+	    forest.setParameter("batchsize", batchsize);
 
 	    std::string train_str("train");
 	    if(train_or_test.compare(train_str) == 0)

@@ -26,10 +26,13 @@ std::string global_str;
 std::vector<int> treeRootPos;
 std::vector<int> blocks;
 std::vector<double>etime;
+std::vector<double>final_etime;
+double time_per_batch;
 std::vector<int> sizesbin;
 std::fstream f_time;
 std::fstream fblock;
-#define NUM_FILES 9
+int batchsize1 = 10;
+#define NUM_FILES 900
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 MemoryMapped mmappedObj;
@@ -370,7 +373,11 @@ namespace fp {
 
 			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename2 = "/data4/binbfs"){							  int tmp_val ;
 				int treesPerBin;
-				readRandomClearCache();
+				int batchsize = fpSingleton::getSingleton().returnBatchsize();
+				if(observationNumber % batchsize == 0){
+					readRandomClearCache();
+					readRandomClearCache();
+				}
 				std::fstream fi;
 
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();
@@ -497,6 +504,8 @@ namespace fp {
 			}
 
 			inline float testForest(){
+				std::cout<<"Number of classes: !!\n"<<	fpSingleton::getSingleton().returnNumClasses()<<"\n";
+				int batchsize = fpSingleton::getSingleton().returnBatchsize();
 				writeRandomToFile();		
 				
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();
@@ -512,6 +521,13 @@ namespace fp {
 					if(predClass != fpSingleton::getSingleton().returnTestLabel(i)){
 						++numWrong;
 					}
+
+					time_per_batch += etime[i];
+					if(i%batchsize == 0)
+					{
+						final_etime.push_back(time_per_batch);
+						time_per_batch = 0;
+					}
 				}
 				std::cout << "\nnumWrong= " << numWrong << "\n";
 				
@@ -520,7 +536,7 @@ namespace fp {
 				
 				//Write elapsed times to file
 				f_time.open("elapsed_time_" + layout_str + "_depth_"+ depth_str + ".csv", std::ios::out);
-				for(auto t: etime)
+				for(auto t: final_etime)
 					f_time<<t<<",";
 				f_time.close();
 				

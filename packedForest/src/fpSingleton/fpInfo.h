@@ -53,6 +53,7 @@ namespace fp {
 			std::string layout;
 
 			int depthIntertwined;
+			int batchsize;
 			int seed;
 			randomNumberRerFMWC randNum;
 
@@ -87,6 +88,7 @@ namespace fp {
 				patchWidthMin = 0;
 				patchWidthMax = 0;
 				depthIntertwined = 0;
+				batchsize = 0;
 				forestType.clear();
 				layout.clear();
 				CSVFileName.clear();
@@ -170,6 +172,10 @@ namespace fp {
 			
 			inline int returnDepthIntertwined() const{
 				return depthIntertwined;
+			}
+			
+			inline int returnBatchsize() const{
+				return batchsize;
 			}
 
 			inline bool loadDataFromCSV(){
@@ -338,6 +344,8 @@ namespace fp {
 					useRowMajor = (bool)parameterValue;
 				}else if(parameterName == "depthIntertwined"){
 					depthIntertwined = parameterValue;
+				}else if(parameterName == "batchsize"){
+					batchsize = parameterValue;
 				}else if(parameterName == "methodToUse"){
 					methodToUse = parameterValue;
 					if(!(methodToUse == 1 || methodToUse == 2)){

@@ -15,7 +15,7 @@
 #include <fstream>
 #include <set>
 
-#define NUM_FILES 9 
+#define NUM_FILES 900 
 #define BLOCK_SIZE 128
 int counter = 0;
 std::fstream ff;

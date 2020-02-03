@@ -133,6 +133,9 @@ namespace fp {
 			inline int returnDepthIntertwined(){
 				return fpForestInfo.returnDepthIntertwined();
 			}
+			inline int returnBatchsize(){
+				return fpForestInfo.returnBatchsize();
+			}
 			
 			inline int returnNumFeatures(){
 				return fpForestInfo.returnNumFeatures();
