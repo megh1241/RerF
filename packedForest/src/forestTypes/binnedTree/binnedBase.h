@@ -29,7 +29,7 @@ std::vector<double>etime;
 std::vector<int> sizesbin;
 std::fstream f_time;
 std::fstream fblock;
-#define NUM_FILES 900
+#define NUM_FILES 9
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 MemoryMapped mmappedObj;
@@ -170,15 +170,17 @@ namespace fp {
                                         finalBinVec[i].setLeftValue(nodeNewIdx[bin[finalBinVec[i].returnLeftNodeID()].getID()]);
                                         finalBinVec[i].setRightValue(nodeNewIdx[bin[finalBinVec[i].returnRightNodeID()].getID()]);
                                 }
-				binStruct<T, Q> tempbin;
-				std::cout<<"\n\n PRINTINF FINALLL\n\n";
-				for(auto i: finalBinVec){
-					std::cout<<"id: "<<i.getID()<<"\n";
-					i.printNode();
-				}
+				for(int i=0; i<siz; ++i)
+					finalBinVec[i].setID(i);
+
+				binStruct<T, Q> tempbin(128);
 				tempbin.setBin(finalBinVec);
 				BinLayout<T, Q> mergedBin(tempbin, global_fname);
 				mergedBin.setFinalBin(finalBinVec);
+				bin.clear();
+				roots.clear();
+			        reVec.clear();
+				nodeNewIdx.clear();
 				return mergedBin;
 				
 			}
@@ -191,10 +193,14 @@ namespace fp {
 				std::vector<BinLayout<T, Q>> binvector;
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();
 				int depth = fpSingleton::getSingleton().returnDepthIntertwined();
+				int treesPerBin = fpSingleton::getSingleton().returnNumTrees() / fpSingleton::getSingleton().returnNumThreads();
+				std::vector<std::string> layout_names = {"bfs", "stat", "binstat", "binbfs", "binstatclass"};
+
+				//int numTrees = fpSingleton::getSingleton().returnN
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
 					binStruct<T, Q> tempbin;
-					tempbin.createBin(binSizes[j], binSeeds[j], 1);
+					tempbin.createBin(treesPerBin, binSeeds[j], 1);
 		    			
 					BinLayout<T, Q> bins_serialize(tempbin, global_fname) ;
 					tempbin.setBin(bins_serialize.getFinalBin());
@@ -209,8 +215,10 @@ namespace fp {
                         			bins_serialize.BINBFSLayout(depth);
 					else if(layout_str.compare("binstat") == 0)
                         			bins_serialize.BINStatLayout(depth);
-                        		else
+					else if(layout_str.compare("binstatclass") == 0)
                         			bins_serialize.BINStatClassLayout(depth);
+                        		//else
+                        		//	bins_serialize.BINStatClassLayout(depth);
 
                     			auto start = std::chrono::steady_clock::now();
 					#pragma omp critical
@@ -225,20 +233,55 @@ namespace fp {
 					treeRootPos = bins_serialize.treeRootPos;
                 		}
 
+				std::string filename_ser;
 				if(fpSingleton::getSingleton().returnNumThreads() > 1 && mergeVec == 1)
 				{
-						std::cout<<"CONDITION!!!!!\n";
 						BinLayout<T, Q> mergedBin = mergeBinLayoutVecs(binvector);
-						mergedBin.writeToFile(treeRootPos, 1);
-						mergedBin.writeToFileStat();
+						/*
+						BinLayout<T, Q> mergedBin = mergeBinLayoutVecs(binvector);
+						mergedBin.BINStatLayout(depth);	
+						filename_ser = "/data4/binstat";
+						mergedBin.setFilename(filename_ser);
+						mergedBin.writeToFile(mergedBin.treeRootPos, 1);
+						mergedBin.writeToFileStat("/data4/binstats");
+						
+						mergedBin.BINStatClassLayout(depth);	
+						filename_ser = "/data4/binstatclass";
+						mergedBin.setFilename(filename_ser);
+						mergedBin.writeToFile(mergedBin.treeRootPos, 1 );
+						mergedBin.writeToFileStat("/data4/binstatclasssdsfsd");
+						
+						mergedBin.BFSLayout();	
+						filename_ser = "/data4/bfs";
+						mergedBin.setFilename(filename_ser);
+						mergedBin.writeToFile(mergedBin.treeRootPos, 1);
+						mergedBin.writeToFileStat("/data4/bfs2s");
+
+
+						mergedBin.statLayout();
+						filename_ser = "/data4/stat";
+						mergedBin.setFilename(filename_ser);
+						mergedBin.writeToFile(mergedBin.treeRootPos, 1);
+						mergedBin.writeToFileStat("/data4/stat2s");
+						mergedBin.BINBFSLayout(depth);	
+						filename_ser = "/data4/binbfs";
+						mergedBin.setFilename(filename_ser);
+						mergedBin.writeToFile(mergedBin.treeRootPos, 1);
+						mergedBin.writeToFileStat("/data4/binbfssdfdsf");
+						*/
+						mergedBin.BINBFSLayout(depth);	
+						filename_ser = "/data4/binbfs";
+						mergedBin.setFilename(filename_ser);
+						mergedBin.writeToFile(mergedBin.treeRootPos, 1);
+						mergedBin.writeToFileStat("/data4/binbfssdfdsf");
 				}
 
 				else
 				{
-				for(auto single_bin: binvector){
-					single_bin.writeToFile(treeRootPos, numBins);
-					single_bin.writeToFileStat();
-				}
+					for(auto single_bin: binvector){
+						single_bin.writeToFile(treeRootPos, numBins);
+						single_bin.writeToFileStat("/data4/nodeStat");
+					}
 				}
 				
 				/*
@@ -325,7 +368,7 @@ namespace fp {
 			}
 
 
-			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = global_fname){							  int tmp_val ;
+			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = "/data4/binbfs"){							  int tmp_val ;
 				int treesPerBin;
 				readRandomClearCache();
 				std::fstream fi;
@@ -363,7 +406,7 @@ namespace fp {
                         	treesPerBin = fpSingleton::getSingleton().returnNumTrees() / fpSingleton::getSingleton().returnNumThreads();
 				
 				binStruct<T, Q> temp = binStruct<T, Q>(treesPerBin);
-				global_str = global_fname + std::to_string(observationNumber%NUM_FILES) + ".bin";
+				global_str = filename + std::to_string(observationNumber%NUM_FILES) + ".bin";
                        		mmappedObj.open(global_str, 0); 
                         	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
 				int num_threads = fpSingleton::getSingleton().returnNumThreads();
@@ -372,7 +415,7 @@ namespace fp {
 				//std::cout<<"Num threads! "<< fpSingleton::getSingleton().returnNumThreads() <<"\n";
 //std::cout<<"***************************************\n";
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
-				for(int k = 0; k < numBins; ++k){
+				for(int k = 0; k < 1; ++k){
                 			int uniqueCount = 0;
 					//std::cout<<"sizesbin[k]: "<<sizesbin[k]<<"\n";
 					//fflush(stdout);

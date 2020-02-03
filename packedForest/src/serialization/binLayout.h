@@ -23,7 +23,7 @@
 #include <functional>
 #include <cstring>
 #include <iostream>
-#define NUM_FILES 900 
+#define NUM_FILES 9 
 
 using namespace std::placeholders;
 using std::placeholders::_1;
@@ -67,7 +67,15 @@ namespace fp{
 			}
 
 			inline void BINBFSLayout(int depthIntertwined){
-				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
+				treeRootPos.clear();
+				nodeNewIdx.clear();
+				binQ.clear();
+				binQTemp.clear();
+				binQLeft.clear();
+				binQRight.clear();
+				std::vector< fpBaseNodeStat<T,Q> > bin = finalbin;
+				finalbin.clear();
+					//= binstr.getBin();
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
 				int numNodesToProc = std::pow(2, depthIntertwined) -1 ; 
@@ -178,6 +186,8 @@ namespace fp{
 			}
 
 			inline void BINStatLayout(int depthIntertwined){
+				treeRootPos.clear();
+				nodeNewIdx.clear();
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
@@ -348,6 +358,9 @@ namespace fp{
 				int card[20] = {0};
 				int max = -1;
 				int subtree_class = -1;
+				finalbin.clear();
+				treeRootPos.clear();
+				nodeNewIdx.clear();
 				std::memset(class_size_in_st, 0, 20*sizeof(class_size_in_st[0])); 
 				
 				//std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
@@ -616,6 +629,7 @@ namespace fp{
 				std::deque<fpBaseNodeStat<T, Q>> binST;
 				finalbin.clear();
 				nodeNewIdx.clear();
+				treeRootPos.clear();
 
 				for(int i = 0; i < numClasses; ++i){
 					finalbin.push_back(bin[i]);
@@ -725,11 +739,11 @@ namespace fp{
 			}
 
 
-			inline void writeToFileStat(){
+			inline void writeToFileStat(std::string filename_local){
 				std::ofstream f;
 				fpBaseNodeStat<T,Q> nodeToWrite;
 				for(int j = 0; j < 1; j++){
-					f.open(("cifar_trained_stat" + std::to_string(j) + ".bin").c_str(), std::ios::out|std::ios::binary);
+					f.open((filename_local + std::to_string(j) + ".bin").c_str(), std::ios::out|std::ios::binary);
 					for(auto i: finalbin){
 						nodeToWrite = i;
 						f.write((char*)&nodeToWrite, sizeof(nodeToWrite));

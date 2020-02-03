@@ -15,7 +15,7 @@
 #include <fstream>
 #include <set>
 
-#define NUM_FILES 900 
+#define NUM_FILES 9 
 #define BLOCK_SIZE 128
 int counter = 0;
 std::fstream ff;
@@ -658,21 +658,23 @@ namespace fp{
 					int q;
                     			std::vector<int> v;
 
-					std::cout<<"Number of trees in bin!: "<<numOfTreesInBin<<"\n";
-					std::cout<<"Number of classes!: "<< fpSingleton::getSingleton().returnNumClasses()<<"\n";
+					//std::cout<<"Number of trees in bin!: "<<numOfTreesInBin<<"\n";
+					//std::cout<<"Number of classes!: "<< fpSingleton::getSingleton().returnNumClasses()<<"\n";
 					std::vector<int> v_num_nodes;
                     			//auto start = std::chrono::steady_clock::now();
 					if(roots.size()>0){
                         			for( q=0; q<numOfTreesInBin; ++q){
                                 			//v_num_nodes.push_back(currNode[q]);
 						    	currNode[q] = roots[q];
+							//std::cout<<currNode[q]<<"\n";
 							__builtin_prefetch(&bin[currNode[q]], 0, 3);
 					    	}
                     			}
                     			else {
                         			for( q=0; q<numOfTreesInBin; ++q){
                                 		//	v_num_nodes.push_back(currNode[q]);
-						    	currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();
+							currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();
+							//std::cout<<currNode[q]<<"\n";
 					        		__builtin_prefetch(&bin[currNode[q]], 0, 3);
 					    	}
                     			}
@@ -682,11 +684,11 @@ namespace fp{
 						for( q=0; q<numOfTreesInBin; ++q){
 //#pragma omp critical 
 							if(bin[currNode[q]].isInternalNodeFront()){
-								v.push_back(currNode[q]/BLOCK_SIZE);
                                 				if(num_threads == 1)
-									v_num_nodes.push_back(currNode[q]);
+									v.push_back(currNode[q]/BLOCK_SIZE);
                                 				featureNum = bin[currNode[q]].returnFeatureNumber();
 								featureVal = fpSingleton::getSingleton().returnTestFeatureVal(featureNum,observationNum);
+							//std::cout<<currNode[q]<<"\n";
 								currNode[q] = bin[currNode[q]].fpBaseNode<T, Q>::nextNode(featureVal);
 								__builtin_prefetch(&bin[currNode[q]], 0, 3);
 								++numberNotInLeaf;
