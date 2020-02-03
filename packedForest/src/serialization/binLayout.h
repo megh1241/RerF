@@ -188,6 +188,7 @@ namespace fp{
 			inline void BINStatLayout(int depthIntertwined){
 				treeRootPos.clear();
 				nodeNewIdx.clear();
+				finalbin.clear();
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
 				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 
@@ -689,6 +690,7 @@ namespace fp{
 				std::deque<fpBaseNodeStat<T, Q>> binST;
 				finalbin.clear();
 				nodeNewIdx.clear();
+				treeRootPos.clear();
 				for(int i = 0; i < numClasses; ++i){
 					finalbin.push_back(bin[i]);
 					nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));
@@ -752,7 +754,7 @@ namespace fp{
 				}
 			}
 
-			inline void writeToFile(std::vector<int> roots, int numBins){
+			inline void writeToFile(std::vector<int> roots, int numBins, std::string treeroot_fname = "treeroots.csv"){
 #pragma omp critical
 				{
 					std::ofstream f;
@@ -766,7 +768,7 @@ namespace fp{
 						f.close();
 
 					}
-					std::string treeroot_fname = "treeroots.csv";
+					//std::string treeroot_fname = "treeroots.csv";
 					f.open(treeroot_fname.c_str(), std::ios::out|std::ios::app);
 					for (auto root: roots)
 						f<<root<<"\n";

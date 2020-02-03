@@ -237,43 +237,43 @@ namespace fp {
 				if(fpSingleton::getSingleton().returnNumThreads() > 1 && mergeVec == 1)
 				{
 						BinLayout<T, Q> mergedBin = mergeBinLayoutVecs(binvector);
-						/*
-						BinLayout<T, Q> mergedBin = mergeBinLayoutVecs(binvector);
-						mergedBin.BINStatLayout(depth);	
+						BinLayout<T, Q> mergedBin2 = mergedBin;
+						BinLayout<T, Q> mergedBin3 = mergedBin;
+						BinLayout<T, Q> mergedBin4 = mergedBin;
+						BinLayout<T, Q> mergedBin5 = mergedBin;
+						BinLayout<T, Q> mergedBin6 = mergedBin;
+						
+						mergedBin4.BINStatLayout(depth);	
 						filename_ser = "/data4/binstat";
-						mergedBin.setFilename(filename_ser);
-						mergedBin.writeToFile(mergedBin.treeRootPos, 1);
-						mergedBin.writeToFileStat("/data4/binstats");
+						mergedBin4.setFilename(filename_ser);
+						mergedBin4.writeToFile(mergedBin4.treeRootPos, 1);
+						mergedBin4.writeToFileStat("/data4/binstats");
 						
-						mergedBin.BINStatClassLayout(depth);	
+						mergedBin5.BINStatClassLayout(depth);	
 						filename_ser = "/data4/binstatclass";
-						mergedBin.setFilename(filename_ser);
-						mergedBin.writeToFile(mergedBin.treeRootPos, 1 );
-						mergedBin.writeToFileStat("/data4/binstatclasssdsfsd");
+						mergedBin5.setFilename(filename_ser);
+						mergedBin5.writeToFile(mergedBin5.treeRootPos, 1 );
+						mergedBin5.writeToFileStat("/data4/binstatclasssdsfsd");
 						
-						mergedBin.BFSLayout();	
+						mergedBin2.BFSLayout();	
 						filename_ser = "/data4/bfs";
-						mergedBin.setFilename(filename_ser);
-						mergedBin.writeToFile(mergedBin.treeRootPos, 1);
-						mergedBin.writeToFileStat("/data4/bfs2s");
+						mergedBin2.setFilename(filename_ser);
+						mergedBin2.writeToFile(mergedBin2.treeRootPos, 1, "bfstreeroots.csv");
+						mergedBin2.writeToFileStat("/data4/bfs2s");
 
 
-						mergedBin.statLayout();
+						mergedBin3.statLayout();
 						filename_ser = "/data4/stat";
-						mergedBin.setFilename(filename_ser);
-						mergedBin.writeToFile(mergedBin.treeRootPos, 1);
-						mergedBin.writeToFileStat("/data4/stat2s");
-						mergedBin.BINBFSLayout(depth);	
+						mergedBin3.setFilename(filename_ser);
+						mergedBin3.writeToFile(mergedBin2.treeRootPos, 1, "stattreeroots.csv");
+						mergedBin3.writeToFileStat("/data4/stat2s");
+					
+						mergedBin6.BINBFSLayout(depth);	
 						filename_ser = "/data4/binbfs";
-						mergedBin.setFilename(filename_ser);
-						mergedBin.writeToFile(mergedBin.treeRootPos, 1);
-						mergedBin.writeToFileStat("/data4/binbfssdfdsf");
-						*/
-						mergedBin.BINBFSLayout(depth);	
-						filename_ser = "/data4/binbfs";
-						mergedBin.setFilename(filename_ser);
-						mergedBin.writeToFile(mergedBin.treeRootPos, 1);
-						mergedBin.writeToFileStat("/data4/binbfssdfdsf");
+						mergedBin6.setFilename(filename_ser);
+						mergedBin6.writeToFile(mergedBin6.treeRootPos, 1);
+						mergedBin6.writeToFileStat("/data4/binbfssdfdsf");
+
 				}
 
 				else
@@ -368,11 +368,13 @@ namespace fp {
 			}
 
 
-			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename = "/data4/binbfs"){							  int tmp_val ;
+			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename2 = "/data4/binbfs"){							  int tmp_val ;
 				int treesPerBin;
 				readRandomClearCache();
 				std::fstream fi;
 
+				std::string layout_str = fpSingleton::getSingleton().returnLayout();
+				std::string filename = "/data4/" + layout_str;
 				//Read locations of the first node of each bin when there are multiple bins
 				if(fpSingleton::getSingleton().returnNumThreads() > 1){
 					fi.open("/data4/binstart.txt");
@@ -391,10 +393,9 @@ namespace fp {
 				treeRootPos.clear();
 
 				//Read the tree root positions for BFS and Stat layouts
-				std::string layout_str = fpSingleton::getSingleton().returnLayout();	
 				if(layout_str.compare("bfs") == 0 || layout_str.compare("stat") == 0){
 					int rootpos;
-					fi.open("treeroots.csv");
+					fi.open(layout_str + "treeroots.csv");
 					while(!fi.eof()){
                     				fi>>rootpos;
 						treeRootPos.push_back(rootpos);
