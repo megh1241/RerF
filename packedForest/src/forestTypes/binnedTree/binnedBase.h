@@ -414,7 +414,7 @@ namespace fp {
                         	treesPerBin = fpSingleton::getSingleton().returnNumTrees() / fpSingleton::getSingleton().returnNumThreads();
 				
 				binStruct<T, Q> temp = binStruct<T, Q>(treesPerBin);
-				global_str = filename + std::to_string(observationNumber%NUM_FILES) + ".bin";
+				global_str = filename + std::to_string((observationNumber/batchsize)%NUM_FILES) + ".bin";
                        		mmappedObj.open(global_str, 0); 
                         	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
 				int num_threads = fpSingleton::getSingleton().returnNumThreads();
@@ -423,7 +423,7 @@ namespace fp {
 				//std::cout<<"Num threads! "<< fpSingleton::getSingleton().returnNumThreads() <<"\n";
 //std::cout<<"***************************************\n";
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
-				for(int k = 0; k < 1; ++k){
+				for(int k = 0; k < numBins; ++k){
                 			int uniqueCount = 0;
 					//std::cout<<"sizesbin[k]: "<<sizesbin[k]<<"\n";
 					//fflush(stdout);
