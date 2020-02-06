@@ -95,13 +95,14 @@ namespace fp {
 				std::vector<BinLayout<T, Q>> binvector;
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();
 				int depth = fpSingleton::getSingleton().returnDepthIntertwined();
+				std::cout<<"NUM BINS: "<<numBins<<"\n";
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
 					bins[j].createBin(binSizes[j], binSeeds[j], 1);
 		    			
 					BinLayout<T, Q> bins_serialize(bins[j], global_fname) ;
 					bins[j].setBin(bins_serialize.getFinalBin());
-					
+					std::cout<<"Layout: "<<layout_str<<"\n";	
 
 					//bins_serialize.setBin();
 					if(layout_str.compare("bfs") == 0)
@@ -112,9 +113,11 @@ namespace fp {
                         			bins_serialize.BINBFSLayout(depth);
 					else if(layout_str.compare("binstat") == 0)
                         			bins_serialize.BINStatLayout(depth);
-                        		else
+                        		else{
+						std::cout<<"CLASS\n";
                         			bins_serialize.BINStatClassLayout(depth);
 
+					}
                     			auto start = std::chrono::steady_clock::now();
 					#pragma omp critical
 					{
@@ -344,7 +347,7 @@ namespace fp {
 				
 				int numTried = 0;
 				int numWrong = 0;
-    				for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
+    				for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i+=100){
 					++numTried;
 					int predClass = predictClass(i);
 

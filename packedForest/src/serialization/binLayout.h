@@ -331,7 +331,7 @@ namespace fp{
 			}
 
 			inline void BINStatClassLayout(int depthIntertwined){
-				
+				std::cout<<"Enter hjererere\n";	
 				int total_tree_card = 0;
 				int num_classes_in_subtree = 0;
 				int stno = 0;
