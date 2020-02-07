@@ -31,7 +31,7 @@ using std::placeholders::_2;
 
 std::map<int, int> map_subtree_to_class;
 std::map<int, int> map_subtree_to_size;
-int class_size_in_st[20];
+int class_size_in_st[102];
 
 namespace fp{
 	template<typename T, typename Q>
@@ -269,6 +269,8 @@ namespace fp{
 							binST.push_front(bin[ele.returnLeftNodeID()]); 
 
 						else {
+							//std::cout<<"Left card: "<<bin[ele.returnLeftNodeID()].getCard()<<"\n";
+							//std::cout<<"right card: "<<bin[ele.returnRightNodeID()].getCard()<<"\n";
 							if(bin[ele.returnLeftNodeID()].getCard() <= bin[ele.returnRightNodeID()].getCard()){
 								binST.push_front(bin[ele.returnLeftNodeID()]); 
 								binST.push_front(bin[ele.returnRightNodeID()]); 
@@ -336,10 +338,10 @@ namespace fp{
 				int num_classes_in_subtree = 0;
 				int stno = 0;
 				double eps = 0;
-				int card[20] = {0};
+				int card[102] = {0};
 				int max = -1;
 				int subtree_class = -1;
-				std::memset(class_size_in_st, 0, 20*sizeof(class_size_in_st[0])); 
+				std::memset(class_size_in_st, 0, 102*sizeof(class_size_in_st[0])); 
 				
 				//std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
@@ -444,7 +446,7 @@ namespace fp{
 					curr_subtree = ele.getSTNum();
 					binST.push_back(ele);
 					//if(curr_subtree != old_subtree){
-						std::memset(card, 0, 20*sizeof(card[0])); 
+						std::memset(card, 0, 102*sizeof(card[0])); 
 				//	if(curr_subtree != old_subtree){
 						total_tree_card = 0;
 						num_classes_in_subtree=0;
@@ -511,7 +513,7 @@ namespace fp{
 					//compute max class
 				//	if(curr_subtree != old_subtree){
 						max = -1;
-						subtree_class = 12;
+						subtree_class = 103;
 				//	}
 					//if(num_classes_in_subtree > 0)
 					//	eps = 1 / (double)num_classes_in_subtree;

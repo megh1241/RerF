@@ -222,7 +222,7 @@ namespace fp{
 
 
 				inline void linkParentToLeaf(){
-					assert(nodeQueue.back().returnParentNodeNumber() >= fpSingleton::getSingleton().returnNumClasses());
+					//assert(nodeQueue.back().returnParentNodeNumber() >= fpSingleton::getSingleton().returnNumClasses());
 					assert(nodeQueue.back().returnParentNodeNumber() <= parentNodesPosition());
 
 					assert(nodeQueue.back().returnNodeClass() >= 0);

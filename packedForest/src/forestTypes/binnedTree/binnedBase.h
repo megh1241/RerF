@@ -347,7 +347,7 @@ namespace fp {
 				
 				int numTried = 0;
 				int numWrong = 0;
-    				for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i+=100){
+    				for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
 					++numTried;
 					int predClass = predictClass(i);
 
