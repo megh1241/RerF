@@ -54,9 +54,10 @@ namespace fp{
 					// This is an efficient way to shuffle the first "mtry" elements of the feature vector
 					// in order to sample features w/o replacement.
 					int tempSwap;
+					int randomPosition;
 					for(int locationToMove = 0; locationToMove < fpSingleton::getSingleton().returnMtry(); locationToMove++){
 						#pragma omp critical
-						int randomPosition = randNum->gen(fpSingleton::getSingleton().returnNumFeatures()-locationToMove)+locationToMove;
+						randomPosition = randNum->gen(fpSingleton::getSingleton().returnNumFeatures()-locationToMove)+locationToMove;
 						tempSwap = featuresToTry[locationToMove];
 						featuresToTry[locationToMove] = featuresToTry[randomPosition];
 						featuresToTry[randomPosition] = tempSwap;
