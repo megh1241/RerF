@@ -47,13 +47,15 @@ namespace fp{
 
 				randomNumberRerFMWC* randNum;
 				inline void calcMtryForNode(std::vector<int>& featuresToTry){
-					for (int i=0; i<fpSingleton::getSingleton().returnNumFeatures(); ++i){
+				/*	for (int i=0; i<fpSingleton::getSingleton().returnNumFeatures(); ++i){
 						featuresToTry.push_back(i);
-					}
+					}*/
 
 					// This is an efficient way to shuffle the first "mtry" elements of the feature vector
 					// in order to sample features w/o replacement.
-					/*for(int locationToMove = 0; locationToMove < fpSingleton::getSingleton().returnMtry(); locationToMove++){
+					int tempSwap;
+					for(int locationToMove = 0; locationToMove < fpSingleton::getSingleton().returnMtry(); locationToMove++){
+						#pragma omp critical
 						int randomPosition = randNum->gen(fpSingleton::getSingleton().returnNumFeatures()-locationToMove)+locationToMove;
 						tempSwap = featuresToTry[locationToMove];
 						featuresToTry[locationToMove] = featuresToTry[randomPosition];
@@ -61,7 +63,7 @@ namespace fp{
 					}
 
 					featuresToTry.resize(fpSingleton::getSingleton().returnMtry());
-				*/
+				
                 }
 
 
