@@ -47,9 +47,9 @@ namespace fp{
 
 				randomNumberRerFMWC* randNum;
 				inline void calcMtryForNode(std::vector<int>& featuresToTry){
-				/*	for (int i=0; i<fpSingleton::getSingleton().returnNumFeatures(); ++i){
+					for (int i=0; i<fpSingleton::getSingleton().returnNumFeatures(); ++i){
 						featuresToTry.push_back(i);
-					}*/
+					}
 
 					// This is an efficient way to shuffle the first "mtry" elements of the feature vector
 					// in order to sample features w/o replacement.
