@@ -540,7 +540,7 @@ namespace fp{
 					//	eps = 1 / (double)num_classes_in_subtree;
 					if(total_tree_card > 0){
 						for(int i=0; i<numClasses; ++i){
-							std::cout<<"class num: "<<i<<"card[i]: "<<card[i]<<" / "<<total_tree_card<<"\n";
+							//std::cout<<"class num: "<<i<<"card[i]: "<<card[i]<<" / "<<total_tree_card<<"\n";
 							if(card[i] > max && ((double)(card[i]) / (double)(total_tree_card) > eps)){
 								subtree_class = i;
 								max = card[i];
@@ -552,7 +552,7 @@ namespace fp{
 						std::cout<<"total_tree_card != 0!!!!\n";
 						std::cout<<"leaf_present: "<<leaf_present<<"\n";
 					}
-					std::cout<<"subtree_class: "<<subtree_class<<"\n";
+					//std::cout<<"subtree_class: "<<subtree_class<<"\n";
 					class_size_in_st[subtree_class]++;
 					map_subtree_to_class[curr_subtree] = subtree_class;
 					old_subtree = curr_subtree;
@@ -576,7 +576,7 @@ namespace fp{
 				}
 
 
-				std::cout<<"Printing map_subtree_to_size!\n";
+				/*std::cout<<"Printing map_subtree_to_size!\n";
 				for(int i = 0; i<currLevel+3 ; i++)
 					std::cout<<map_subtree_to_size[i]<<"\n";
 
@@ -591,6 +591,7 @@ namespace fp{
 				std::cout<<"*******************************************\n";	
 					std::cout<<"i: "<<i<<" class_size_in_st[i]: "<<class_size_in_st[i]<<"\n";
 				}
+				*/
 				std::sort(newfinalbin.begin(), newfinalbin.end(), [this](auto l, auto r){return myCompFunction(l, r);} );
 				finalbin.clear();
 				for(auto i:newfinalbin2)

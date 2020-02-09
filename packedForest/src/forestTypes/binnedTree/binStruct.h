@@ -401,9 +401,10 @@ namespace fp{
                 		inline void intertwineRootsLayout(){
                     			for(; currTree < numOfTreesInBin; ++currTree){
 						setSharedVectors();
-						loadFirstNode();	
-                        			while(!nodeQueue.empty())
+						loadFirstNode();
+                        			while(!nodeQueue.empty()){
 							processNode();
+						}
 					}
                 		}
 
@@ -449,6 +450,7 @@ namespace fp{
 
 
 				inline void createBin(int numTrees, int randSeed, int depthInter){
+					depthInter = 1;
 					numOfTreesInBin = numTrees;
 					randNum.initialize(randSeed);
 					initializeStructures();
@@ -459,7 +461,6 @@ namespace fp{
                         			intertwineRootsLayout();
                     			else if (depthInter > 1)
                         			intertwineMultipleLevelsLayout(depthInter);
-
                     			//printBin();    
                     			removeStructures();
 				}

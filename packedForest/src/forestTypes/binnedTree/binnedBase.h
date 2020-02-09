@@ -100,11 +100,11 @@ namespace fp {
 				for(auto binl : layoutVec)
 				{
 					std::vector<fpBaseNodeStat<T, Q>> currVec = binl.getFinalBin();
-					std::cout<<"************************\n";
+					/*std::cout<<"************************\n";
 					for(auto i: currVec){
 					std::cout<<"id: "<<i.getID()<<"\n";
 					i.printNode();
-					}
+					}*/
 
 				}
 				for(auto binl : layoutVec){
@@ -128,11 +128,11 @@ namespace fp {
 					}
 					count++;
 				}
-				std::cout<<"\n\n PRINTINF LATERTATYFSTUY\n\n";
+				/*std::cout<<"\n\n PRINTINF LATERTATYFSTUY\n\n";
 				for(auto i: finalBinVec){
 					std::cout<<"id: "<<i.getID()<<"\n";
 					i.printNode();
-				}
+				}*/
 				std::vector<fpBaseNodeStat<T, Q>> bin;
                                 int siz = finalBinVec.size();
 
@@ -173,7 +173,8 @@ namespace fp {
 				for(int i=0; i<siz; ++i)
 					finalBinVec[i].setID(i);
 
-				binStruct<T, Q> tempbin(128);
+				int num_trees = fpSingleton::getSingleton().returnNumTrees();
+				binStruct<T, Q> tempbin(num_trees);
 				tempbin.setBin(finalBinVec);
 				BinLayout<T, Q> mergedBin(tempbin, global_fname);
 				mergedBin.setFinalBin(finalBinVec);
@@ -199,11 +200,11 @@ namespace fp {
 				//int numTrees = fpSingleton::getSingleton().returnN
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
-					binStruct<T, Q> tempbin;
-					tempbin.createBin(treesPerBin, binSeeds[j], 1);
-		    			
-					BinLayout<T, Q> bins_serialize(tempbin, global_fname) ;
-					tempbin.setBin(bins_serialize.getFinalBin());
+					bins[j].createBin(binSizes[j], binSeeds[j], 1);
+		    		
+					std::cout<<"created! "<<j<<"\n";	
+					BinLayout<T, Q> bins_serialize(bins[j], global_fname) ;
+					bins[j].setBin(bins_serialize.getFinalBin());
 					
 
 					//bins_serialize.setBin();
@@ -224,7 +225,7 @@ namespace fp {
 					#pragma omp critical
 					{
 						binvector.push_back(bins_serialize);
-				 		bins[j] = tempbin;
+				 		//bins[j] = tempbin;
 						//       	sizesbin.push_back((int)bins_serialize.finalbin.size());	
 					}
 
