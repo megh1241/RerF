@@ -29,9 +29,6 @@ using namespace std::placeholders;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-std::map<int, int> map_subtree_to_class;
-std::map<int, int> map_subtree_to_size;
-int class_size_in_st[20];
 
 namespace fp{
 	template<typename T, typename Q>
@@ -46,6 +43,9 @@ namespace fp{
 			std::string filename;
 			std::vector<std::string> filename_vec;
 			public:
+			std::map<int, int> map_subtree_to_class;
+			std::map<int, int> map_subtree_to_size;
+			int class_size_in_st[20];
 			std::vector<fpBaseNodeStat<T, Q>> finalbin;
 			std::vector<int> treeRootPos;
 			BinLayout(binStruct<T, Q> tempbins): binstr(tempbins){
@@ -359,9 +359,9 @@ namespace fp{
 				int card[20] = {0};
 				int max = -1;
 				int subtree_class = -1;
-				finalbin.clear();
-				treeRootPos.clear();
-				nodeNewIdx.clear();
+//finalbin.clear();
+				//treeRootPos.clear();
+				//nodeNewIdx.clear();
 				std::memset(class_size_in_st, 0, 20*sizeof(class_size_in_st[0])); 
 				
 				//std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
@@ -372,8 +372,6 @@ namespace fp{
 				//binstr.setNumTrees(128);
 				//fpSingleton::getSingleton().setNumClasses(10);
 				//auto numClasses = 10;
-				std::cout<<"printing bin INIT\n";
-				std::cout<<"*******************************************\n";
 
 				for(auto i = 0; i<numClasses; ++i){
 					finalbin.push_back(bin[i]);
@@ -385,8 +383,6 @@ namespace fp{
 					//bin[i+numClasses].setSTNum(stno++);
 					binQTemp.push_back(bin[i+numClasses]);
 				}
-				std::cout<<"*******************************************\n";
-				std::cout<<"Printing queue!\n";
 				// Intertwined levels
 				int currLevel = 0; 
 		
@@ -394,8 +390,6 @@ namespace fp{
 				//process intertwined(BIN) levels	
 				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
 					auto ele = binQTemp.front();
-					ele.printID();
-					ele.printNode();
 					binQTemp.pop_front();
 					if(ele.getID()>= numClasses) {
 						ele.setSTNum(currLevel);
@@ -769,6 +763,7 @@ namespace fp{
 						f.close();
 
 					}
+					int numtrees = binstr.returnNumTrees();
 					//std::string treeroot_fname = "treeroots.csv";
 					f.open(treeroot_fname.c_str(), std::ios::out|std::ios::app);
 					for (auto root: roots)
@@ -777,10 +772,10 @@ namespace fp{
 
                                 	f.open("/data4/binstart.txt", std::ios::out | std::ios::app);
                                 	if(numBins > 1){
-                                                f<<finalbin.size()<<"\n";
+                                                f<<fpSingleton::getSingleton().returnNumTreeBins()<<"\n"<<finalbin.size()<<"\n"<<numtrees<<"\n";
                                 	}
                                 	else if(numBins == 1){
-                                        	f<<0<<"\n";
+                                        	f<<fpSingleton::getSingleton().returnNumTreeBins()<<"\n"<<0<<"\n"<<numtrees<<"\n";
                                 	}
                                 	f.close();
 				}

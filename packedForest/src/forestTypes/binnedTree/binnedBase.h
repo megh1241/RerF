@@ -187,7 +187,7 @@ namespace fp {
 			}
 
 			inline void growBins(){
-				int mergeVec = 1;
+				int mergeVec = 0;
 				calcBinSizes();
 				fpDisplayProgress printProgress;
 				bins.resize(numBins);
@@ -369,27 +369,43 @@ namespace fp {
 			}
 
 
-			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename2 = "/data4/binbfs"){							  int tmp_val ;
+			inline int predictClass(int observationNumber, bool fromFile = true, std::string filename2 = "/data4/binbfs"){							  
+				int tmp_val, n_tree, num_bins;
 				int treesPerBin;
 				readRandomClearCache();
 				std::fstream fi;
-
+				treesPerBin=0;
+				std::vector<binStruct<T, Q>> temp;
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();
-				std::string filename = "/data4/" + layout_str;
+				std::string filename = global_fname;
+				//std::string filename = "/data4/" + layout_str;
 				//Read locations of the first node of each bin when there are multiple bins
-				if(fpSingleton::getSingleton().returnNumThreads() > 1){
-					fi.open("/data4/binstart.txt");
+				if(fpSingleton::getSingleton().returnNumThreads() >= 1){
+					fi.open("/data4/binstart.txt", std::ios::in);
 					sizesbin.clear();
 					int sumsum = 0;
-					for(int i=0; i<fpSingleton::getSingleton().returnNumThreads(); ++i){
+					int i=0;
+					while(!fi.eof()){
+						fi>>num_bins;
 						fi>>tmp_val;
+						fi>>n_tree;
+						 binStruct<T, Q> strtemp(n_tree);
+						temp.push_back(strtemp);
+						i++;
 						sizesbin.push_back(sumsum);
 						sumsum+=tmp_val;
 					}
 					fi.close();
+					numBins = num_bins;
 				}
-				else
+				/*else{
+					fi.open("/data4/binstart.txt");
+					fi>>num_bins;
+					fi>>tmp_val;
+					fi>>n_tree;
+					temp[0].setNumTrees(n_tree);
 					sizesbin.push_back(0);
+				}*/
 			
 				treeRootPos.clear();
 
@@ -407,7 +423,6 @@ namespace fp {
 				std::vector<int> predictions(fpSingleton::getSingleton().returnNumClasses(),0);
                         	treesPerBin = fpSingleton::getSingleton().returnNumTrees() / fpSingleton::getSingleton().returnNumThreads();
 				
-				binStruct<T, Q> temp = binStruct<T, Q>(treesPerBin);
 				global_str = filename + std::to_string(observationNumber%NUM_FILES) + ".bin";
                        		mmappedObj.open(global_str, 0); 
                         	data = (fpBaseNode<T, Q>*)mmappedObj.getData();
@@ -417,7 +432,7 @@ namespace fp {
 				//std::cout<<"Num threads! "<< fpSingleton::getSingleton().returnNumThreads() <<"\n";
 //std::cout<<"***************************************\n";
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
-				for(int k = 0; k < 1; ++k){
+				for(int k = 0; k < numBins; ++k){
                 			int uniqueCount = 0;
 					//std::cout<<"sizesbin[k]: "<<sizesbin[k]<<"\n";
 					//fflush(stdout);
@@ -425,7 +440,7 @@ namespace fp {
 					if(!fromFile)
 					    bins[k].predictBinObservation(observationNumber, predictions);
 		    			else{
-						temp.predictBinObservation(uniqueCount, treeRootPos, mmapped_file_pos, observationNumber, predictions);
+						temp[k].predictBinObservation(uniqueCount, treeRootPos, mmapped_file_pos, observationNumber, predictions);
                         			if(num_threads == 1)
 							blocks.push_back(uniqueCount);
                     			}
@@ -498,15 +513,16 @@ namespace fp {
 			}
 
 			inline float testForest(){
-				writeRandomToFile();		
+	//			writeRandomToFile();		
 				
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();
 			
 				std::cout<<"Number of classes: !!\n"<<	fpSingleton::getSingleton().returnNumClasses()<<"\n";
+				fflush(stdout);
 				int numTried = 0;
 				int numWrong = 0;
     				//for (int i = 0; i < 1; i++){
-    				for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i+=500){
+    				for (int i = 0; i <fpSingleton::getSingleton().returnNumObservations();i++){
 					++numTried;
 					int predClass = predictClass(i);
 
