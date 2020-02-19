@@ -125,8 +125,8 @@ int main(int argc, char* argv[]) {
                     forest.setParameter("columnWithY", 5408);
                     break;
                 case 8: //TODO: better way (automatically ? ) to find the number of columns in a given csv file
-                    forest.setParameter("CSVFileName", "datasets/poker-hand-testing.csv");
-                    forest.setParameter("columnWithY", 10);
+                    forest.setParameter("CSVFileName", "datasets/cifar-10.csv");
+                    forest.setParameter("columnWithY", 3072);
                     break;
                 case 7: 
                     forest.setParameter("CSVFileName", "/data4/cifar-100.csv");
