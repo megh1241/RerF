@@ -29,7 +29,7 @@ std::vector<double>etime;
 std::vector<int> sizesbin;
 std::fstream f_time;
 std::fstream fblock;
-#define NUM_FILES 900
+#define NUM_FILES 2 
 
 std::vector<MemoryMapped> mmappedObj_vec(NUM_FILES);
 MemoryMapped mmappedObj;
@@ -95,15 +95,12 @@ namespace fp {
 				std::vector<BinLayout<T, Q>> binvector;
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();
 				int depth = fpSingleton::getSingleton().returnDepthIntertwined();
-				std::cout<<"NUM BINS: "<<numBins<<"\n";
 #pragma omp parallel for num_threads(fpSingleton::getSingleton().returnNumThreads())
 				for(int j = 0; j < numBins; ++j){
 					bins[j].createBin(binSizes[j], binSeeds[j], 1);
 		    			
 					BinLayout<T, Q> bins_serialize(bins[j], global_fname) ;
 					bins[j].setBin(bins_serialize.getFinalBin());
-					std::cout<<"Layout: "<<layout_str<<"\n";	
-
 					//bins_serialize.setBin();
 					if(layout_str.compare("bfs") == 0)
                         			bins_serialize.BFSLayout();
@@ -111,10 +108,13 @@ namespace fp {
                         			bins_serialize.statLayout();
 					else if(layout_str.compare("binbfs") == 0)
                         			bins_serialize.BINBFSLayout(depth);
+					else if(layout_str.compare("bindfs") == 0)
+                        			bins_serialize.BINDFSLayout(depth);
 					else if(layout_str.compare("binstat") == 0)
                         			bins_serialize.BINStatLayout(depth);
+					else if(layout_str.compare("dfs") == 0)
+                        			bins_serialize.DFSLayout();
                         		else{
-						std::cout<<"CLASS\n";
                         			bins_serialize.BINStatClassLayout(depth);
 
 					}
