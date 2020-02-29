@@ -226,8 +226,9 @@ class fpBaseNodeStat : public fpBaseNode<T, F>
         	int id;
 		int left_leaf_card;
 		int right_leaf_card;
-		//subtreeNum = -2 indicates class, =-1 indicates interleaved BIN
 		int subtreeNum;
+		int parent;
+		int blank;
 	public:
 		fpBaseNodeStat(){
 			fpBaseNode<T, F>();
@@ -238,7 +239,7 @@ class fpBaseNodeStat : public fpBaseNode<T, F>
 			this->setCutValue(cutValue);
 			this->setFeatureValue(feature);
 			this->setDepth(depth);
-			//fpBaseNode<T, F>(cutValue, depth, feature);
+			blank = 1;
 		}
 		void setSTNum(int num){
 			subtreeNum = num;
@@ -251,7 +252,15 @@ class fpBaseNodeStat : public fpBaseNode<T, F>
 		int getCard(){
 			return cardinality;
 		}
-		
+	
+		int getBlank(){
+			return blank;
+		}
+
+		void setBlank(int val){
+			blank = val;
+		}
+
 		void setLeftLeafCard(int cardi){
                         left_leaf_card = cardi;
                 }
@@ -267,7 +276,6 @@ class fpBaseNodeStat : public fpBaseNode<T, F>
 		int getRightLeafCard(){
 			return right_leaf_card;
 		}
-
 
 		int getID(){
 			return id;

@@ -114,6 +114,8 @@ namespace fp {
                         			bins_serialize.BINStatLayout(depth);
 					else if(layout_str.compare("dfs") == 0)
                         			bins_serialize.DFSLayout();
+					else if(layout_str.compare("align") == 0)
+                        			bins_serialize.alignLayout(depth);
                         		else{
                         			bins_serialize.BINStatClassLayout(depth);
 
@@ -242,7 +244,7 @@ namespace fp {
 
 				//Read the tree root positions for BFS and Stat layouts
 				std::string layout_str = fpSingleton::getSingleton().returnLayout();	
-				if(layout_str.compare("bfs") == 0 || layout_str.compare("stat") == 0){
+				if(layout_str.compare("dfs") == 0 || layout_str.compare("bfs") == 0 || layout_str.compare("stat") == 0){
 					int rootpos;
 					fi.open("treeroots.csv");
 					while(!fi.eof()){

@@ -46,6 +46,7 @@ namespace fp{
 			std::map<int, int> nodeNewIdx;
 			std::string filename;
 			std::vector<std::string> filename_vec;
+			
 			public:
 			std::vector<fpBaseNodeStat<T, Q>> finalbin;
 			std::vector<int> treeRootPos;
@@ -61,6 +62,176 @@ namespace fp{
 				/* Return the file in which the forest was written to */
 				return filename;
 			}
+			
+			inline void push_insert(std::deque<fpBaseNodeStat<T, Q>> &binST, fpBaseNodeStat<T, Q> ele){
+				//Find position to insert element so that it remains sorted
+				int count = 0, pos=0;
+				for(auto i: binST){
+					if ( ((float)(ele.getID())/(float)(ele.returnDepth())) < ((float)(i.getID())/(float)(i.returnDepth())))
+					{
+						pos = count;
+						break;
+					}
+					
+					count++;
+				}
+				if(pos == 0)
+					pos = count;
+				binST.insert(binST.begin() + pos, ele);
+			}
+
+
+			/*inline void leafLayout(int depthIntertwined){
+				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
+				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
+
+				int numNodesToProc = std::pow(2, depthIntertwined) -1 ; 
+				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
+
+
+				for(int i=0; i<bin.size(); ++i){
+					if(i < (numClasses + binstr.returnNumTrees()))
+						continue;
+					
+					if(bin[i].returnLeftNodeID() >= numClasses)
+						bin[bin[i].returnLeftNodeID()].setParentID(bin[i].getID());
+					if(bin[i].returnRightNodeID() >= numClasses)
+						bin[bin[i].returnRightNodeID()].setParentID(bin[i].getID());
+				}
+
+				
+				for(auto i = 0; i < numClasses; ++i){
+					finalbin.push_back(bin[i]);
+					nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));
+				}
+
+				for(auto i = 0; i < binstr.returnNumTrees(); ++i) {
+					binQTemp.push_back(bin[i+numClasses]);
+				}
+				// Intertwined levels
+				int currLevel = 0; 
+				int posInLevel = 0;
+				//if(nodeTreeMap[binQ.front().getID()] != i)
+				//  continue;
+				
+				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
+					auto ele = binQTemp.front();
+					ele.printID();
+					ele.printNode();
+					binQTemp.pop_front();
+					if(ele.getID()>= numClasses) {
+						ele.setSTNum(currLevel);
+						finalbin.push_back(ele);
+						nodeNewIdx.insert(std::pair<int, int>(ele.getID(), finalbin.size()-1));
+						bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
+						bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
+						binQLeft.push_back(bin[ele.returnLeftNodeID()]); 
+						binQRight.push_back(bin[ele.returnRightNodeID()]); 
+					}
+					else {
+						binQLeft.push_back(bin[ele.returnRightNodeID()]); 
+						binQRight.push_back(bin[ele.returnRightNodeID()]); 
+					}
+
+					if(posInLevel == binstr.returnNumTrees() - 1)
+					{
+						while(!binQLeft.empty()){
+							auto ele = binQLeft.front();
+							binQTemp.push_back(ele);
+							binQLeft.pop_front();
+						}
+						while(!binQRight.empty()){
+							auto ele = binQRight.front();
+							binQTemp.push_back(ele);
+							binQRight.pop_front();
+						}
+						posInLevel = 0;
+					}
+					else
+						posInLevel++;
+					
+					currLevel++;
+				}
+
+
+				while(!binQTemp.empty()){
+					auto ele = binQTemp.front();
+					if(ele.getID() >= numClasses)
+						binQ.push_back(ele);
+					binQTemp.pop_front();
+
+				}
+
+
+					
+					
+					
+				for(auto st_iter = 0; st_iter <mainST.size(); st_iter++)
+				{
+
+					binST = mainST[st_iter];
+					// STAT per (sub)tree layout
+					int n_leaves = 0; 
+					int minID = INT_MAX;
+					for(int i=0; i<binST.size(); ++i)
+					{
+						if(binST[i].returnLeftNodeID() < numClasses && binST[i].returnRightNodeID() < numClasses)
+							n_leaves++;
+						binST[binST[i].returnLeftNodeID()].setParentNode(binST[i].getID());
+						binST[binST[i].returnRightNodeID()].setParentNode(binST[i].getID());
+						
+						if(binST[i].returnLeftNodeID() < numClasses || binST[i].returnRightNodeID() < numClasses)
+							binST[i].setLeafPathCount(binST[binST[i].returnParentNode()].pathLeafCount() + getCard());
+						else
+							binST[i].setPathLeafCount(binST[binST[i].returnParentNode()].pathLeafCount());
+					}
+
+					for(int i=0; i<n_leaves; i++)
+					{
+						int max = -1;
+						int index_bin = 0;
+						int count = 0;
+						for(auto node: binST)
+						{
+							if(node.returnLeftNodeID() < numClasses && node.returnRightNodeID() < numClasses && node.returnBlank() > 0)
+							{
+								if (node.pathLeafCount() >= max){
+									max = node.pathLeafCount();
+									index_bin = count;	        	
+								}
+							}
+							count++;
+							if(node.getID() < minID)
+								minID = node.getID();
+						}
+
+						auto start_node = binST[index_bin];
+						auto node = start_node;
+						std::deque<fpBaseNodeStat<T, Q>> tempStack;
+						while(1)
+						{
+							//TODO check that parent is also within ST and that we haven't gone as far up as bin
+							if(node.returnBlank() < 0)
+								break;
+							
+							tempStack.push_front(node);
+							binST[node].setBlank(-1);
+							if(node.getParentNode() == -100)
+								break;
+							node = binST[node.getParentNode()];
+						}
+						while(!tempStack.empty())
+						{
+							auto ele = tempStack.pop_front();
+							finalbin.push_back(ele);
+							nodeNewIdx.insert(std::pair<int, int>(ele.getID(), finalbin.size()-1));
+						}
+
+					}
+				}
+
+			}*/
+
 
 			inline void BINBFSLayout(int depthIntertwined){
 				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
@@ -166,6 +337,141 @@ namespace fp{
 						}
 					}
 				}		
+				int siz = finalbin.size();
+				for (auto i=numClasses; i<siz; i++){
+					finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
+					finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
+				}
+			}
+
+			inline void alignLayout(int depthIntertwined){
+				std::vector< fpBaseNodeStat<T,Q> > bin = binstr.getBin();
+				std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
+				std::vector<fpBaseNodeStat<T, Q>> subtreebin;
+
+				int numNodesToProc = std::pow(2, depthIntertwined) - 1; 
+				auto numClasses = fpSingleton::getSingleton().returnNumClasses();
+
+
+				for(auto i = 0; i < numClasses; ++i){
+					finalbin.push_back(bin[i]);
+					nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));
+				}
+
+				for(auto i = 0; i < binstr.returnNumTrees(); ++i){
+					binQTemp.push_back(bin[i+numClasses]);
+				}
+
+				// Intertwined levels
+				int currLevel = 0;
+				int posInLevel = 0; 
+				//if(nodeTreeMap[binQ.front().getID()] != i)
+				//  continue
+
+				while(currLevel < numNodesToProc*binstr.returnNumTrees()) {
+					auto ele = binQTemp.front();
+					ele.printID();
+					ele.printNode();
+					binQTemp.pop_front();
+					if(ele.getID()>= numClasses) {
+						ele.setSTNum(currLevel);
+						finalbin.push_back(ele);
+						nodeNewIdx.insert(std::pair<int, int>(ele.getID(), finalbin.size()-1));
+						bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
+						bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
+						binQLeft.push_back(bin[ele.returnLeftNodeID()]); 
+						binQRight.push_back(bin[ele.returnRightNodeID()]); 
+					}
+					else {
+						binQLeft.push_back(bin[ele.returnRightNodeID()]); 
+						binQRight.push_back(bin[ele.returnRightNodeID()]); 
+					}
+
+					if(posInLevel == binstr.returnNumTrees() - 1)
+					{
+						while(!binQLeft.empty()){
+							auto ele = binQLeft.front();
+							binQTemp.push_back(ele);
+							binQLeft.pop_front();
+						}
+						while(!binQRight.empty()){
+							auto ele = binQRight.front();
+							binQTemp.push_back(ele);
+							binQRight.pop_front();
+						}
+						posInLevel = 0;
+					}
+					else
+						posInLevel++;
+					
+					currLevel++;
+				}
+
+
+				while(!binQTemp.empty()){
+					auto ele = binQTemp.front();
+					if(ele.getID() >= numClasses)
+						binQ.push_back(ele);
+					binQTemp.pop_front();
+				}
+				
+				// STAT per (sub)tree layout 
+
+				int path_size=0;
+				std::vector<int> path_vec;
+				while(!binQ.empty()){
+					std::deque<fpBaseNodeStat<T, Q>> binST;
+					auto ele = binQ.front();
+					binQ.pop_front();
+					binST.push_back(ele);
+					while(!binST.empty()){
+						path_size++;
+						auto ele = binST.front();
+						binST.pop_front(); 
+						finalbin.push_back(ele);
+						subtreebin.push_back(ele);
+						nodeNewIdx.insert(std::pair<int, int>(ele.getID(), finalbin.size()-1));
+						if((ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) || (ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()))
+						{
+							path_vec.push_back(path_size);
+							path_size = 0;
+						}
+						if((ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) && (ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()))
+							continue;
+
+						else if(ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses())
+							push_insert(binST, bin[ele.returnRightNodeID()]);
+							//binST.push_front(bin[ele.returnRightNodeID()]);
+						else if(ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses())
+							push_insert(binST, bin[ele.returnLeftNodeID()]);
+							//binST.push_front(bin[ele.returnLeftNodeID()]); 
+
+						else {
+							if(bin[ele.returnLeftNodeID()].getCard() <= bin[ele.returnRightNodeID()].getCard()){
+								push_insert(binST, bin[ele.returnLeftNodeID()]);
+								push_insert(binST, bin[ele.returnRightNodeID()]);
+								//binST.push_front(bin[ele.returnLeftNodeID()]); 
+								//binST.push_front(bin[ele.returnRightNodeID()]); 
+							}
+							else{
+								push_insert(binST, bin[ele.returnRightNodeID()]);
+								push_insert(binST, bin[ele.returnLeftNodeID()]);
+								//binST.push_front(bin[ele.returnRightNodeID()]); 
+								//binST.push_front(bin[ele.returnLeftNodeID()]); 
+							}
+						}
+					}
+					path_vec.push_back(path_size);
+					path_size = 0;
+				}
+
+				
+				std::fstream fsiz;
+				fsiz.open("path_sizes22.csv", std::ios::out);
+				for(auto size_item: path_vec)
+					fsiz<<size_item<<",";
+				fsiz.close();
+
 				int siz = finalbin.size();
 				for (auto i=numClasses; i<siz; i++){
 					finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
@@ -449,6 +755,7 @@ namespace fp{
 				int card[102] = {0};
 				int max = -1;
 				int subtree_class = -1;
+				std::vector<int> leaf_card_vec;
 				std::memset(class_size_in_st, 0, 102*sizeof(class_size_in_st[0])); 
 				
 				//std::map<int, int> nodeTreeMap = binstr.getNodeTreeMap();
@@ -460,11 +767,12 @@ namespace fp{
 				//fpSingleton::getSingleton().setNumClasses(10);
 				//auto numClasses = 10;
 
-				for(auto i = 0; i<numClasses; ++i){
+			/*	
+			 	for(auto i = 0; i<numClasses; ++i){
 					finalbin.push_back(bin[i]);
                                         nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));
-
 				}
+			*/
 				//roots of trees
 				for(auto i = 0; i < binstr.returnNumTrees(); ++i){
 					//bin[i+numClasses].setSTNum(stno++);
@@ -541,10 +849,13 @@ namespace fp{
 				int curr_subtree = binQ.front().getSTNum();
 				//int old_subtree=-1;
 				int leaf_present = 0;
+				int first_tree = 0;
+				std::vector<std::vector<double>> per_subtree_dist;
 				while(!binQ.empty()){
 					leaf_present = 0;
 					std::deque<fpBaseNodeStat<T, Q>> binST;
 					auto ele = binQ.front();
+					leaf_card_vec.push_back(ele.getCard());
 					binQ.pop_front();
 					ele.setSTNum(new_st);
 					curr_subtree = ele.getSTNum();
@@ -566,6 +877,7 @@ namespace fp{
 						//if(!ele.isInternalNode() && ele.returnClass()<numClasses){
 						
 						if( ele.returnLeftNodeID()<numClasses){
+							//leaf_card_vec.push_back(ele.getLeftLeafCard());
                                                         if(card[ele.returnLeftNodeID()] == 0)
                                                                 num_classes_in_subtree++;
                                                         card[ele.returnLeftNodeID()] += ele.getLeftLeafCard();
@@ -574,6 +886,7 @@ namespace fp{
                                                         leaf_present = 1;
                                                 }
                                                 if( ele.returnRightNodeID()<numClasses){
+							//leaf_card_vec.push_back(ele.getRightLeafCard());
                                                         if(card[ele.returnRightNodeID()] == 0)
                                                                 num_classes_in_subtree++;
                                                         card[ele.returnRightNodeID()] += ele.getRightLeafCard();
@@ -591,44 +904,58 @@ namespace fp{
 
 						else if(ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses()) {
 							bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
-							binST.push_front(bin[ele.returnRightNodeID()]);
+							//binST.push_front(bin[ele.returnRightNodeID()]);
+							push_insert(binST, bin[ele.returnRightNodeID()]);
 						}
 
 						else if(ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses()){
 							bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
-							binST.push_front(bin[ele.returnLeftNodeID()]); 
+							//binST.push_front(bin[ele.returnLeftNodeID()]); 
+							push_insert(binST, bin[ele.returnLeftNodeID()]);
 						}
 						else {
 							if(bin[ele.returnLeftNodeID()].getCard() <=  bin[ele.returnRightNodeID()].getCard()){
 								bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
-								binST.push_front(bin[ele.returnLeftNodeID()]); 
+								//binST.push_front(bin[ele.returnLeftNodeID()]); 
 								bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
-								binST.push_front(bin[ele.returnRightNodeID()]); 
+								//binST.push_front(bin[ele.returnRightNodeID()]); 
+								push_insert(binST, bin[ele.returnLeftNodeID()]);
+								push_insert(binST, bin[ele.returnRightNodeID()]);
 							}
 							else{
 								bin[ele.returnRightNodeID()].setSTNum(ele.getSTNum());
-								binST.push_front(bin[ele.returnRightNodeID()]); 
+								//binST.push_front(bin[ele.returnRightNodeID()]); 
 								bin[ele.returnLeftNodeID()].setSTNum(ele.getSTNum());
-								binST.push_front(bin[ele.returnLeftNodeID()]); 
+								//binST.push_front(bin[ele.returnLeftNodeID()]); 
+								push_insert(binST, bin[ele.returnRightNodeID()]);
+								push_insert(binST, bin[ele.returnLeftNodeID()]);
 							}
 						}
 					}
 					new_st++;
 					//compute max class
 				//	if(curr_subtree != old_subtree){
-						max = -1;
-						subtree_class = 103;
+					max = -1;
+					subtree_class = 103;
 				//	}
 					//if(num_classes_in_subtree > 0)
 					//	eps = 1 / (double)num_classes_in_subtree;
 					if(total_tree_card > 0){
+						std::vector<double> card_frac;
 						for(int i=0; i<numClasses; ++i){
+				//			
 				//			std::cout<<"class num: "<<i<<"card[i]: "<<card[i]<<" / "<<total_tree_card<<"\n";
 							if(card[i] > max && ((double)(card[i]) / (double)(total_tree_card) > eps)){
 								subtree_class = i;
 								max = card[i];
 							}
+							
+							//if(first_tree == 0){	
+								card_frac.push_back((double)(card[i]));
+								//card_frac.push_back((double)(card[i]) / (double)(total_tree_card));
+							//}
 						}
+						per_subtree_dist.push_back(card_frac);
 					}
 					else
 					{
@@ -638,6 +965,8 @@ namespace fp{
 				//	std::cout<<"subtree_class: "<<subtree_class<<"\n";
 					class_size_in_st[subtree_class]++;
 					map_subtree_to_class[curr_subtree] = subtree_class;
+					if(first_tree == 0)
+						first_tree = 1;
 					//old_subtree = curr_subtree;
 				}
 				/*std::cout<<"PRINTING CLASS: !!\n";
@@ -681,6 +1010,10 @@ namespace fp{
 					finalbin.push_back(i);
 				for(auto i:newfinalbin)
 					finalbin.push_back(i);
+			 	for(auto i = 0; i<numClasses; ++i){
+					finalbin.push_back(bin[i]);
+                                        //nodeNewIdx.insert(std::pair<int, int>(bin[i].getID(), finalbin.size()-1));
+				}
 				/*std::cout<<"Printing newfinalbin2!\n";
 				std::cout<<"*******************************************\n";	
 				for(auto i: newfinalbin2)
@@ -692,15 +1025,39 @@ namespace fp{
 					std::cout<<"*******************************************\n";	
 				}*/	
 				nodeNewIdx.clear();
+				siz = finalbin.size();
 				for(auto i=0; i < siz; ++i){
 					nodeNewIdx.insert(std::pair<int, int>(finalbin[i].getID(), i));
 				}
 				siz = finalbin.size();
-				for (auto i=numClasses; i<siz; i++){
+				for (auto i=0; i<siz-numClasses; i++){
 					finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
 					finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
 				}
 				nodeNewIdx.clear();
+				std::fstream fsiz;
+				fsiz.open("st_card.csv", std::ios::out);
+				for(auto size_item: leaf_card_vec)
+					fsiz<<size_item<<",";
+				fsiz.close();
+				
+				fsiz.open("per_subtree.csv", std::ios::out);
+				for(int i=0; i<per_subtree_dist.size(); ++i)
+				{
+					for(int j=0; j<per_subtree_dist[0].size(); ++j)
+					{
+						fsiz<<per_subtree_dist[i][j]<<",";
+					}
+					fsiz<<"\n";
+				}
+				/*
+				for(auto st: per_subtree_dist){
+					for(auto ele: st)
+						fsiz<<ele<<",";
+					fsiz<<"\n";
+				}*/
+				fsiz.close();
+
 
 			}
 
@@ -791,21 +1148,28 @@ namespace fp{
 							continue;
 
 						else if(ele.returnLeftNodeID() < fpSingleton::getSingleton().returnNumClasses())
-							binST.push_front(bin[ele.returnRightNodeID()]);
-
+							push_insert(binST, bin[ele.returnRightNodeID()]);
+							//binST.push_front(bin[ele.returnRightNodeID()]);
 						else if(ele.returnRightNodeID() < fpSingleton::getSingleton().returnNumClasses())
-							binST.push_front(bin[ele.returnLeftNodeID()]); 
+							push_insert(binST, bin[ele.returnLeftNodeID()]);
+							//binST.push_front(bin[ele.returnLeftNodeID()]); 
 
 						else{
-								binST.push_front(bin[ele.returnLeftNodeID()]); 
-								binST.push_front(bin[ele.returnRightNodeID()]); 
+								std::cout<<"printing left and right cardinalities!\n";
+								std::cout << bin[ele.returnLeftNodeID()].getCard() <<"\n";
+								std::cout << bin[ele.returnRightNodeID()].getCard() <<"\n"; 
 								if(bin[ele.returnLeftNodeID()].getCard() <= bin[ele.returnRightNodeID()].getCard()){
-									binST.push_front(bin[ele.returnLeftNodeID()]); 
-									binST.push_front(bin[ele.returnRightNodeID()]); 
+									//binST.push_front(bin[ele.returnLeftNodeID()]); 
+									//binST.push_front(bin[ele.returnRightNodeID()]); 
+									push_insert(binST, bin[ele.returnLeftNodeID()]);
+									push_insert(binST, bin[ele.returnRightNodeID()]);
 								}
 								else{
-									binST.push_front(bin[ele.returnRightNodeID()]); 
-									binST.push_front(bin[ele.returnLeftNodeID()]); 
+									std::cout<<"else!!\n";
+									//binST.push_front(bin[ele.returnRightNodeID()]); 
+									//binST.push_front(bin[ele.returnLeftNodeID()]); 
+									push_insert(binST, bin[ele.returnRightNodeID()]);
+									push_insert(binST, bin[ele.returnLeftNodeID()]);
 								}
 						}
 					}
@@ -815,7 +1179,7 @@ namespace fp{
 				for (auto i=numClasses; i<siz; i++){
 					finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
 					finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
-					finalbin[i].setDepth(bin[nodeNewIdx[i]].returnDepth());
+					//finalbin[i].setDepth(bin[nodeNewIdx[i]].returnDepth());
 				}
 			}
 
@@ -870,7 +1234,7 @@ namespace fp{
 				for (auto i=numClasses; i<siz; i++){
 					finalbin[i].setLeftValue(nodeNewIdx[bin[finalbin[i].returnLeftNodeID()].getID()]);
 					finalbin[i].setRightValue(nodeNewIdx[bin[finalbin[i].returnRightNodeID()].getID()]);
-					finalbin[i].setDepth(bin[nodeNewIdx[i]].returnDepth());
+					//finalbin[i].setDepth(bin[nodeNewIdx[i]].returnDepth());
 				}
 			}
 

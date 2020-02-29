@@ -669,7 +669,8 @@ namespace fp{
                     			else {
                         			for( q=0; q<numOfTreesInBin; ++q){
                                 		//	v_num_nodes.push_back(currNode[q]);
-						    	currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();;
+						    	currNode[q] = q;
+						    	//currNode[q] = q+fpSingleton::getSingleton().returnNumClasses();;
 					        		__builtin_prefetch(&bin[currNode[q]], 0, 3);
 					    	}
                     			}
@@ -690,7 +691,8 @@ namespace fp{
 						}
 
 					}while(numberNotInLeaf);
-
+				std::cout<<"before leaf\n";
+				fflush(stdout);
                     		auto end = std::chrono::steady_clock::now();
 					for( q=0; q<numOfTreesInBin; q++){
 //#pragma omp atomic update
@@ -699,6 +701,8 @@ namespace fp{
 					}
 #pragma omp critical 
                     			uniqueCount = std::set<int>( v.begin(), v.end() ).size();
+					std::cout<<"after leaf\n";
+				fflush(stdout);
                   
 //#pragma omp critical
 //					etime.push_back(std::chrono::duration<double, std::milli>(end - start).count());
