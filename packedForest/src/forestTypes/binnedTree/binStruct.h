@@ -411,6 +411,14 @@ namespace fp{
 				}
 
 				inline void intertwineMultipleLevelsLayout(int depthInter){
+
+					/*xxxInter methods are almost identical to xxx methods, the difference being, we process the front nodes instead of back
+					  A better way to do this would be to modify xxx with a flag xxx(interleave = True) and inside the method, if interleave == true
+					  then provess front otherwise process from the back. However, I did not want to touch any of the existing code as this was purely
+					 experimental and I did not want a rigorous code review on this. 
+					*/
+
+					//initialization is slightly Hacky
 					for(; currTree < numOfTreesInBin; ++currTree){
 						setSharedVectors();
 						loadFirstNodeInter();
@@ -419,19 +427,27 @@ namespace fp{
 					for(auto ele: nodeQueueLeft)
 						nodeQueueInter.push_back(ele);
 
+					//separate queue for the right nodes as they need to be placed after ALL the left nodes of current nodes per tree
 					for(auto ele: nodeQueueRight)
 						nodeQueueInter.push_back(ele);
 					nodeQueueRight.clear();
 
+					//depthInter is the depth intertwined
 					int topNodeTreeNum=0, d = 0, numNodesInterleaved = std::pow(2, depthInter) - 2;
+
+					//Number of nodes to be processesed per tree intertwined = 2^(depthInter) -2
+					//This while loop processes the interleaved portion
 					while(d++ <  depthInter){
+						//iterate through current node per tree
 						for(int currTree=0; currTree< numOfTreesInBin; ++currTree){
 							topNodeTreeNum=nodeQueueInter.front().exposeTreeNum();
+							//if the corresponding node does not exist(because it has a leaf earlier), move to the next tree
 							if(topNodeTreeNum != currTree)
 								continue;
 							processNodeInter();
 						}
 
+						//place all the right nodes after the left nodes. so pop from the right node queue.
 						while(!nodeQueueRight.empty()){
 							processingNodeBin<T,Q> ele = nodeQueueRight.front();
 							nodeQueueRight.pop_front();
@@ -439,6 +455,8 @@ namespace fp{
 						}
 					}
 
+
+					//Regular weighted DFS / STAT
 					while(!nodeQueueInter.empty()){
 						auto ele = nodeQueueInter.front();
 						currTree = ele.exposeTreeNum(); 
@@ -451,8 +469,11 @@ namespace fp{
 				}
 
 				inline void intertwineClassLayout(){
+					//IGNORE
+					//TODO: remove
 					int a =9;
 				}
+
 
 				inline void createBin(int numTrees, int randSeed, int depthInter){
 					numOfTreesInBin = numTrees;
