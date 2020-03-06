@@ -660,6 +660,8 @@ namespace fp{
                     			//std::vector<int> v_num_nodes;
                     		auto start = std::chrono::steady_clock::now();
 					if(roots.size()>0){
+                                    std::cout<<"if condition\n";
+                                    fflush(stdout);
                         			for( q=0; q<numOfTreesInBin; ++q){
                                 			//v_num_nodes.push_back(currNode[q]);
 						    	currNode[q] = roots[q];
