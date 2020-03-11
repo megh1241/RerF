@@ -104,14 +104,14 @@ namespace fp {
                     //bins_serialize.setBin();
                     if(layout_str.compare("bfs") == 0)
                         bins_serialize.BFSLayout();
-                    else if(layout_str.compare("newsat") == 0)
+                    else if(layout_str.compare("stat") == 0)
                         //bins_serialize.LeafStatLayout(depth);
                         bins_serialize.statLayout();
                     else if(layout_str.compare("binbfs") == 0)
                         bins_serialize.BINBFSLayout(depth);
                     else if(layout_str.compare("bindfs") == 0)
                         bins_serialize.BINDFSLayout(depth);
-                    else if(layout_str.compare("binstat") == 0)
+                    else if(layout_str.compare("align") == 0)
                         bins_serialize.alignLayout(depth);
                     else if(layout_str.compare("dfs") == 0)
                         bins_serialize.DFSLayout();
