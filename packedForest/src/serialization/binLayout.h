@@ -951,6 +951,28 @@ namespace fp{
                     return tempNode;
                 }
 
+                inline int findClass(std::vector<fpBaseNodeStat<T, Q>> temp){
+                    int classes[1000] = {0};
+                    int numClasses = fpSingleton::getSingleton().returnNumClasses();
+                    
+                    for(auto i: temp){
+                        if(i.returnLeftNodeID() < numClasses)
+                            classes[i.getLeftLeafCard()]++;
+                        if(i.returnRightNodeID() < numClasses)
+                            classes[i.getRightLeafCard()]++;
+                    }
+                    int max = -1;
+                    int  maxclass = 0;
+                    for(int i=0; i<numClasses; ++i){
+                        if(classes[i] > max)
+                        {
+                            max = classes[i];
+                            maxclass = i;
+                        }
+                    }
+                    return maxclass;
+                }
+
                 inline void newStatLayout(){
                     int front_subtree_id = 0;
                     int count_small_st = 0;
@@ -1050,7 +1072,6 @@ namespace fp{
                             }
                         }
                     }
-
                     int siz = finalbin.size();
                     for (auto i=numClasses; i<siz; i++){
                         if(!(finalbin[i].returnLeftNodeID() == -1 && finalbin[i].returnRightNodeID() == -1) ){
@@ -1059,6 +1080,109 @@ namespace fp{
                         }
                         //		finalbin[i].setDepth(bin[nodeNewIdx[i]].returnDepth());
                     }
+
+                    std::vector<fpBaseNodeStat<T, Q>> newfinalbin; 
+                    for(int i=0; i<numClasses; ++i)
+                        newfinalbin.push_back(finalbin[i]);
+                    std::vector<std::vector<fpBaseNodeStat<T, Q>>> classwise_res;
+                    std::vector<fpBaseNodeStat<T, Q>> temp;
+                    std::vector<std::vector<fpBaseNodeStat<T, Q>>> temp2;
+                    for(int i=0; i<numClasses; i++){
+                        classwise_res.push_back(temp);
+                    }
+                    pos_in_block = numClasses;
+                    int blankflag = 0;
+                    for(int i=numClasses; i<siz; ++i){
+                        if( (i!=siz-1) && (pos_in_block%BLOCK_SIZE != BLOCK_SIZE -1)){
+                            if(!(finalbin[i].returnLeftNodeID() == -1 && finalbin[i].returnRightNodeID() == -1) ){
+                                    temp.push_back(finalbin[i]);
+                            }
+                            else
+                                blankflag = 1;
+                        }
+                        else{
+                            if(!(finalbin[i].returnLeftNodeID() == -1 && finalbin[i].returnRightNodeID() == -1) ){
+                                    temp.push_back(finalbin[i]);
+                            }
+                            else
+                                blankflag = 1;
+
+                            std::cout<<"temp size; "<<temp.size()<<"\n";
+                            std::cout<<"blankflag; "<<blankflag<<"\n";
+                            std::cout<<"pos in block: "<<pos_in_block<<"\n";
+                            if(blankflag == 0) {
+                                for(auto j: temp)
+                                    newfinalbin.push_back(j);
+                            }
+                            else{
+                                temp2.push_back(temp);
+                                /*
+                                int classno = findClass(temp);
+                                for(auto j: temp)
+                                    classwise_res[classno].push_back(j);
+                                */
+                            }
+                            blankflag = 0;
+                            temp.clear();
+                        }
+                        pos_in_block++;
+                    }
+                    fpBaseNodeStat<T, Q> blank_node = genBlankNode();
+                    int pos2 = (newfinalbin.size())%BLOCK_SIZE;
+                    
+                    
+                    std::sort(temp2.begin(), temp2.end(), [](const std::vector<fpBaseNodeStat<T, Q>> & a, const std::vector<fpBaseNodeStat<T, Q>> & b){ return a.size() < b.size(); });
+                    for(auto vec: temp2){
+                        if (pos2 + vec.size()-1 > BLOCK_SIZE - 1)
+                        {
+                            for(int kk=pos2; kk<BLOCK_SIZE; ++kk)
+                                newfinalbin.push_back(blank_node);
+                            pos2 = 0;
+                        }
+
+                        for(auto vv: vec){
+                            newfinalbin.push_back(vv);
+                            pos2 = (pos2+1)%BLOCK_SIZE;
+                        }
+                    }
+                    //std::sort(classwise_res.begin(), classwise_res.end(), [](const std::vector<fpBaseNodeStat<T, Q>> & a, const std::vector<fpBaseNodeStat<T, Q>> & b){ return a.size() < b.size(); });
+                    for(auto vec: classwise_res){
+                        for(auto vv: vec){
+                            newfinalbin.push_back(vv);
+                        }
+                    }
+                    siz = newfinalbin.size();
+                    std::cout<<"newfinalbin size: "<<newfinalbin.size()<<"\n";
+                    fflush(stdout);
+                    std::cout<<"finalbin size: "<<finalbin.size()<<"\n";
+                    fflush(stdout);
+                    nodeNewIdx.clear();
+                    treeRootPos.clear();
+                    for(int i=0; i<siz; ++i){
+                        if(!(newfinalbin[i].returnLeftNodeID() == -1 && newfinalbin[i].returnRightNodeID() == -1) ){
+                            nodeNewIdx.insert(std::pair<int, int>(newfinalbin[i].getID(), i));
+                            if (newfinalbin[i].returnDepth() == 0 && i>=numClasses){
+                                treeRootPos.push_back(i); 
+                            }
+                        }
+                    }
+                    //TODO: treerootpos.clear and reset
+                    //TODO nodeNewIdx
+                    std::cout<<"finish twicce here here \n";
+                    fflush(stdout);
+                    for (auto i=numClasses; i<siz; i++){
+                        if(!(newfinalbin[i].returnLeftNodeID() == -1 && newfinalbin[i].returnRightNodeID() == -1) ){
+                            newfinalbin[i].setLeftValue(nodeNewIdx[finalbin[newfinalbin[i].returnLeftNodeID()].getID()]);
+                            newfinalbin[i].setRightValue(nodeNewIdx[finalbin[newfinalbin[i].returnRightNodeID()].getID()]);
+                        }
+                        //		finalbin[i].setDepth(bin[nodeNewIdx[i]].returnDepth());
+                    }
+                    finalbin.clear();
+                    for(auto i: newfinalbin)
+                        finalbin.push_back(i);
+                    
+                    std::cout<<"finish thrice thrice here here \n";
+                    fflush(stdout);
                 }
 
 

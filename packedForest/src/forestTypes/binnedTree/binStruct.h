@@ -681,7 +681,7 @@ namespace fp{
 						for( q=0; q<numOfTreesInBin; ++q){
 #pragma omp critical 
 							if(bin[currNode[q]].isInternalNodeFront()){
-								v.push_back(currNode[q]/BLOCK_SIZE);
+                                v.push_back(currNode[q]/BLOCK_SIZE);
                                 		//		v_num_nodes.push_back(currNode[q]);
                                 				featureNum = bin[currNode[q]].returnFeatureNumber();
 								featureVal = fpSingleton::getSingleton().returnTestFeatureVal(featureNum,observationNum);
