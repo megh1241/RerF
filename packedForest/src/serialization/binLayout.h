@@ -1084,11 +1084,12 @@ namespace fp{
                     std::vector<fpBaseNodeStat<T, Q>> newfinalbin; 
                     for(int i=0; i<numClasses; ++i)
                         newfinalbin.push_back(finalbin[i]);
-                    std::vector<std::vector<fpBaseNodeStat<T, Q>>> classwise_res;
+                    std::vector<std::vector< std::vector<fpBaseNodeStat<T, Q>>>> classwise_res;
+                    std::vector<std::vector< std::vector<fpBaseNodeStat<T, Q>>>> classwise_res_2;
                     std::vector<fpBaseNodeStat<T, Q>> temp;
                     std::vector<std::vector<fpBaseNodeStat<T, Q>>> temp2;
                     for(int i=0; i<numClasses; i++){
-                        classwise_res.push_back(temp);
+                        classwise_res.push_back(temp2);
                     }
                     pos_in_block = numClasses;
                     int blankflag = 0;
@@ -1116,11 +1117,9 @@ namespace fp{
                             }
                             else{
                                 temp2.push_back(temp);
-                                /*
-                                int classno = findClass(temp);
-                                for(auto j: temp)
-                                    classwise_res[classno].push_back(j);
-                                */
+                                //int classno = findClass(temp);
+                                //for(auto j: temp)
+                                  //  classwise_res[classno].push_back(temp);
                             }
                             blankflag = 0;
                             temp.clear();
@@ -1130,9 +1129,16 @@ namespace fp{
                     fpBaseNodeStat<T, Q> blank_node = genBlankNode();
                     int pos2 = (newfinalbin.size())%BLOCK_SIZE;
                     
+                   /*for (auto class1 : classwise_res){
+                        std::sort(class1.begin(), class1.end(), [](const std::vector<fpBaseNodeStat<T, Q>> & a, const std::vector<fpBaseNodeStat<T,      Q>> & b){ return a.size() < b.size(); });
+                        classwise_res_2.push_back(class1);
+                        
+                   }*/
+                    //std::sort(temp2.begin(), temp2.end(), [](const std::vector<fpBaseNodeStat<T, Q>> & a, const std::vector<fpBaseNodeStat<T, Q>> & b){ return a.size() < b.size(); });
+                    //std::sort(classwise_res.begin(), classwise_res.end(), [](const std::vector<fpBaseNodeStat<T, Q>> & a, const std::vector<fpBaseNodeStat<T, Q>> & b){ return a.size() < b.size(); });
                     
-                    std::sort(temp2.begin(), temp2.end(), [](const std::vector<fpBaseNodeStat<T, Q>> & a, const std::vector<fpBaseNodeStat<T, Q>> & b){ return a.size() < b.size(); });
-                    for(auto vec: temp2){
+                    //for(auto temp3: classwise_res_2){
+                    /*for(auto vec: temp2){
                         if (pos2 + vec.size()-1 > BLOCK_SIZE - 1)
                         {
                             for(int kk=pos2; kk<BLOCK_SIZE; ++kk)
@@ -1144,9 +1150,9 @@ namespace fp{
                             newfinalbin.push_back(vv);
                             pos2 = (pos2+1)%BLOCK_SIZE;
                         }
-                    }
-                    //std::sort(classwise_res.begin(), classwise_res.end(), [](const std::vector<fpBaseNodeStat<T, Q>> & a, const std::vector<fpBaseNodeStat<T, Q>> & b){ return a.size() < b.size(); });
-                    for(auto vec: classwise_res){
+                    }*/
+                    //}
+                    for(auto vec: temp2){
                         for(auto vv: vec){
                             newfinalbin.push_back(vv);
                         }
